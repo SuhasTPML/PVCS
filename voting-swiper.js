@@ -184,11 +184,14 @@
       watchSlidesProgress: true,
       followFinger: true,
       threshold: 0,
-      touchRatio: 0.85,
-      touchAngle: 30,
+      touchRatio: 1,
+      touchAngle: 45,
       speed: 500,
       spaceBetween: 18,
       slideToClickedSlide: true,
+      preventClicks: true,
+      preventClicksPropagation: true,
+      passiveListeners: false,
       mousewheel: {
         enabled: true,
         forceToAxis: true,
@@ -202,7 +205,8 @@
       breakpoints: {
         760: {
           threshold: 8,
-          touchRatio: 1
+          touchRatio: 1,
+          touchAngle: 45
         }
       },
       effect: "creative",

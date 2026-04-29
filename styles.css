@@ -1301,6 +1301,7 @@ body[data-page="voting-swiper"] .vote-swiper {
   padding: 10px 0 18px;
   overflow: visible;
   touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 body[data-page="voting-swiper"] .vote-swiper .swiper-wrapper {
