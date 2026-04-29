@@ -1059,23 +1059,25 @@ body[data-page="voting"] .page-shell {
   overflow: hidden;
   border-radius: 28px;
   border: 1px solid rgba(255, 248, 239, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 38%),
-    linear-gradient(180deg, rgba(120, 13, 25, 0.94), rgba(43, 5, 10, 0.98));
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.34);
+  background: linear-gradient(135deg, var(--card-a), var(--card-b));
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(18px);
   transform-origin: center center;
   transition: transform 260ms ease, opacity 260ms ease, filter 260ms ease, box-shadow 260ms ease;
 }
 
 .vote-card::before {
-  content: "";
+  display: none;
+}
+
+.vote-card__photo {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.08), transparent 26%);
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 0;
 }
 
 .vote-card__visual {
@@ -1083,22 +1085,16 @@ body[data-page="voting"] .page-shell {
   display: grid;
   align-content: start;
   gap: 10px;
-  min-height: 54%;
   padding: 20px;
-  background:
-    linear-gradient(150deg, rgba(255, 255, 255, 0.22), transparent 54%),
-    linear-gradient(135deg, var(--card-a), var(--card-b));
+  background: rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1;
 }
 
 .vote-card__visual::after {
-  content: "";
-  position: absolute;
-  inset: auto -18% -26% auto;
-  width: 180px;
-  height: 180px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 68%);
-  opacity: 0.72;
+  display: none;
 }
 
 .vote-card__rank,
@@ -1131,6 +1127,7 @@ body[data-page="voting"] .page-shell {
   color: rgba(255, 248, 239, 0.9);
 }
 
+
 .vote-card__visual h3 {
   margin: 0;
   max-width: 10ch;
@@ -1141,12 +1138,17 @@ body[data-page="voting"] .page-shell {
   letter-spacing: -0.03em;
 }
 
+
 .vote-card__body {
-  display: grid;
-  gap: 16px;
-  padding: 18px 20px 20px;
-  background: linear-gradient(180deg, rgba(33, 2, 6, 0.2), rgba(33, 2, 6, 0.5));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 20px 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.72) 50%);
   border-radius: 0 0 28px 28px;
+  position: relative;
+  z-index: 1;
 }
 
 .vote-card__summary {
@@ -1186,6 +1188,29 @@ body[data-page="voting"] .page-shell {
 
 .vote-card__cta {
   padding-inline: 18px;
+}
+
+.vote-card__cta--strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #ffcb61, #f5a623);
+  border: none;
+  border-radius: 0 0 28px 28px;
+  color: #3a1200;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 160ms ease;
+}
+
+.vote-card__cta--strip:hover {
+  filter: brightness(1.06);
 }
 
 .vote-card__ghost {
@@ -1339,13 +1364,11 @@ body[data-page="voting-swiper"] .vote-swiper .swiper-slide .vote-card {
 body[data-page="voting-swiper"] .vote-swiper .swiper-slide .vote-card__cta {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px);
 }
 
 body[data-page="voting-swiper"] .vote-swiper .swiper-slide-active .vote-card__cta {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
 }
 
 body[data-page="voting-swiper"] .vote-swiper .swiper-slide:not(.swiper-slide-active) .vote-card__ghost {

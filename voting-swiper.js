@@ -40,6 +40,7 @@
     return (
       '<article class="vote-card vote-card--swiper" data-nominee-id="' + escapeHtml(nominee.id) + '" ' +
         'style="--card-a:' + nominee.accent[0] + '; --card-b:' + nominee.accent[1] + ';">' +
+        (nominee.image ? '<img class="vote-card__photo" src="' + escapeHtml(nominee.image) + '" alt="' + escapeHtml(nominee.title) + '">' : '') +
         '<div class="vote-card__visual">' +
           '<span class="vote-card__rank">#' + String(index + 1).padStart(2, "0") + "</span>" +
           '<span class="vote-card__subtitle">' + escapeHtml(nominee.subtitle) + "</span>" +
@@ -47,16 +48,10 @@
         "</div>" +
         '<div class="vote-card__body">' +
           '<p class="vote-card__summary">' + escapeHtml(nominee.summary) + "</p>" +
-          '<div class="vote-card__footer">' +
-            '<div class="vote-card__votes">' +
-              '<strong data-vote-count-nominee="' + escapeHtml(nominee.id) + '">' + formatNumber(nominee.votes) + "</strong>" +
-              "<span>votes</span>" +
-            "</div>" +
-            '<button class="btn btn--primary vote-card__cta" type="button" data-vote-now="true" data-category-id="' + escapeHtml(category.id) + '"' +
-              (isActive ? "" : ' tabindex="-1" aria-hidden="true"') + ">" +
-              "Vote Now" +
-            "</button>" +
-          "</div>" +
+          '<button class="vote-card__cta vote-card__cta--strip" type="button" data-vote-now="true" data-category-id="' + escapeHtml(category.id) + '"' +
+            (isActive ? "" : ' tabindex="-1" aria-hidden="true"') + ">" +
+            "Vote Now" +
+          "</button>" +
         "</div>" +
       "</article>"
     );
@@ -98,14 +93,7 @@
       return null;
     }
 
-    root.innerHTML = [
-      '<section class="section-card voting-intro voting-intro--swiper">',
-        '<p class="eyebrow">Voting Swiper Copy</p>',
-        '<h1>Category carousels powered by Swiper</h1>',
-        '<p>This version keeps the same voting data, but uses Swiper for the swipe interaction and slide motion.</p>',
-        '<a class="btn btn--ghost" href="voting.html">Open custom version</a>',
-      "</section>"
-    ].join("") + siteData.votingCategories.map(renderCategory).join("");
+    root.innerHTML = siteData.votingCategories.map(renderCategory).join("");
 
     return root;
   }

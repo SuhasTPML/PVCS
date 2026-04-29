@@ -12,6 +12,7 @@ window.CINE_SITE_DATA = {
           title: "Sunlit Frames",
           subtitle: "Feature Drama",
           summary: "A character-first story with a warm visual language and a slow, confident payoff.",
+          image: "https://picsum.photos/seed/sunlit/400/560",
           votes: 184,
           accent: ["#ffca77", "#8f2d3a"]
         },
@@ -20,6 +21,7 @@ window.CINE_SITE_DATA = {
           title: "Midnight Harbor",
           subtitle: "Neo-Noir Thriller",
           summary: "A sharp-edged mystery built on atmosphere, pacing, and a strong final reveal.",
+          image: "https://picsum.photos/seed/midnight/400/560",
           votes: 223,
           accent: ["#8dd8ff", "#27406f"]
         },
@@ -28,6 +30,7 @@ window.CINE_SITE_DATA = {
           title: "River of Dust",
           subtitle: "Period Ensemble",
           summary: "A patient ensemble drama with lived-in performances and a memorable final stretch.",
+          image: "https://picsum.photos/seed/riverdust/400/560",
           votes: 156,
           accent: ["#ffd1ad", "#6c452e"]
         }
@@ -45,6 +48,7 @@ window.CINE_SITE_DATA = {
           title: "Anand Rao",
           subtitle: "Framed Silence",
           summary: "A careful, precise style that lets performances breathe while every frame does work.",
+          image: "https://picsum.photos/seed/anandrao/400/560",
           votes: 142,
           accent: ["#ffe09b", "#7a2a33"]
         },
@@ -53,6 +57,7 @@ window.CINE_SITE_DATA = {
           title: "Meera Iyer",
           subtitle: "Glass City",
           summary: "A modern visual rhythm with crisp blocking and fearless tonal shifts scene to scene.",
+          image: "https://picsum.photos/seed/meeraiyer/400/560",
           votes: 197,
           accent: ["#c7f1ff", "#27556f"]
         },
@@ -61,6 +66,7 @@ window.CINE_SITE_DATA = {
           title: "Karthik Venkat",
           subtitle: "Second Light",
           summary: "An emotionally controlled performance map with a particularly strong final act.",
+          image: "https://picsum.photos/seed/karthikv/400/560",
           votes: 161,
           accent: ["#ffe3b7", "#6d4931"]
         }
@@ -78,6 +84,7 @@ window.CINE_SITE_DATA = {
           title: "Niranjana",
           subtitle: "Lead Actress",
           summary: "A restrained performance that grows in impact as the story becomes more intimate.",
+          image: "https://picsum.photos/seed/niranjana/400/560",
           votes: 205,
           accent: ["#ffdca8", "#8a3242"]
         },
@@ -86,6 +93,7 @@ window.CINE_SITE_DATA = {
           title: "Rahul Shetty",
           subtitle: "Lead Actor",
           summary: "A high-energy performance with sharp comic timing and clean emotional turns.",
+          image: "https://picsum.photos/seed/rahulshetty/400/560",
           votes: 188,
           accent: ["#a6e2ff", "#31567c"]
         },
@@ -94,6 +102,7 @@ window.CINE_SITE_DATA = {
           title: "Sahana Prakash",
           subtitle: "Supporting Actor",
           summary: "A scene-stealing turn that lands small beats with uncommon precision and warmth.",
+          image: "https://picsum.photos/seed/sahanaprakash/400/560",
           votes: 173,
           accent: ["#ffe4bf", "#734b2e"]
         }
@@ -111,6 +120,7 @@ window.CINE_SITE_DATA = {
           title: "The Last Reel",
           subtitle: "Festival Favorite",
           summary: "A layered crowd-pleaser that keeps momentum while still landing emotional beats.",
+          image: "https://picsum.photos/seed/lastreel/400/560",
           votes: 236,
           accent: ["#ffd9a2", "#835a23"]
         },
@@ -119,6 +129,7 @@ window.CINE_SITE_DATA = {
           title: "City Parade",
           subtitle: "Musical Drama",
           summary: "Big energy, strong music cues, and a polished finish that plays well with audiences.",
+          image: "https://picsum.photos/seed/cityparade/400/560",
           votes: 219,
           accent: ["#c2f4ff", "#2d6281"]
         },
@@ -127,6 +138,7 @@ window.CINE_SITE_DATA = {
           title: "After the Rain",
           subtitle: "Family Drama",
           summary: "A heartfelt, accessible story that gives every character a satisfying moment.",
+          image: "https://picsum.photos/seed/afterrain/400/560",
           votes: 201,
           accent: ["#ffe0c0", "#6f4c33"]
         }
