@@ -541,25 +541,28 @@ body[data-page="home"] .page-shell {
 .sponsor-chip {
   min-width: 152px;
   display: grid;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
-  padding: 12px;
+  justify-items: center;
+  padding: 12px 14px;
   border: 1px solid rgba(255, 248, 239, 0.12);
-  border-radius: 20px;
+  border-radius: 14px;
   background: rgba(255, 248, 239, 0.96);
   color: #4a1112;
+  text-align: center;
 }
 
 .sponsor-chip img {
-  height: 30px;
+  height: 38px;
   width: auto;
   object-fit: contain;
 }
 
 .sponsor-chip__label {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: #7b3940;
+  text-align: center;
 }
 
 .content-block {
