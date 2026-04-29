@@ -183,7 +183,7 @@
       grabCursor: true,
       watchSlidesProgress: true,
       followFinger: true,
-      threshold: 2,
+      threshold: 0,
       touchRatio: 0.85,
       touchAngle: 30,
       speed: 500,
