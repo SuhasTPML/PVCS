@@ -44,7 +44,7 @@
       return "menu";
     }
     if (page === "index.html") return "home";
-    if (page === "voting.html") return "vote";
+    if (page === "voting.html" || page === "voting-swiper.html") return "vote";
     if (page === "contest.html") return "contest";
     if (page === "process.html") return "process";
     if (page === "about.html") return "about";
@@ -70,7 +70,7 @@
           classes.push("is-emphasis");
         }
         if ((item.pageUrl === "index.html" && currentPage === "home") ||
-            (item.pageUrl === "voting.html" && isVotingPage) ||
+            ((item.pageUrl === "voting.html" || item.pageUrl === "voting-swiper.html") && isVotingPage) ||
             (item.pageUrl === currentPage + ".html")) {
           classes.push("is-active");
         }
