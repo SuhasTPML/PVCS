@@ -186,6 +186,7 @@
       threshold: 0,
       touchRatio: 1,
       touchAngle: 45,
+      longSwipesRatio: 0.2,
       speed: 500,
       spaceBetween: 18,
       slideToClickedSlide: true,
