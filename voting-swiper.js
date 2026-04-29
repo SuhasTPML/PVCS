@@ -219,13 +219,13 @@
           translate: ["-88%", 18, -220],
           rotate: [0, 0, -8],
           scale: 0.84,
-          opacity: 0.78
+          opacity: 1
         },
         next: {
           translate: ["88%", 18, -220],
           rotate: [0, 0, 8],
           scale: 0.84,
-          opacity: 0.78
+          opacity: 1
         }
       },
       on: {
