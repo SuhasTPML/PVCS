@@ -2,7 +2,7 @@ window.CINE_SITE_DATA = {
   votingCategories: [
     {
       id: "best-film",
-      label: "Category 01",
+      label: "Category",
       title: "Best Film",
       description: "Pick the film that balanced craft, emotion, and audience pull the best.",
       hint: "Swipe horizontally to move through nominees. Tap Vote Now on the centered card.",
@@ -38,7 +38,7 @@ window.CINE_SITE_DATA = {
     },
     {
       id: "best-director",
-      label: "Category 02",
+      label: "Category",
       title: "Best Director",
       description: "A category for the most controlled visual storytelling and strongest command of tone.",
       hint: "Use the side arrows or swipe to spotlight another nominee.",
@@ -74,7 +74,7 @@ window.CINE_SITE_DATA = {
     },
     {
       id: "best-performance",
-      label: "Category 03",
+      label: "Category",
       title: "Best Performance",
       description: "The performance that felt the most present, textured, and memorable on screen.",
       hint: "Voting always happens on the main card. The two side cards are preview states.",
@@ -110,7 +110,7 @@ window.CINE_SITE_DATA = {
     },
     {
       id: "audience-choice",
-      label: "Category 04",
+      label: "Category",
       title: "Audience Choice",
       description: "The crowd favorite category with the broadest appeal across genres and formats.",
       hint: "Scroll down for the next category after you cast your vote.",

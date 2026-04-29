@@ -172,7 +172,6 @@
         ' style="--card-a: ' + nominee.accent[0] + '; --card-b: ' + nominee.accent[1] + ';">' +
         '<div class="vote-card__visual">' +
           '<span class="vote-card__rank">#' + String(index + 1).padStart(2, "0") + "</span>" +
-          '<span class="vote-card__subtitle">' + escapeHtml(nominee.subtitle) + "</span>" +
           '<h3>' + escapeHtml(nominee.title) + "</h3>" +
         "</div>" +
         '<div class="vote-card__body">' +
