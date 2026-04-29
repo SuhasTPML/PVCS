@@ -183,7 +183,9 @@
       grabCursor: true,
       watchSlidesProgress: true,
       followFinger: true,
-      threshold: 8,
+      threshold: 2,
+      touchRatio: 0.85,
+      touchAngle: 30,
       speed: 500,
       spaceBetween: 18,
       slideToClickedSlide: true,
@@ -196,6 +198,12 @@
       keyboard: {
         enabled: true,
         onlyInViewport: true
+      },
+      breakpoints: {
+        760: {
+          threshold: 8,
+          touchRatio: 1
+        }
       },
       effect: "creative",
       creativeEffect: {
