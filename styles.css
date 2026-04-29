@@ -1146,6 +1146,7 @@ body[data-page="voting"] .page-shell {
   gap: 16px;
   padding: 18px 20px 20px;
   background: linear-gradient(180deg, rgba(33, 2, 6, 0.2), rgba(33, 2, 6, 0.5));
+  border-radius: 0 0 28px 28px;
 }
 
 .vote-card__summary {
@@ -1313,6 +1314,7 @@ body[data-page="voting-swiper"] .vote-swiper .swiper-slide {
   z-index: 1;
   width: min(84vw, 360px);
   height: clamp(380px, 62vw, 540px);
+  clip-path: inset(0 round 28px);
   opacity: 0.72;
   transition: opacity 220ms ease;
 }
@@ -1325,6 +1327,7 @@ body[data-page="voting-swiper"] .vote-swiper .swiper-slide-active {
 body[data-page="voting-swiper"] .vote-swiper .swiper-slide-prev,
 body[data-page="voting-swiper"] .vote-swiper .swiper-slide-next {
   z-index: 3;
+  opacity: 1;
 }
 
 body[data-page="voting-swiper"] .vote-swiper .swiper-slide .vote-card {
