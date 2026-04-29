@@ -1507,6 +1507,10 @@ body[data-page="voting-swiper"] .vote-phone-step__summary {
   gap: 8px;
 }
 
+body[data-page="voting-swiper"] .vote-phone-step__summary[hidden] {
+  display: none !important;
+}
+
 body[data-page="voting-swiper"] .vote-summary-card {
   display: grid;
   gap: 6px;
@@ -1514,6 +1518,10 @@ body[data-page="voting-swiper"] .vote-summary-card {
   border-radius: 22px;
   border: 1px solid rgba(255, 248, 239, 0.12);
   background: rgba(255, 248, 239, 0.05);
+}
+
+body[data-page="voting-swiper"] .vote-summary-card[hidden] {
+  display: none !important;
 }
 
 body[data-page="voting-swiper"] .vote-summary-card.is-complete {

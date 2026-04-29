@@ -5,15 +5,15 @@
   }
 
   var suffixes = [
-    "Encore",
-    "Midnight Cut",
-    "Audience Pick",
-    "Final Cut",
-    "Festival Edit",
-    "Gold Reel",
-    "Studio Pick",
-    "Extended Cut",
-    "Spotlight"
+    "ವಿಶೇಷ ಆವೃತ್ತಿ",
+    "ರಾತ್ರಿ ಕಟ್",
+    "ಜನರ ಆಯ್ಕೆ",
+    "ಅಂತಿಮ ಕಟ್",
+    "ಉತ್ಸವ ಆವೃತ್ತಿ",
+    "ಸುವರ್ಣ ರೀಲ್",
+    "ಸ್ಟುಡಿಯೋ ಆಯ್ಕೆ",
+    "ವಿಸ್ತೃತ ಆವೃತ್ತಿ",
+    "ವಿಶೇಷ ಬೆಳಕು"
   ];
 
   siteData.votingCategories = siteData.votingCategories.map(function (category) {
@@ -23,10 +23,10 @@
     suffixes.forEach(function (suffix, index) {
       var source = seed[index % seed.length];
       nominees.push({
-        id: category.id + "-" + String(index + 4) + "-" + suffix.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        id: category.id + "-" + String(index + 4),
         title: source.title + " " + suffix,
         subtitle: source.subtitle,
-        summary: source.summary + " Demo variant " + String(index + 4) + " for carousel testing.",
+        summary: source.summary + " ಕಾರುಸೆಲ್ ಪರೀಕ್ಷೆಗೆ ರೂಪಾಂತರ " + String(index + 4) + ".",
         votes: source.votes + (index + 1) * 7,
         accent: source.accent
       });

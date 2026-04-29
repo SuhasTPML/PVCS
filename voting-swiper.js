@@ -162,7 +162,7 @@
         '<h3>' + escapeHtml(category.title) + "</h3>" +
         '<p class="vote-summary-card__choice" data-summary-choice>Not selected yet</p>' +
         '<button class="vote-summary-card__link" type="button" data-summary-jump="' + escapeHtml(category.id) + '">' +
-          "Change vote" +
+          "Vote now" +
         "</button>" +
       "</article>"
     );
@@ -330,6 +330,7 @@
     var formNode = qs("[data-phone-form]", section);
     var successPanel = qs("[data-success-panel]", section);
     var successCopy = qs("[data-success-copy]", section);
+    var summaryGrid = qs("[data-summary-grid]", section);
     section.classList.toggle("is-locked", !allComplete);
     section.classList.toggle("is-unlocked", allComplete);
     section.classList.toggle("is-submitting", flow.submissionStatus === "submitting");
@@ -349,6 +350,7 @@
       progressFill.style.width = Math.round((completed / total) * 100) + "%";
     }
 
+    var pendingCount = 0;
     qsa("[data-summary-card]", section).forEach(function (card, index) {
       var category = categories[index];
       if (!category) {
@@ -357,15 +359,28 @@
 
       var state = getCategoryState()[category.id] || {};
       var choiceNode = qs("[data-summary-choice]", card);
-      card.classList.toggle("is-complete", !!state.selectedNomineeTitle);
+      var jumpButton = qs("[data-summary-jump]", card);
+      var isComplete = !!state.selectedNomineeTitle;
+
+      card.classList.toggle("is-complete", isComplete);
+      card.hidden = isComplete;
+      if (!isComplete) {
+        pendingCount += 1;
+      }
+
       if (choiceNode) {
         choiceNode.textContent = state.selectedNomineeTitle || "Not selected yet";
       }
+
+      if (jumpButton) {
+        jumpButton.textContent = "Vote now";
+        jumpButton.disabled = flow.submissionStatus === "submitting" || isComplete;
+      }
     });
 
-    qsa("[data-summary-jump]", section).forEach(function (button) {
-      button.disabled = flow.submissionStatus === "submitting";
-    });
+    if (summaryGrid) {
+      summaryGrid.hidden = pendingCount === 0;
+    }
 
     if (phoneInput) {
       phoneInput.value = flow.phoneInput;
