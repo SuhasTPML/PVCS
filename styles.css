@@ -759,11 +759,19 @@ h2,
 
 .side-menu__section {
   display: grid;
-  gap: 6px;
+  gap: 4px;
+}
+
+[data-menu-links] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
 }
 
 .side-menu__section-title {
-  padding: 0 4px;
+  padding: 0 2px;
   color: rgba(255, 248, 239, 0.72);
   font-size: 0.68rem;
   font-weight: 600;
@@ -776,7 +784,7 @@ h2,
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 4px;
+  gap: 0;
 }
 
 .side-menu__list li {
@@ -789,11 +797,12 @@ h2,
   align-items: center;
   gap: 10px;
   min-height: 38px;
-  padding: 8px 10px;
-  border-radius: 14px;
+  padding: 8px 12px;
+  border-radius: 0;
   background: rgba(255, 248, 239, 0.04);
   line-height: 1.1;
   transition: background-color 180ms ease, transform 180ms ease, color 180ms ease;
+  width: 100%;
 }
 
 .side-menu li a:hover,
@@ -841,6 +850,14 @@ h2,
 
 .side-menu > a.btn {
   margin-top: 0;
+}
+
+.side-menu__section + .side-menu__section {
+  padding-top: 8px;
+}
+
+.side-menu__section .side-menu__list li + li a {
+  border-top: 1px solid rgba(255, 248, 239, 0.08);
 }
 
 .popup {
