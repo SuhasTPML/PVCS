@@ -15,9 +15,31 @@
       vote: "M5 6.5h14v11H5zm2 2v7h10v-7zm2.5-4h5l1 2h-7z",
       contest: "M7 5h10v3h2v10H5V8h2zm2 5.5 2 2 4-4",
       process: "M6 6h12v3H6zm0 5h12v3H6zm0 5h8v3H6z",
-      menu: "M4.5 7h15M4.5 12h15M4.5 17h15"
+      menu: "M4.5 7h15M4.5 12h15M4.5 17h15",
+      about: "M12 2.75a3.25 3.25 0 1 1 0 6.5a3.25 3.25 0 0 1 0-6.5zm-4 8.75h8a2 2 0 0 1 2 2v7H6v-7a2 2 0 0 1 2-2z",
+      jury: "M12 3.5l6 2v4.5c0 4-2.5 7.5-6 10-3.5-2.5-6-6-6-10V5.5l6-2zm0 3a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-2 4.5v1h4v-1h-4z",
+      cineCorner: "M6 7h12v10H6zm2 2v6h8V9H8zm1 1.5h6v1H9zm0 2h6v1H9z",
+      previousYears: "M7 5h10v3H7zm-1 5h12v9H6zm3-3h6v2H9z",
+      terms: "M7 4.5h10l2 2V19.5H7zM9 9h6M9 12h6M9 15h4"
     };
     return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (pathMap[name] || pathMap.menu) + '"/></svg>';
+  }
+
+  function itemIconName(item) {
+    var page = item.pageUrl || "";
+    if (item.menuTrigger) {
+      return "menu";
+    }
+    if (page === "index.html") return "home";
+    if (page === "voting.html") return "vote";
+    if (page === "contest.html") return "contest";
+    if (page === "process.html") return "process";
+    if (page === "about.html") return "about";
+    if (page === "jury.html") return "jury";
+    if (page === "cine-corner.html") return "cineCorner";
+    if (page === "previous-years.html") return "previousYears";
+    if (page === "terms.html") return "terms";
+    return "menu";
   }
 
   function renderBottomNav() {
@@ -53,15 +75,50 @@
 
   function renderMenu() {
     var list = qs("[data-menu-links]");
-    if (!list || !siteData.menuLinks) {
+    if (!list) {
       return;
     }
 
-    list.innerHTML = siteData.menuLinks
-      .map(function (item) {
-        return '<li><a href="' + item.pageUrl + '">' + item.label + "</a></li>";
+    var currentPage = document.body.getAttribute("data-page") || "home";
+    var primaryLinks = (siteData.bottomNav || [])
+      .filter(function (item) {
+        return !item.menuTrigger;
       })
-      .join("");
+      .map(function (item) {
+        return {
+          label: item.label,
+          pageUrl: item.pageUrl
+        };
+      });
+    var secondaryLinks = siteData.menuLinks || [];
+    function renderLink(item) {
+      var classes = [];
+      if ((item.pageUrl === "index.html" && currentPage === "home") ||
+          (item.pageUrl === currentPage + ".html")) {
+        classes.push("is-active");
+      }
+      return '<li><a' +
+        (classes.length ? ' class="' + classes.join(" ") + '"' : "") +
+        ' href="' + item.pageUrl + '">' +
+        '<span class="side-menu__icon">' + createNavIcon(itemIconName(item)) + '</span>' +
+        '<span class="side-menu__label">' + item.label + '</span>' +
+        '<span class="side-menu__chevron" aria-hidden="true">›</span>' +
+        "</a></li>";
+    }
+
+    list.innerHTML =
+      '<section class="side-menu__section">' +
+        '<div class="side-menu__section-title">ಮುಖ್ಯ ವಿಭಾಗಗಳು</div>' +
+        '<ul class="side-menu__list">' +
+          primaryLinks.map(renderLink).join("") +
+        "</ul>" +
+      "</section>" +
+      '<section class="side-menu__section">' +
+        '<div class="side-menu__section-title">ಇತರೆ</div>' +
+        '<ul class="side-menu__list">' +
+          secondaryLinks.map(renderLink).join("") +
+        "</ul>" +
+      "</section>";
   }
 
   function renderSponsors() {
