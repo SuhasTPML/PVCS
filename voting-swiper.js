@@ -111,7 +111,7 @@
     });
   }
 
-  function renderCard(category, nominee, index, isActive) {
+  function renderCard(category, nominee, index) {
     return (
       '<article class="vote-card vote-card--swiper" data-nominee-id="' + escapeHtml(nominee.id) + '" ' +
         'style="--card-a:' + nominee.accent[0] + '; --card-b:' + nominee.accent[1] + ';">' +
@@ -122,10 +122,6 @@
         "</div>" +
         '<div class="vote-card__body">' +
           '<p class="vote-card__summary">' + escapeHtml(nominee.summary) + "</p>" +
-          '<button class="vote-card__cta vote-card__cta--strip" type="button" data-vote-now="true" data-category-id="' + escapeHtml(category.id) + '"' +
-            (isActive ? "" : ' tabindex="-1" aria-hidden="true"') + ">" +
-            "Vote Now" +
-          "</button>" +
         "</div>" +
       "</article>"
     );
@@ -145,11 +141,16 @@
           '<div class="swiper vote-swiper" data-swiper-id="' + escapeHtml(category.id) + '" aria-label="' + escapeHtml(category.title) + ' nominees">' +
             '<div class="swiper-wrapper">' +
               category.nominees.map(function (nominee, index) {
-                return '<div class="swiper-slide" data-nominee-id="' + escapeHtml(nominee.id) + '">' + renderCard(category, nominee, index, index === 0) + "</div>";
+                return '<div class="swiper-slide" data-nominee-id="' + escapeHtml(nominee.id) + '">' + renderCard(category, nominee, index) + "</div>";
               }).join("") +
             "</div>" +
           "</div>" +
           '<button class="vote-carousel__control vote-carousel__control--next" type="button" data-swiper-next aria-label="Next nominee">&rsaquo;</button>' +
+        "</div>" +
+        '<div class="vote-category__action">' +
+          '<button class="vote-category__vote-btn" type="button" data-vote-now="true" data-category-id="' + escapeHtml(category.id) + '">' +
+            "Vote Now" +
+          "</button>" +
         "</div>" +
         '<p class="vote-category__hint">' + escapeHtml(category.hint) + "</p>" +
       "</section>"
@@ -226,34 +227,23 @@
 
   function refreshActiveButtons(section, category) {
     var state = getCategoryState()[category.id];
+    var button = qs("[data-vote-now]", section);
+    if (!button) {
+      return;
+    }
+
+    var isSelected = !!state.selectedNomineeId;
+    var isLocked = isSelected && !state.isEditing;
+
     qsa(".swiper-slide", section).forEach(function (slide) {
-      var button = qs("[data-vote-now]", slide);
-      if (!button) {
-        return;
-      }
-
-      var nomineeId = slide.getAttribute("data-nominee-id");
-      if (!nomineeId) {
-        var card = qs("[data-nominee-id]", slide);
-        nomineeId = card ? card.getAttribute("data-nominee-id") : "";
-      }
-      var isActive = slide.classList.contains("swiper-slide-active");
-      var isSelected = !!state.selectedNomineeId && state.selectedNomineeId === nomineeId;
-      var isLocked = !!state.selectedNomineeId && !state.isEditing;
-
-      slide.classList.toggle("is-selected", isSelected);
-      button.textContent = isSelected ? (isLocked ? "Change vote" : "Vote Now") : "Vote Now";
-      button.setAttribute("aria-pressed", isSelected ? "true" : "false");
-      button.classList.toggle("is-selected", isSelected);
-
-      if (isActive) {
-        button.removeAttribute("tabindex");
-        button.removeAttribute("aria-hidden");
-      } else {
-        button.setAttribute("tabindex", "-1");
-        button.setAttribute("aria-hidden", "true");
-      }
+      var nomineeId = slide.getAttribute("data-nominee-id") ||
+        (qs("[data-nominee-id]", slide) || {}).getAttribute && qs("[data-nominee-id]", slide).getAttribute("data-nominee-id") || "";
+      slide.classList.toggle("is-selected", isSelected && state.selectedNomineeId === nomineeId);
     });
+
+    button.textContent = isLocked ? "Change vote" : "Vote Now";
+    button.setAttribute("aria-pressed", isLocked ? "true" : "false");
+    button.classList.toggle("is-selected", isLocked);
   }
 
   function syncCategoryInteraction(section, category) {
@@ -829,16 +819,6 @@
 
       registerVote(categoryId);
     }
-
-    root.addEventListener("touchend", function (event) {
-      var voteButton = event.target.closest("[data-vote-now]");
-      if (!voteButton) {
-        return;
-      }
-
-      event.preventDefault();
-      handleVoteButton(voteButton);
-    }, { capture: true, passive: false });
 
     root.addEventListener("click", function (event) {
       var voteButton = event.target.closest("[data-vote-now]");
