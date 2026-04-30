@@ -1931,7 +1931,8 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
 
   body[data-page="voting-swiper"] .vote-category--swiper {
     min-height: calc(100dvh - var(--header-h) - var(--bottom-nav-h) - 24px);
-    padding: 16px;
+    gap: 12px;
+    padding: 12px;
   }
 
   body[data-page="voting-swiper"] .vote-carousel--swiper {
@@ -1945,18 +1946,58 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
     font-size: 1.45rem;
   }
 
+  body[data-page="voting-swiper"] .voting-intro {
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  body[data-page="voting-swiper"] .voting-intro h1 {
+    font-size: clamp(1.28rem, 4.5vw, 1.75rem);
+    line-height: 0.98;
+  }
+
+  body[data-page="voting-swiper"] .voting-intro p:last-child {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
   body[data-page="voting-swiper"] .vote-swiper .swiper-slide {
     width: min(86vw, 320px);
-    height: 430px;
+    height: 360px;
   }
 
   body[data-page="voting-swiper"] .vote-card {
-    min-height: 430px;
+    min-height: 360px;
+  }
+
+  body[data-page="voting-swiper"] .vote-card__visual {
+    gap: 8px;
+    padding: 16px;
+  }
+
+  body[data-page="voting-swiper"] .vote-card__visual h3 {
+    font-size: clamp(1.35rem, 4.3vw, 2rem);
   }
 
   body[data-page="voting-swiper"] .vote-card__body {
-    --vote-card-body-x: 16px;
-    padding: 16px var(--vote-card-body-x) 0;
+    --vote-card-body-x: 14px;
+    gap: 8px;
+    padding: 12px var(--vote-card-body-x) 0;
+  }
+
+  body[data-page="voting-swiper"] .vote-card__summary {
+    -webkit-line-clamp: 2;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  body[data-page="voting-swiper"] .vote-category__hint {
+    font-size: 0.84rem;
+    line-height: 1.4;
   }
 
   body[data-page="voting-swiper"] .vote-phone-step {

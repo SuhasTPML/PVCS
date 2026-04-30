@@ -282,3 +282,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: Horizontal swipe still worked on mobile, but tapping `Vote Now` could do nothing because touch interaction suppressed the synthetic click.
 - Working approach: Handle `pointerup` for touch/pen targets in capture phase, route it through the same vote-action handler, and keep a short duplicate-action guard so the later `click` does not double-submit.
 - Next-time rule: For CTA buttons embedded inside swipeable mobile surfaces, do not trust bubbled `click` alone; add a touch-safe `pointerup` path with deduping.
+
+## 2026-04-30 - Check mobile hit geometry before assuming a tap-handler bug
+- Context: Investigating why `Vote Now` on the swiper cards still failed on mobile after adding touch-safe event handling.
+- Command/workflow: Browser debugging of the live `/PVCS/voting` route with Playwright geometry and hit-testing checks.
+- Failed approach: Focused first on event-handler logic (`click` / `pointerup`) without verifying whether the visible CTA was actually inside the tappable viewport.
+- Symptom: The code paths looked correct, but users still could not activate the card CTA on mobile.
+- Working approach: Measure the button and bottom-nav rectangles and use `elementFromPoint(...)` on the button area; this showed the CTA was mostly below the viewport and the only visible sliver was inside the fixed bottom-nav zone.
+- Next-time rule: For mobile tap bugs in transformed/swipe layouts, inspect live element geometry and hit-testing first; a layout/overlay collision can fully explain a “tap does nothing” report even when event handlers are wired correctly.
