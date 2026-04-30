@@ -1967,37 +1967,16 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
 
   body[data-page="voting-swiper"] .vote-swiper .swiper-slide {
     width: min(86vw, 320px);
-    height: 360px;
+    height: 430px;
   }
 
   body[data-page="voting-swiper"] .vote-card {
-    min-height: 360px;
-  }
-
-  body[data-page="voting-swiper"] .vote-card__visual {
-    gap: 8px;
-    padding: 16px;
-  }
-
-  body[data-page="voting-swiper"] .vote-card__visual h3 {
-    font-size: clamp(1.35rem, 4.3vw, 2rem);
+    min-height: 430px;
   }
 
   body[data-page="voting-swiper"] .vote-card__body {
-    --vote-card-body-x: 14px;
-    gap: 8px;
-    padding: 12px var(--vote-card-body-x) 0;
-  }
-
-  body[data-page="voting-swiper"] .vote-card__summary {
-    -webkit-line-clamp: 2;
-    font-size: 0.92rem;
-    line-height: 1.45;
-  }
-
-  body[data-page="voting-swiper"] .vote-category__hint {
-    font-size: 0.84rem;
-    line-height: 1.4;
+    --vote-card-body-x: 16px;
+    padding: 16px var(--vote-card-body-x) 0;
   }
 
   body[data-page="voting-swiper"] .vote-phone-step {
