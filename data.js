@@ -150,52 +150,52 @@ window.CINE_SITE_DATA = {
     description:
       "2024ರಲ್ಲಿ ಬಿಡುಗಡೆಯಾದ ಕನ್ನಡ ಚಲನಚಿತ್ರಗಳ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸುವ ಮೂರನೇ ಆವೃತ್ತಿಯ ವೇದಿಕೆ.",
     ctaLabel: "ಆಯ್ಕೆ ಪ್ರಕ್ರಿಯೆ ನೋಡಿ",
-    ctaLink: "process.html"
+    ctaLink: "#/process"
   },
   sponsors: [
     {
       label: "Presenting Sponsor",
       imageUrl: "https://images.assettype.com/prajavani/2025-06-10/jifsfjno/caslogo.png",
-      destination: "contest.html"
+      destination: "#/contest"
     },
     {
       label: "Powered By",
       imageUrl: "https://images.assettype.com/prajavani/2025-06-25/kvceh6g6/trends.png",
-      destination: "process.html"
+      destination: "#/process"
     },
     {
       label: "Special Partner",
       imageUrl: "https://images.assettype.com/prajavani/2025-06-25/zgfksb8d/shree-sai-gold-palace-logo.png",
-      destination: "about.html"
+      destination: "#/about"
     },
     {
       label: "Associate Sponsor",
       imageUrl: "https://images.assettype.com/prajavani/2025-06-10/1yiqcgi1/prestige.png",
-      destination: "jury.html"
+      destination: "#/jury"
     },
     {
       label: "Associate Sponsor",
       imageUrl: "https://images.assettype.com/prajavani/2025-06-10/7vnztg6q/freedomlogo.png",
-      destination: "previous-years.html"
+      destination: "#/previous-years"
     },
     {
       label: "Telecast Partner",
       imageUrl: "https://images.assettype.com/prajavani/2025-06-10/wz3lj1z6/zlogo.png",
-      destination: "terms.html"
+      destination: "#/terms"
     }
   ],
   menuLinks: [
-    { label: "ಪ್ರಸ್ತಾವನೆ", pageUrl: "about.html" },
-    { label: "ತೀರ್ಪುಗಾರರು", pageUrl: "jury.html" },
-    { label: "ಸಿನಿ ಕಾರ್ನರ್", pageUrl: "cine-corner.html" },
-    { label: "ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು", pageUrl: "previous-years.html" },
-    { label: "ನಿಯಮಗಳು", pageUrl: "terms.html" }
+    { label: "ಪ್ರಸ್ತಾವನೆ", pageUrl: "#/about" },
+    { label: "ತೀರ್ಪುಗಾರರು", pageUrl: "#/jury" },
+    { label: "ಸಿನಿ ಕಾರ್ನರ್", pageUrl: "#/cine-corner" },
+    { label: "ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು", pageUrl: "#/previous-years" },
+    { label: "ನಿಯಮಗಳು", pageUrl: "#/terms" }
   ],
   bottomNav: [
-    { label: "ಮುಖಪುಟ", pageUrl: "/PVCS", icon: "home" },
-    { label: "ವೋಟಿಂಗ್", pageUrl: "/PVCS/voting", icon: "vote", emphasis: true },
-    { label: "ಸ್ಪರ್ಧೆ", pageUrl: "contest.html", icon: "contest" },
-    { label: "ಪ್ರಕ್ರಿಯೆ", pageUrl: "process.html", icon: "process" },
+    { label: "ಮುಖಪುಟ", pageUrl: "#/", icon: "home" },
+    { label: "ವೋಟಿಂಗ್", pageUrl: "#/voting", icon: "vote", emphasis: true },
+    { label: "ಸ್ಪರ್ಧೆ", pageUrl: "#/contest", icon: "contest" },
+    { label: "ಪ್ರಕ್ರಿಯೆ", pageUrl: "#/process", icon: "process" },
     { label: "ಮೆನು", pageUrl: "#menu", icon: "menu", menuTrigger: true }
   ]
 };

@@ -835,5 +835,9 @@
     refreshPhoneStep();
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  window.__initVotingSwiper = init;
+  if (window.__votingSwiperPending) {
+    window.__votingSwiperPending = false;
+    init();
+  }
 })();

@@ -3,19 +3,32 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ | ಮುಖಪುಟ</title>
+    <title>ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ</title>
     <script>
       (function () {
         var pvcs = "https://suhastpml.github.io/PVCS/";
         var d = "?d=" + new Date().toISOString().slice(0, 10).replace(/-/g, "");
         var h = document.head;
+
+        var swcss = document.createElement("link");
+        swcss.rel = "stylesheet";
+        swcss.href = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css";
+        h.appendChild(swcss);
+
         var css = document.createElement("link");
         css.rel = "stylesheet";
         css.href = pvcs + "styles.css" + d;
         h.appendChild(css);
-        ["data.js", "app.js"].forEach(function (f) {
+
+        [
+          pvcs + "data.js" + d,
+          pvcs + "voting-data-augment.js" + d,
+          pvcs + "app.js" + d,
+          "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js",
+          pvcs + "voting-swiper.js" + d
+        ].forEach(function (src) {
           var s = document.createElement("script");
-          s.src = pvcs + f + d;
+          s.src = src;
           s.async = false;
           h.appendChild(s);
         });
@@ -25,56 +38,142 @@
   <body data-page="home">
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="brand-lockup" href="/PVCS" aria-label="ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ ಮುಖಪುಟ">
+        <a class="brand-lockup" href="#/" aria-label="ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ ಮುಖಪುಟ">
           <img src="PVCSlogo.svg?v=2" alt="ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ">
         </a>
       </div>
     </header>
 
-    <main class="page-shell home-shell">
-      <section class="home-fold home-fold--hero">
-        <div class="hero-stage">
-          <img class="hero-stage__trophy" src="https://thumbor-stg.assettype.com/prajavani2/2026-04-29/xykvsmq8/PVCS-Trophy.svg" alt="ಸಿನಿ ಸಮ್ಮಾನ ಟ್ರೋಫಿ">
-          <div class="hero-stage__copy">
-            <h1>ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅತಿದೊಡ್ಡ ಪ್ರಶಸ್ತಿ ಸಂಭ್ರಮಕ್ಕೆ ಸುಸ್ವಾಗತ</h1>
-            <p>ಚಂದನವನದ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗೌರವಿಸುವ, ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅತ್ಯಂತ ಪ್ರತಿಷ್ಠಿತ ಸಿನಿ ಸಮ್ಮಾನದ ವೇದಿಕೆ.</p>
+    <!-- Home -->
+    <div data-route="home">
+      <main class="page-shell home-shell">
+        <section class="home-fold home-fold--hero">
+          <div class="hero-stage">
+            <img class="hero-stage__trophy" src="https://thumbor-stg.assettype.com/prajavani2/2026-04-29/xykvsmq8/PVCS-Trophy.svg" alt="ಸಿನಿ ಸಮ್ಮಾನ ಟ್ರೋಫಿ">
+            <div class="hero-stage__copy">
+              <h1>ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅತಿದೊಡ್ಡ ಪ್ರಶಸ್ತಿ ಸಂಭ್ರಮಕ್ಕೆ ಸುಸ್ವಾಗತ</h1>
+              <p>ಚಂದನವನದ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗೌರವಿಸುವ, ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅತ್ಯಂತ ಪ್ರತಿಷ್ಠಿತ ಸಿನಿ ಸಮ್ಮಾನದ ವೇದಿಕೆ.</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="sponsor-band sponsor-band--bare" aria-labelledby="sponsors-title">
-        <h2 id="sponsors-title" class="sr-only">Sponsors</h2>
-        <div class="sponsor-band__track" data-sponsor-track></div>
-      </section>
+        <section class="sponsor-band sponsor-band--bare" aria-labelledby="sponsors-title">
+          <h2 id="sponsors-title" class="sr-only">Sponsors</h2>
+          <div class="sponsor-band__track" data-sponsor-track></div>
+        </section>
 
-      <section class="home-fold home-fold--actions">
-        <div class="action-stack">
-          <a class="action-card action-card--vote" href="/PVCS/voting">
-            <span class="action-card__halo" aria-hidden="true"></span>
-            <span class="action-card__badge">01</span>
-            <span class="action-card__eyebrow">Public Voting</span>
-            <h2>ಪಬ್ಲಿಕ್ ವೋಟಿಂಗ್</h2>
-            <p>ನಾಮನಿರ್ದೇಶಿತರ ಪೈಕಿ ನಿಮ್ಮ ಮೆಚ್ಚಿನವರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ದಾಖಲಿಸಿ.</p>
-            <div class="action-card__footer">
-              <span class="action-card__cta">ಈಗ ಮತ ನೀಡಿ</span>
-              <span class="action-card__arrow" aria-hidden="true">→</span>
-            </div>
-          </a>
+        <section class="home-fold home-fold--actions">
+          <div class="action-stack">
+            <a class="action-card action-card--vote" href="#/voting">
+              <span class="action-card__halo" aria-hidden="true"></span>
+              <span class="action-card__badge">01</span>
+              <span class="action-card__eyebrow">Public Voting</span>
+              <h2>ಪಬ್ಲಿಕ್ ವೋಟಿಂಗ್</h2>
+              <p>ನಾಮನಿರ್ದೇಶಿತರ ಪೈಕಿ ನಿಮ್ಮ ಮೆಚ್ಚಿನವರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ದಾಖಲಿಸಿ.</p>
+              <div class="action-card__footer">
+                <span class="action-card__cta">ಈಗ ಮತ ನೀಡಿ</span>
+                <span class="action-card__arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
 
-          <a class="action-card action-card--contest" href="contest.html">
-            <span class="action-card__halo" aria-hidden="true"></span>
-            <span class="action-card__badge">02</span>
-            <span class="action-card__eyebrow">Contest</span>
-            <h2>ಸ್ಪರ್ಧೆ</h2>
-            <p>ಈ ಆವೃತ್ತಿಯ ಘಟ್ಟಗಳು, ಪ್ರಮುಖ ವಿವರಗಳು ಮತ್ತು ವಿಶೇಷ ಅಂಶಗಳನ್ನು ಸಂಕ್ಷಿಪ್ತವಾಗಿ ನೋಡಿ.</p>
-            <div class="action-card__footer">
-              <span class="action-card__cta">ಹೆಚ್ಚು ತಿಳಿಯಿರಿ</span>
-              <span class="action-card__arrow" aria-hidden="true">→</span>
-            </div>
-          </a>
-        </div>
-      </section>
-    </main>
+            <a class="action-card action-card--contest" href="#/contest">
+              <span class="action-card__halo" aria-hidden="true"></span>
+              <span class="action-card__badge">02</span>
+              <span class="action-card__eyebrow">Contest</span>
+              <h2>ಸ್ಪರ್ಧೆ</h2>
+              <p>ಈ ಆವೃತ್ತಿಯ ಘಟ್ಟಗಳು, ಪ್ರಮುಖ ವಿವರಗಳು ಮತ್ತು ವಿಶೇಷ ಅಂಶಗಳನ್ನು ಸಂಕ್ಷಿಪ್ತವಾಗಿ ನೋಡಿ.</p>
+              <div class="action-card__footer">
+                <span class="action-card__cta">ಹೆಚ್ಚು ತಿಳಿಯಿರಿ</span>
+                <span class="action-card__arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Voting -->
+    <div data-route="voting" hidden>
+      <main class="page-shell voting-swiper-page" data-voting-swiper-root></main>
+    </div>
+
+    <!-- About -->
+    <div data-route="about" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ಆಶಯ</h1>
+          <p>ಚಂದನವನದ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸಲು ಮತ್ತು ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅಭೂತಪೂರ್ವ ಪರಂಪರೆಯನ್ನು ಎತ್ತಿಹಿಡಿಯಲು 'ಪ್ರಜಾವಾಣಿ ಕನ್ನಡ ಸಿನಿ ಸಮ್ಮಾನ' ವೇದಿಕೆಯಾಗಬೇಕೆಂಬುದೇ ಆಶಯ.</p>
+          <p>ಅಸಾಧಾರಣ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸಿ, ಪ್ರಶಂಸಿಸಿ ಚಿತ್ರರಂಗದ ಬೆಳವಣಿಗೆಗೆ ಉತ್ತೇಜನ ನೀಡುವ ಉದ್ದೇಶದಿಂದಲೇ ಈ ಆವೃತ್ತಿ ಅಣಿಯಾಗಿದೆ.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
+
+    <!-- Contest -->
+    <div data-route="contest" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ಸ್ಪರ್ಧೆ</h1>
+          <p>This page is intentionally minimal for now. Final contest details can be dropped into this shell without changing the shared chrome.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
+
+    <!-- Process -->
+    <div data-route="process" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ಪ್ರಕ್ರಿಯೆ</h1>
+          <p>This shell is ready for the real nomination, jury, and voting-process copy when it is available.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
+
+    <!-- Jury -->
+    <div data-route="jury" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ತೀರ್ಪುಗಾರರು</h1>
+          <p>This page will later host the structured jury presentation using the existing reference photos and names.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
+
+    <!-- Cine Corner -->
+    <div data-route="cine-corner" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ಸಿನಿ ಕಾರ್ನರ್</h1>
+          <p>This destination can later link out to the final article, media, or archive experience without changing the navigation system.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
+
+    <!-- Previous Years -->
+    <div data-route="previous-years" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು</h1>
+          <p>This page can later hold Season 1 and Season 2 destination cards using the legacy URLs already present in the reference files.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
+
+    <!-- Terms -->
+    <div data-route="terms" hidden>
+      <main class="page-shell shell-grid">
+        <section class="section-card shell-card">
+          <h1>ನಿಯಮಗಳು</h1>
+          <p>Final terms and conditions can be inserted here later without touching the navigation, spacing, or page shell.</p>
+          <a class="btn btn--primary" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+        </section>
+      </main>
+    </div>
 
     <nav class="bottom-nav" aria-label="Primary">
       <div class="bottom-nav__inner" data-bottom-nav></div>
@@ -91,7 +190,7 @@
         <button class="side-menu__close" type="button" data-menu-close aria-label="Close menu">X</button>
       </div>
       <ul data-menu-links></ul>
-      <a class="btn btn--ghost" href="/PVCS">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
+      <a class="btn btn--ghost" href="#/">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</a>
     </aside>
 
     <div class="popup" data-popup aria-labelledby="popup-title" aria-modal="true" role="dialog">
@@ -101,9 +200,8 @@
           <button class="popup__close" type="button" data-popup-close aria-label="Close popup">X</button>
         </div>
         <p data-popup-description></p>
-        <a class="btn btn--primary" data-popup-cta href="process.html"></a>
+        <a class="btn btn--primary" data-popup-cta href="#/process"></a>
       </div>
     </div>
   </body>
 </html>
-
