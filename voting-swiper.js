@@ -830,11 +830,7 @@
       registerVote(categoryId);
     }
 
-    root.addEventListener("pointerup", function (event) {
-      if (event.pointerType !== "touch" && event.pointerType !== "pen") {
-        return;
-      }
-
+    root.addEventListener("touchend", function (event) {
       var voteButton = event.target.closest("[data-vote-now]");
       if (!voteButton) {
         return;
@@ -842,7 +838,7 @@
 
       event.preventDefault();
       handleVoteButton(voteButton);
-    }, true);
+    }, { capture: true, passive: false });
 
     root.addEventListener("click", function (event) {
       var voteButton = event.target.closest("[data-vote-now]");
