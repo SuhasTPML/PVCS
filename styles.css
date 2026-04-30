@@ -121,7 +121,7 @@ button {
   height: calc(var(--header-h) - 8px);
   padding: 0;
   border: none;
-  border-radius: 2px;
+  border-radius: 10px;
   background: transparent;
   overflow: hidden;
   line-height: 0;
@@ -849,7 +849,7 @@ h2,
 .side-menu__label {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: 0.94rem;
+  font-size: 18px;
 }
 
 .side-menu__chevron {
@@ -1837,7 +1837,7 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
   }
 
   .side-menu__label {
-    font-size: 0.9rem;
+    font-size: 18px;
   }
 
   .side-menu__chevron {
