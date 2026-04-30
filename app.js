@@ -62,7 +62,7 @@
     }
 
     var currentPage = document.body.getAttribute("data-page") || "home";
-    var isVotingPage = currentPage === "voting";
+    var isVotingPage = currentPage === "voting" || currentPage === "voting-swiper";
     nav.innerHTML = siteData.bottomNav
       .map(function (item) {
         var classes = ["bottom-nav__link"];

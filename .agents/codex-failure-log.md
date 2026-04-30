@@ -266,3 +266,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: `rg` failed with Windows path syntax errors like `The filename, directory name, or volume label syntax is incorrect. (os error 123)`.
 - Working approach: Use `rg -g '*.html' -g '*.js' 'pattern' .` so ripgrep handles the file filtering itself.
 - Next-time rule: In this PowerShell workspace, do not pass shell-style globs as path arguments to `rg`; use `-g` filters with `.` as the search root.
+
+## 2026-04-30 - Do not repurpose `data-page` markers that scoped CSS depends on
+- Context: Converting the repo to keep only the swiper voting experience while leaving the live route at `/PVCS/voting`.
+- Command/workflow: Swiper-route cleanup across `voting-swiper.html`, `app.js`, and shared navigation state.
+- Failed approach: Changed `voting-swiper.html` from `data-page="voting-swiper"` to `data-page="voting"` to match the live route name.
+- Symptom: The live page loaded but most swiper-specific layout/styles disappeared because large sections of `styles.css` were scoped to `body[data-page="voting-swiper"]`.
+- Working approach: Keep the live route as `/PVCS/voting`, restore `data-page="voting-swiper"` for the page-scoped CSS, and make shared app logic treat both `voting` and `voting-swiper` as the active vote page.
+- Next-time rule: Before renaming a page-state marker like `data-page`, search CSS and JS for selectors that depend on it; keep the marker stable unless all scoped selectors are migrated together.
