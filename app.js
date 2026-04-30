@@ -88,6 +88,26 @@
       .join("");
   }
 
+  function renderHeaderNav() {
+    var el = qs("[data-header-nav]");
+    if (!el || !siteData.bottomNav) return;
+    var currentPage = document.body.getAttribute("data-page") || "home";
+    var isVotingPage = currentPage === "voting" || currentPage === "voting-swiper";
+    el.innerHTML = siteData.bottomNav
+      .filter(function (item) { return !item.menuTrigger; })
+      .map(function (item) {
+        var classes = ["header-nav__link"];
+        if (item.emphasis) classes.push("is-emphasis");
+        if (
+          (item.pageUrl === "#/" && currentPage === "home") ||
+          (item.pageUrl === "#/voting" && isVotingPage) ||
+          (item.pageUrl === "#/" + currentPage)
+        ) classes.push("is-active");
+        return '<a class="' + classes.join(" ") + '" href="' + item.pageUrl + '">' + item.label + "</a>";
+      })
+      .join("");
+  }
+
   function renderMenu() {
     var list = qs("[data-menu-links]");
     if (!list) {
@@ -297,6 +317,7 @@
     }
 
     renderBottomNav();
+    renderHeaderNav();
     renderMenu();
 
     window.scrollTo(0, 0);

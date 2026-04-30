@@ -106,6 +106,10 @@ button {
   gap: 16px;
 }
 
+.header-nav {
+  display: none;
+}
+
 .brand-lockup {
   display: inline-flex;
   align-items: center;
@@ -2026,5 +2030,45 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media (min-width: 760px) {
+  .site-header__inner {
+    justify-content: flex-start;
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 16px;
+  }
+
+  .header-nav__link {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: background-color 180ms ease, color 180ms ease;
+    white-space: nowrap;
+  }
+
+  .header-nav__link:hover,
+  .header-nav__link:focus-visible {
+    background: rgba(255, 248, 239, 0.08);
+    color: var(--text);
+  }
+
+  .header-nav__link.is-active {
+    background: rgba(255, 248, 239, 0.12);
+    color: var(--text);
+  }
+
+  .header-nav__link.is-emphasis {
+    color: var(--accent-strong);
   }
 }
