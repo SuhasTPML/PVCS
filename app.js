@@ -317,11 +317,17 @@
     navigate(getRoute());
   });
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function onReady() {
     renderSponsors();
     initMenu();
     initYear();
     navigate(getRoute());
     initPopup();
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", onReady);
+  } else {
+    onReady();
+  }
 })();
