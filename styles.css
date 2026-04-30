@@ -121,7 +121,7 @@ button {
   height: calc(var(--header-h) - 8px);
   padding: 0;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   background: transparent;
   overflow: hidden;
   line-height: 0;
