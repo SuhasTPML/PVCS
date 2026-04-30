@@ -1,12 +1,26 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cine Sammana | Jury</title>
-    <link rel="stylesheet" href="https://suhastpml.github.io/PVCS/styles.css?v=26">
-    <script defer src="https://suhastpml.github.io/PVCS/data.js?v=2"></script>
-    <script defer src="https://suhastpml.github.io/PVCS/app.js?v=8"></script>
+    <script>
+      (function () {
+        var pvcs = "https://suhastpml.github.io/PVCS/";
+        var d = "?d=" + new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        var h = document.head;
+        var css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = pvcs + "styles.css" + d;
+        h.appendChild(css);
+        ["data.js", "app.js"].forEach(function (f) {
+          var s = document.createElement("script");
+          s.src = pvcs + f + d;
+          s.async = false;
+          h.appendChild(s);
+        });
+      })();
+    </script>
   </head>
   <body data-page="jury">
     <header class="site-header">
