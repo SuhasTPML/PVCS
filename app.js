@@ -95,7 +95,8 @@
     var isVotingPage = currentPage === "voting" || currentPage === "voting-swiper";
     var items = siteData.bottomNav
       .filter(function (item) { return !item.menuTrigger; })
-      .concat(siteData.menuLinks || []);
+      .concat(siteData.menuLinks || [])
+      .slice(0, 6);
     el.innerHTML = items
       .map(function (item) {
         var classes = ["header-nav__link"];

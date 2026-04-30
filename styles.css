@@ -116,7 +116,7 @@ button {
   gap: 0;
   height: calc(var(--header-h) - 8px);
   padding: 0;
-  border: 1px solid rgba(255, 248, 239, 0.26);
+  border: none;
   border-radius: 5px;
   background: transparent;
   overflow: hidden;
@@ -2041,7 +2041,8 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
   .header-nav {
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: space-evenly;
+    flex: 1;
     margin-left: 16px;
   }
 
@@ -2051,7 +2052,7 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
     padding: 6px 14px;
     border-radius: 10px;
     color: var(--muted);
-    font-size: 1.76rem;
+    font-size: 0.88rem;
     font-weight: 600;
     transition: background-color 180ms ease, color 180ms ease;
     white-space: nowrap;
