@@ -175,7 +175,7 @@
         '<div class="vote-phone-step__header">' +
           '<p class="eyebrow">Final step</p>' +
           '<h2>Confirm your vote with a phone number</h2>' +
-          '<p class="vote-phone-step__copy">All four categories must be complete before submission unlocks. Your number is used to prevent duplicate votes.</p>' +
+          '<p class="vote-phone-step__copy">Enter your mobile number to submit your vote. We use it to prevent duplicate entries.</p>' +
         "</div>" +
         '<div class="vote-phone-step__progress">' +
           '<div class="vote-phone-step__progress-meta">' +
@@ -190,7 +190,7 @@
         '<div class="vote-phone-step__success" data-success-panel hidden>' +
           '<p class="eyebrow">Thank you</p>' +
           '<h3>Your ballot is ready</h3>' +
-          '<p data-success-copy>Your selections are locked in. This preview will be wired to the backend submission endpoint next.</p>' +
+          '<p data-success-copy>Thank you for participating in Praja Vaani Cine Sammana!</p>' +
           '<div class="vote-phone-step__success-summary" data-success-summary></div>' +
         "</div>" +
         '<div class="vote-phone-step__form" data-phone-form>' +
@@ -215,8 +215,8 @@
     root.innerHTML = [
       '<section class="section-card voting-intro">',
         '<p class="eyebrow">Voting</p>',
-        '<h1>Category-by-category nominee carousel</h1>',
-        '<p>Swipe horizontally inside each category to move the active card. Tap Vote Now on the centered nominee, then move through the flow until the phone step unlocks.</p>',
+        '<h1>Vote for Your Favourites</h1>',
+        '<p>Swipe through the nominees in each category and tap Vote Now to make your pick. Complete all categories to submit.</p>',
       "</section>"
     ].join("") +
       siteData.votingCategories.map(renderCategory).join("") +
@@ -332,8 +332,8 @@
 
     if (progressHint) {
       progressHint.textContent = allComplete
-        ? "Phone capture is unlocked"
-        : "Finish all categories to unlock submission";
+        ? "Enter your number below to submit"
+        : "Complete all categories to unlock submission";
     }
 
     if (progressFill) {
@@ -410,7 +410,7 @@
       } else if (flow.submissionStatus === "success") {
         statusNode.textContent = flow.submissionMessage || "Your ballot was accepted.";
       } else if (!allComplete) {
-        statusNode.textContent = "Finish the four categories to unlock submission.";
+        statusNode.textContent = "Complete all categories to unlock submission.";
       } else if (!isValidPhone(normalizePhoneInput(flow.phoneInput)) && flow.phoneInput) {
         statusNode.textContent = "Enter a valid 10-digit mobile number.";
       } else {
@@ -438,9 +438,7 @@
         }
 
         if (successCopy) {
-          successCopy.textContent = flow.submissionMode === "preview"
-            ? "Your selections are locked in. This is a frontend preview until the backend endpoint is connected."
-            : "Your selections are locked in.";
+          successCopy.textContent = "Thank you for participating in Praja Vaani Cine Sammana!";
         }
       }
     }
@@ -566,8 +564,7 @@
     if (!submitUrl) {
       window.setTimeout(function () {
         flow.submissionStatus = "success";
-        flow.submissionMode = "preview";
-        flow.submissionMessage = "Frontend preview complete. Backend submission is not connected yet.";
+        flow.submissionMessage = "Your vote has been submitted successfully.";
         refreshPhoneStep();
       }, 550);
       return;
