@@ -93,8 +93,10 @@
     if (!el || !siteData.bottomNav) return;
     var currentPage = document.body.getAttribute("data-page") || "home";
     var isVotingPage = currentPage === "voting" || currentPage === "voting-swiper";
-    el.innerHTML = siteData.bottomNav
+    var items = siteData.bottomNav
       .filter(function (item) { return !item.menuTrigger; })
+      .concat(siteData.menuLinks || []);
+    el.innerHTML = items
       .map(function (item) {
         var classes = ["header-nav__link"];
         if (item.emphasis) classes.push("is-emphasis");
