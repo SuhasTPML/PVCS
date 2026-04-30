@@ -420,6 +420,10 @@
     });
 
     root.addEventListener("pointerdown", function (event) {
+      if (event.target.closest("[data-vote-now]")) {
+        return;
+      }
+
       var stage = event.target.closest("[data-carousel-stage]");
       if (!stage) {
         return;
