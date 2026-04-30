@@ -43,7 +43,7 @@
     if (item.menuTrigger) {
       return "menu";
     }
-    if (page === "index.html") return "home";
+    if (page === "index.html" || page === "/PVCS") return "home";
     if (page === "voting.html" || page === "voting-swiper.html" || page === "/PVCS/voting") return "vote";
     if (page === "contest.html") return "contest";
     if (page === "process.html") return "process";
@@ -70,6 +70,7 @@
           classes.push("is-emphasis");
         }
         if ((item.pageUrl === "index.html" && currentPage === "home") ||
+            (item.pageUrl === "/PVCS" && currentPage === "home") ||
             ((item.pageUrl === "voting.html" || item.pageUrl === "voting-swiper.html" || item.pageUrl === "/PVCS/voting") && isVotingPage) ||
             (item.pageUrl === currentPage + ".html")) {
           classes.push("is-active");
@@ -109,6 +110,7 @@
     function renderLink(item) {
       var classes = [];
       if ((item.pageUrl === "index.html" && currentPage === "home") ||
+          (item.pageUrl === "/PVCS" && currentPage === "home") ||
           (item.pageUrl === currentPage + ".html")) {
         classes.push("is-active");
       }

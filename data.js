@@ -192,7 +192,7 @@ window.CINE_SITE_DATA = {
     { label: "ನಿಯಮಗಳು", pageUrl: "terms.html" }
   ],
   bottomNav: [
-    { label: "ಮುಖಪುಟ", pageUrl: "index.html", icon: "home" },
+    { label: "ಮುಖಪುಟ", pageUrl: "/PVCS", icon: "home" },
     { label: "ವೋಟಿಂಗ್", pageUrl: "/PVCS/voting", icon: "vote", emphasis: true },
     { label: "ಸ್ಪರ್ಧೆ", pageUrl: "contest.html", icon: "contest" },
     { label: "ಪ್ರಕ್ರಿಯೆ", pageUrl: "process.html", icon: "process" },
