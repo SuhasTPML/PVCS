@@ -1133,7 +1133,7 @@ body[data-page="voting"] .page-shell {
   justify-content: flex-end;
   gap: 12px;
   --vote-card-body-x: 20px;
-  padding: 20px var(--vote-card-body-x) 18px;
+  padding: 20px var(--vote-card-body-x) 24px;
   background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.72) 50%);
   border-radius: 0 0 28px 28px;
   position: relative;
@@ -1998,7 +1998,7 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
 
   body[data-page="voting-swiper"] .vote-card__body {
     --vote-card-body-x: 16px;
-    padding: 16px var(--vote-card-body-x) 0;
+    padding: 16px var(--vote-card-body-x) 20px;
   }
 
   body[data-page="voting-swiper"] .vote-phone-step {
