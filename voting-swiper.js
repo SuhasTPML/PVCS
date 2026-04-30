@@ -658,8 +658,10 @@
       speed: 500,
       spaceBetween: 18,
       slideToClickedSlide: false,
-      preventClicks: true,
-      preventClicksPropagation: true,
+      // Keep tap events available for in-card action buttons on touch devices.
+      preventClicks: false,
+      preventClicksPropagation: false,
+      touchStartPreventDefault: false,
       passiveListeners: false,
       mousewheel: {
         enabled: true,
