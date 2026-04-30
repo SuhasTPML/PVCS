@@ -799,13 +799,28 @@
       }
     });
 
-    root.addEventListener("click", function (event) {
-      var voteButton = event.target.closest("[data-vote-now]");
+    var lastVoteActionKey = "";
+    var lastVoteActionAt = 0;
+
+    function handleVoteButton(voteButton) {
       if (!voteButton) {
         return;
       }
 
       var categoryId = voteButton.getAttribute("data-category-id");
+      if (!categoryId) {
+        return;
+      }
+
+      var actionKey = categoryId + ":" + (voteButton.textContent || "").trim();
+      var now = Date.now();
+      if (lastVoteActionKey === actionKey && now - lastVoteActionAt < 500) {
+        return;
+      }
+
+      lastVoteActionKey = actionKey;
+      lastVoteActionAt = now;
+
       var state = getCategoryState()[categoryId];
       if (state && state.selectedNomineeId && !state.isEditing) {
         openCategoryEditing(categoryId);
@@ -813,6 +828,30 @@
       }
 
       registerVote(categoryId);
+    }
+
+    root.addEventListener("pointerup", function (event) {
+      if (event.pointerType !== "touch" && event.pointerType !== "pen") {
+        return;
+      }
+
+      var voteButton = event.target.closest("[data-vote-now]");
+      if (!voteButton) {
+        return;
+      }
+
+      event.preventDefault();
+      handleVoteButton(voteButton);
+    }, true);
+
+    root.addEventListener("click", function (event) {
+      var voteButton = event.target.closest("[data-vote-now]");
+      if (!voteButton) {
+        return;
+      }
+
+      event.preventDefault();
+      handleVoteButton(voteButton);
     });
 
     initPhoneStep(root);

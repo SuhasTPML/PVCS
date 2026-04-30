@@ -274,3 +274,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: The live page loaded but most swiper-specific layout/styles disappeared because large sections of `styles.css` were scoped to `body[data-page="voting-swiper"]`.
 - Working approach: Keep the live route as `/PVCS/voting`, restore `data-page="voting-swiper"` for the page-scoped CSS, and make shared app logic treat both `voting` and `voting-swiper` as the active vote page.
 - Next-time rule: Before renaming a page-state marker like `data-page`, search CSS and JS for selectors that depend on it; keep the marker stable unless all scoped selectors are migrated together.
+
+## 2026-04-30 - Do not rely on bubbled `click` alone for Swiper card actions on mobile
+- Context: Making the `Vote Now` CTA work reliably inside the swiper-based mobile voting cards.
+- Command/workflow: In-card vote action handling in `voting-swiper.js`.
+- Failed approach: Relied on a delegated `click` handler alone after relaxing Swiper click-prevention settings.
+- Symptom: Horizontal swipe still worked on mobile, but tapping `Vote Now` could do nothing because touch interaction suppressed the synthetic click.
+- Working approach: Handle `pointerup` for touch/pen targets in capture phase, route it through the same vote-action handler, and keep a short duplicate-action guard so the later `click` does not double-submit.
+- Next-time rule: For CTA buttons embedded inside swipeable mobile surfaces, do not trust bubbled `click` alone; add a touch-safe `pointerup` path with deduping.
