@@ -110,6 +110,10 @@ button {
   display: none;
 }
 
+.header-menu-btn {
+  display: none;
+}
+
 .brand-lockup {
   display: inline-flex;
   align-items: center;
@@ -2071,5 +2075,34 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
 
   .header-nav__link.is-emphasis {
     color: var(--accent-strong);
+  }
+
+  .header-menu-btn {
+    display: grid;
+    place-items: center;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 180ms ease;
+  }
+
+  .header-menu-btn:hover,
+  .header-menu-btn:focus-visible {
+    background: rgba(255, 248, 239, 0.08);
+  }
+
+  .header-menu-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
   }
 }
