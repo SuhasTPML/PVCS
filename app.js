@@ -44,7 +44,7 @@
       return "menu";
     }
     if (page === "index.html" || page === "/PVCS") return "home";
-    if (page === "voting.html" || page === "voting-swiper.html" || page === "/PVCS/voting") return "vote";
+    if (page === "/PVCS/voting") return "vote";
     if (page === "contest.html") return "contest";
     if (page === "process.html") return "process";
     if (page === "about.html") return "about";
@@ -62,7 +62,7 @@
     }
 
     var currentPage = document.body.getAttribute("data-page") || "home";
-    var isVotingPage = currentPage === "voting" || currentPage === "voting-swiper";
+    var isVotingPage = currentPage === "voting";
     nav.innerHTML = siteData.bottomNav
       .map(function (item) {
         var classes = ["bottom-nav__link"];
@@ -71,7 +71,7 @@
         }
         if ((item.pageUrl === "index.html" && currentPage === "home") ||
             (item.pageUrl === "/PVCS" && currentPage === "home") ||
-            ((item.pageUrl === "voting.html" || item.pageUrl === "voting-swiper.html" || item.pageUrl === "/PVCS/voting") && isVotingPage) ||
+            (item.pageUrl === "/PVCS/voting" && isVotingPage) ||
             (item.pageUrl === currentPage + ".html")) {
           classes.push("is-active");
         }
