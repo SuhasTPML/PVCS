@@ -139,30 +139,65 @@ The CMS cannot serve separate `.css` or `.js` files with correct MIME types. Hos
 
 ### Trial plan
 
-**Step 1 — Set up GitHub Pages**
+**Step 1 - Set up GitHub Pages**
 - Create a new public repo (e.g. `cinesammana-assets`)
 - Push all static files: `styles.css`, `data.js`, `app.js`, `voting-swiper.js`, `voting-data-augment.js`, images, SVGs
 - Enable GitHub Pages from the `main` branch root
 - Confirm assets are reachable at `https://<user>.github.io/cinesammana-assets/styles.css`
 
-**Step 2 — Update the CMS HTML**
+**Step 2 - Update the CMS HTML**
 - Replace all relative references in the HTML with absolute GitHub Pages URLs
 - Test the voting page loads and behaves correctly end to end
 
-**Step 3 — Rate limit smoke test**
-- Run a burst test against the asset URLs using curl:
-  ```bash
-  for i in {1..200}; do curl -s -o /dev/null -w "%{http_code}\n" \
-    https://<user>.github.io/cinesammana-assets/voting-swiper.js & done
-  ```
-- Watch for any `429` responses or response time degradation
-- If all 200 return `200` cleanly, GitHub Pages is sufficient
+**Step 3 - Stress test hosted CSS and JS**
+- Test both critical assets:
+  - `https://<user>.github.io/cinesammana-assets/styles.css`
+  - `https://<user>.github.io/cinesammana-assets/voting-swiper.js`
+- Run two passes:
+  - Pass A (real asset GET burst): 200 requests per asset URL with concurrency 40
+  - Pass B (extreme concurrency check): 1000 total concurrent transfers (500 per asset) using `HEAD`
+- Why `HEAD` for Pass B:
+  - At very high GET concurrency, local curl write errors like `curl: (23) client returned ERROR on write ...` can appear even when server responses are `200`
+  - `HEAD` avoids body writes and isolates server-side rate-limit/error behavior
+- Record:
+  - HTTP status mix (`200`, `429`, `5xx`)
+  - Avg/P95/P99 response time from curl timings
+- Pass criteria:
+  - No `429` responses
+  - No persistent `5xx` responses
+  - Stable latency over repeated runs
+- If all checks pass, GitHub Pages is sufficient
 
-**Step 4 — If GitHub Pages shows strain, switch to Cloudflare Pages**
+**Step 4 - If GitHub Pages shows strain, switch to Cloudflare Pages**
 - Create a Cloudflare Pages project, connect the same repo
-- Cloudflare deploys from the same files — no code changes needed
+- Cloudflare deploys from the same files - no code changes needed
 - Asset URLs change to `https://cinesammana-assets.pages.dev/...`
 - Update the CMS HTML references and retest
+
+### Executed results (2026-04-30)
+
+Tested live URLs:
+- `https://suhastpml.github.io/PVCS/styles.css`
+- `https://suhastpml.github.io/PVCS/voting-swiper.js`
+
+Pass A (GET burst, 200 requests per asset, concurrency 40):
+- Run 1:
+  - `styles.css`: 200/200 `200`, avg `84.9ms`, p95 `116.2ms`
+  - `voting-swiper.js`: 200/200 `200`, avg `89.8ms`, p95 `89.8ms`
+- Run 2:
+  - `styles.css`: 200/200 `200`, avg `76.8ms`, p95 `88.7ms`
+  - `voting-swiper.js`: 200/200 `200`, avg `94.1ms`, p95 `122.2ms`
+- `429`: `0` in both runs
+- `5xx`: `0` in both runs
+
+Pass B (HEAD, 1000 concurrent transfers total):
+- `styles.css`: 500/500 `200`, avg `3562.6ms`, p95 `3592.3ms`, p99 `3599.5ms`
+- `voting-swiper.js`: 500/500 `200`, avg `3476.2ms`, p95 `3507.4ms`, p99 `3510.6ms`
+- Overall: 1000/1000 `200`, `429 = 0`, `5xx = 0`, curl exit code `0`
+
+Conclusion:
+- GitHub Pages passed both realistic burst load and extreme concurrency checks for these static assets.
+- Keep Cloudflare Pages as fallback only if production monitoring later shows real-world degradation.
 
 ### Decision criteria
 
@@ -192,3 +227,4 @@ The plan is complete when:
 1. Do we keep the phone step as a final swiper slide, or switch to a modal overlay?
 2. Should duplicate submissions show only a generic message, or a more detailed explanation?
 3. Is live vote display intentionally deferred to a later phase?
+
