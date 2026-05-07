@@ -337,3 +337,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: Push failed because the credential prompt had no TTY and stored GitHub tokens were invalid.
 - Working approach: Check `gh auth status` first and refresh GitHub auth before retrying the push.
 - Next-time rule: Verify GitHub CLI/auth state before attempting a push in this environment.
+
+## 2026-05-07 - Browser auth timeout
+- Context: Refreshing GitHub credentials so a push could complete.
+- Command/workflow: `gh auth login -h github.com -p https --web --clipboard`
+- Failed approach: Relied on the browser-based login flow to finish inside the current session.
+- Symptom: The command timed out and `gh auth status` still reported invalid tokens.
+- Working approach: Use a pre-existing valid token or complete the browser login outside the timeout window.
+- Next-time rule: If `gh auth login --web` hangs in this environment, treat it as incomplete and ask for an already-valid token or manual completion.
