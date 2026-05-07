@@ -145,6 +145,98 @@ window.CINE_SITE_DATA = {
       ]
     }
   ],
+  publicVoteCategoryIds: [
+    "best-film",
+    "best-director",
+    "best-performance",
+    "audience-choice"
+  ],
+  defaultStage: "pre-vote",
+  eventDate: "2026-05-17",
+  districts: [
+    "Others",
+    "Bagalkot",
+    "Ballari",
+    "Belagavi",
+    "Bengaluru Rural",
+    "Bengaluru Urban",
+    "Bidar",
+    "Chamarajanagar",
+    "Chikkaballapur",
+    "Chikkamagaluru",
+    "Chitradurga",
+    "Dakshina Kannada",
+    "Davangere",
+    "Dharwad",
+    "Gadag",
+    "Hassan",
+    "Haveri",
+    "Kalaburagi",
+    "Kodagu",
+    "Kolar",
+    "Koppal",
+    "Mandya",
+    "Mysuru",
+    "Raichur",
+    "Ramanagara",
+    "Shivamogga",
+    "Tumakuru",
+    "Udupi",
+    "Uttara Kannada",
+    "Vijayapura",
+    "Vijayanagara",
+    "Yadgir"
+  ],
+  winnerHighlights: [
+    {
+      id: "best-film",
+      category: "Best Film",
+      title: "Midnight Harbor",
+      subtitle: "Public voting winner",
+      summary: "The leading public vote in the best film category, surfaced as the headline result for the post-vote hero.",
+      image: "https://picsum.photos/seed/midnight/400/560"
+    },
+    {
+      id: "best-director",
+      category: "Best Director",
+      title: "Meera Iyer",
+      subtitle: "Public voting winner",
+      summary: "A sharp and disciplined directorial profile that takes the public category spotlight.",
+      image: "https://picsum.photos/seed/meeraiyer/400/560"
+    },
+    {
+      id: "best-performance",
+      category: "Best Performance",
+      title: "Niranjana",
+      subtitle: "Public voting winner",
+      summary: "The performance category leader, framed as one of the key post-vote highlight cards.",
+      image: "https://picsum.photos/seed/niranjana/400/560"
+    },
+    {
+      id: "audience-choice",
+      category: "Audience Choice",
+      title: "Last Reel",
+      subtitle: "Public voting winner",
+      summary: "The audience-led result card for the public voting group.",
+      image: "https://picsum.photos/seed/lastreel/400/560"
+    },
+    {
+      id: "jury-spotlight",
+      category: "Jury Spotlight",
+      title: "Special Recognition",
+      subtitle: "Extended winners surface",
+      summary: "A slot reserved for the additional winners page treatment beyond the four public voting categories.",
+      image: "https://picsum.photos/seed/spotlight/400/560"
+    },
+    {
+      id: "lifetime-honour",
+      category: "Lifetime Honour",
+      title: "Honorary Winner",
+      subtitle: "Extended winners surface",
+      summary: "A supporting winners tile so the post-vote page is not limited to the public ballot categories.",
+      image: "https://picsum.photos/seed/honour/400/560"
+    }
+  ],
   popup: {
     title: "ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ",
     description:

@@ -9,11 +9,7 @@
     "ರಾತ್ರಿ ಕಟ್",
     "ಜನರ ಆಯ್ಕೆ",
     "ಅಂತಿಮ ಕಟ್",
-    "ಉತ್ಸವ ಆವೃತ್ತಿ",
-    "ಸುವರ್ಣ ರೀಲ್",
-    "ಸ್ಟುಡಿಯೋ ಆಯ್ಕೆ",
-    "ವಿಸ್ತೃತ ಆವೃತ್ತಿ",
-    "ವಿಶೇಷ ಬೆಳಕು"
+    "ಉತ್ಸವ ಆವೃತ್ತಿ"
   ];
 
   siteData.votingCategories = siteData.votingCategories.map(function (category) {

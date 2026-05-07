@@ -198,6 +198,30 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 ## 2026-04-29 - Use escalation for git writes and push in this workspace
 - Context: Staging, committing, and pushing voting swiper frontend updates.
 - Command/workflow: `git add`, `git commit -m`, `git push origin master`.
+
+## 2026-05-07 - Resolve skill paths from the user profile, not the repo root
+- Context: Reading the UI/UX skill instructions before editing the PVCS microsite.
+- Command/workflow: `Get-Content` against `.codex/skills/.system/ui-ux-pro-max/SKILL.md`.
+- Failed approach: Looked for the skill file relative to the workspace and under a shortened home path.
+- Symptom: PowerShell returned `cannot find path` errors for both guesses.
+- Working approach: Read the skill from `C:\Users\suhas.bhandari\.codex\skills\.system\ui-ux-pro-max\SKILL.md`.
+- Next-time rule: When a skill lives outside the repo, resolve it from the user profile path shown in the skills list, not from the workspace root.
+
+## 2026-05-07 - Rewrite drifted HTML shells when the live block no longer matches
+- Context: Swapping the static home shell in `index.html` for stage-aware render targets.
+- Command/workflow: `apply_patch` against the existing home section.
+- Failed approach: Patched the old home markup in place after the file had already drifted and the text was mojibake-heavy.
+- Symptom: `apply_patch` could not find the expected block even though the section looked similar in the terminal.
+- Working approach: Replace the whole file content with a clean shell rewrite so the route placeholders are exact.
+- Next-time rule: For HTML shells with encoded or heavily drifted markup, prefer a full-file rewrite over a large in-place patch.
+
+## 2026-05-07 - Capture detached local server logs on a fresh port
+- Context: Smoke-testing the rewritten microsite in a local browser.
+- Command/workflow: Detached `Start-Process` server launch.
+- Failed approach: Started the server without redirected output and then assumed the first port was usable.
+- Symptom: The browser harness hit `ERR_CONNECTION_REFUSED`, so it was unclear whether the server had started or exited immediately.
+- Working approach: Relaunch on a fresh port with redirected stdout/stderr and confirm the process stays running before testing.
+- Next-time rule: When a detached local host is flaky, use a fresh port plus redirected logs to prove it is actually alive before browser testing.
 - Failed approach: Ran git write/network commands in sandbox mode first.
 - Symptom: `.git/index.lock` permission errors on add/commit and GitHub connection failure on push.
 - Working approach: Retry git write and push commands with escalated permissions.

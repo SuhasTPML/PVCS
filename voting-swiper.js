@@ -1,5 +1,11 @@
 (function () {
   var siteData = window.CINE_SITE_DATA || {};
+  var STAGES = {
+    pre: "pre-vote",
+    during: "during-vote",
+    post: "post-vote"
+  };
+  var MAX_PHONE = 10;
 
   function qs(selector, root) {
     return (root || document).querySelector(selector);
@@ -22,67 +28,93 @@
     return Number(value || 0).toLocaleString("en-IN");
   }
 
+  function formatDate(value) {
+    var date = new Date(String(value) + "T00:00:00");
+    if (isNaN(date.getTime())) {
+      return String(value || "");
+    }
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }).format(date);
+  }
+
   function prefersReducedMotion() {
     return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function getCategoryState() {
-    if (!window.__cineVotingSwiperState) {
-      window.__cineVotingSwiperState = {};
-    }
-
-    return window.__cineVotingSwiperState;
+  function getRoute() {
+    return location.hash.replace(/^#\/?/, "").trim() || "home";
   }
 
-  function getFlowState() {
-    if (!window.__cineVotingSwiperFlowState) {
-      window.__cineVotingSwiperFlowState = {
-        phoneInput: "",
-        phoneError: "",
-        submissionStatus: "idle",
-        submissionMode: "",
-        submissionMessage: ""
-      };
-    }
+  function getStage() {
+    return document.body.getAttribute("data-stage") || siteData.defaultStage || STAGES.pre;
+  }
 
-    return window.__cineVotingSwiperFlowState;
+  function getCategories() {
+    return siteData.votingCategories || [];
   }
 
   function getCategory(categoryId) {
-    return (siteData.votingCategories || []).filter(function (item) {
+    return getCategories().filter(function (item) {
       return item.id === categoryId;
     })[0];
   }
 
-  function getCategoryIndex(categoryId) {
-    var categories = siteData.votingCategories || [];
-    var index = 0;
-
-    for (; index < categories.length; index += 1) {
-      if (categories[index].id === categoryId) {
-        return index;
-      }
+  function getState() {
+    if (!window.__pvcsVotingState) {
+      window.__pvcsVotingState = {
+        selections: {},
+        currentStep: 0,
+        phone: {
+          name: "",
+          district: "Others",
+          mobile: "",
+          status: "idle",
+          message: ""
+        },
+        activeCategoryId: "",
+        submissionStatus: "idle",
+        submissionMessage: ""
+      };
     }
+    return window.__pvcsVotingState;
+  }
 
-    return -1;
+  function ensureSelectionState() {
+    var state = getState();
+    getCategories().forEach(function (category) {
+      if (!state.selections[category.id]) {
+        state.selections[category.id] = {
+          nomineeId: "",
+          nomineeTitle: "",
+          nomineeIndex: -1
+        };
+      }
+    });
+    return state;
+  }
+
+  function getSelectedNominee(category) {
+    var state = getState().selections[category.id] || {};
+    if (!state.nomineeId) {
+      return null;
+    }
+    return (category.nominees || []).filter(function (nominee) {
+      return nominee.id === state.nomineeId;
+    })[0] || null;
   }
 
   function getCompletedCount() {
-    return (siteData.votingCategories || []).reduce(function (count, category) {
-      var state = getCategoryState()[category.id];
-      return count + (state && state.selectedNomineeId ? 1 : 0);
+    return getCategories().reduce(function (count, category) {
+      var selection = getState().selections[category.id];
+      return count + (selection && selection.nomineeId ? 1 : 0);
     }, 0);
   }
 
-  function getSelectionSummary() {
-    return (siteData.votingCategories || []).map(function (category) {
-      var state = getCategoryState()[category.id] || {};
-      return {
-        category: category,
-        title: state.selectedNomineeTitle || "",
-        nomineeId: state.selectedNomineeId || ""
-      };
-    });
+  function isValidPhone(value) {
+    return /^[6-9]\d{9}$/.test(value);
   }
 
   function normalizePhoneInput(value) {
@@ -92,481 +124,588 @@
     } else if (digits.indexOf("0") === 0 && digits.length === 11) {
       digits = digits.slice(1);
     }
-
-    return digits;
-  }
-
-  function isValidPhone(value) {
-    return /^[6-9]\d{9}$/.test(value);
+    return digits.slice(0, MAX_PHONE);
   }
 
   function scrollToElement(element) {
     if (!element) {
       return;
     }
-
     element.scrollIntoView({
       behavior: prefersReducedMotion() ? "auto" : "smooth",
       block: "start"
     });
   }
 
-  function renderCard(category, nominee, index) {
-    return (
-      '<article class="vote-card vote-card--swiper" data-nominee-id="' + escapeHtml(nominee.id) + '" ' +
-        'style="--card-a:' + nominee.accent[0] + '; --card-b:' + nominee.accent[1] + ';">' +
-        (nominee.image ? '<img class="vote-card__photo" src="' + escapeHtml(nominee.image) + '" alt="' + escapeHtml(nominee.title) + '">' : '') +
-        '<div class="vote-card__visual">' +
-          '<span class="vote-card__rank">#' + String(index + 1).padStart(2, "0") + "</span>" +
-          '<h3>' + escapeHtml(nominee.title) + "</h3>" +
-        "</div>" +
-        '<div class="vote-card__body">' +
-          '<p class="vote-card__summary">' + escapeHtml(nominee.summary) + "</p>" +
-        "</div>" +
-      "</article>"
-    );
-  }
-
-  function renderCategory(category) {
-    return (
-      '<section class="section-card vote-category vote-category--swiper" data-category-id="' + escapeHtml(category.id) + '">' +
-        '<div class="vote-category__header">' +
-        '<div class="vote-category__heading">' +
-            '<h2>' + escapeHtml(category.title) + "</h2>" +
-            '<p class="vote-category__description">' + escapeHtml(category.description) + "</p>" +
-          "</div>" +
-        "</div>" +
-        '<div class="vote-carousel vote-carousel--swiper">' +
-          '<button class="vote-carousel__control vote-carousel__control--prev" type="button" data-swiper-prev aria-label="Previous nominee">&lsaquo;</button>' +
-          '<div class="swiper vote-swiper" data-swiper-id="' + escapeHtml(category.id) + '" aria-label="' + escapeHtml(category.title) + ' nominees">' +
-            '<div class="swiper-wrapper">' +
-              category.nominees.map(function (nominee, index) {
-                return '<div class="swiper-slide" data-nominee-id="' + escapeHtml(nominee.id) + '">' + renderCard(category, nominee, index) + "</div>";
-              }).join("") +
-            "</div>" +
-          "</div>" +
-          '<button class="vote-carousel__control vote-carousel__control--next" type="button" data-swiper-next aria-label="Next nominee">&rsaquo;</button>' +
-        "</div>" +
-        '<div class="vote-category__action">' +
-          '<button class="vote-category__vote-btn" type="button" data-vote-now="true" data-category-id="' + escapeHtml(category.id) + '">' +
-            "Vote Now" +
-          "</button>" +
-        "</div>" +
-        '<p class="vote-category__hint">' + escapeHtml(category.hint) + "</p>" +
-      "</section>"
-    );
-  }
-
-  function renderSelectionSummaryCard(category) {
-    return (
-      '<article class="vote-summary-card" data-summary-card data-category-id="' + escapeHtml(category.id) + '">' +
-        '<h3>' + escapeHtml(category.title) + "</h3>" +
-        '<p class="vote-summary-card__choice" data-summary-choice>Not selected yet</p>' +
-        '<button class="vote-summary-card__link" type="button" data-summary-jump="' + escapeHtml(category.id) + '">' +
-          "Vote now" +
-        "</button>" +
-      "</article>"
-    );
-  }
-
-  function renderPhoneStep() {
-    return (
-      '<section class="section-card vote-phone-step" id="vote-phone-step" data-phone-step>' +
-        '<div class="vote-phone-step__header">' +
-          '<p class="eyebrow">Final step</p>' +
-          '<h2>Confirm your vote with a phone number</h2>' +
-          '<p class="vote-phone-step__copy">Enter your mobile number to submit your vote. We use it to prevent duplicate entries.</p>' +
-        "</div>" +
-        '<div class="vote-phone-step__progress">' +
-          '<div class="vote-phone-step__progress-meta">' +
-            '<span data-progress-label>0 of 4 categories complete</span>' +
-            '<span data-progress-hint>Finish all categories to unlock submission</span>' +
-          "</div>" +
-          '<div class="vote-phone-step__meter" aria-hidden="true"><span data-progress-fill></span></div>' +
-        "</div>" +
-        '<div class="vote-phone-step__summary" data-summary-grid>' +
-          (siteData.votingCategories || []).map(renderSelectionSummaryCard).join("") +
-        "</div>" +
-        '<div class="vote-phone-step__success" data-success-panel hidden>' +
-          '<p class="eyebrow">Thank you</p>' +
-          '<h3>Your ballot is ready</h3>' +
-          '<p data-success-copy>Thank you for participating in Praja Vaani Cine Sammana!</p>' +
-          '<div class="vote-phone-step__success-summary" data-success-summary></div>' +
-        "</div>" +
-        '<div class="vote-phone-step__form" data-phone-form>' +
-          '<label class="vote-phone-step__field">' +
-            '<span>Phone number</span>' +
-            '<input type="tel" inputmode="numeric" autocomplete="tel" maxlength="14" placeholder="9876543210" data-phone-input disabled>' +
-          "</label>" +
-          '<p class="vote-phone-step__helper" data-phone-helper>Enter a 10-digit Indian mobile number. We strip +91 and 0 prefixes automatically.</p>' +
-          '<button class="btn btn--primary vote-phone-step__submit" type="button" data-phone-submit disabled>Complete all categories</button>' +
-          '<p class="vote-phone-step__status" data-phone-status aria-live="polite"></p>' +
-        "</div>" +
-      "</section>"
-    );
-  }
-
-  function renderPage() {
-    var root = qs("[data-voting-swiper-root]");
-    if (!root || !siteData.votingCategories || !siteData.votingCategories.length) {
-      return null;
+  function renderNomineeCard(nominee, index, mode, selected) {
+    var classes = ["vote-tile"];
+    if (selected) {
+      classes.push("is-selected");
     }
+    if (mode === "browse") {
+      classes.push("vote-tile--browse");
+    }
+    var tag = mode === "browse" ? "article" : "button";
+    return [
+      '<' + tag + ' class="' + classes.join(" ") + '"' + (mode === "browse" ? "" : ' type="button" data-nominee-id="' + escapeHtml(nominee.id) + '" data-nominee-index="' + index + '"') + '>',
+        '<img class="vote-tile__image" src="' + escapeHtml(nominee.image) + '" alt="' + escapeHtml(nominee.title) + '">',
+        '<span class="vote-tile__rank">#' + String(index + 1).padStart(2, "0") + "</span>",
+        '<span class="vote-tile__body">',
+          '<strong>' + escapeHtml(nominee.title) + "</strong>",
+          '<small>' + escapeHtml(nominee.subtitle || "") + "</small>",
+          '<span>' + escapeHtml(nominee.summary || "") + "</span>",
+        "</span>",
+      "</" + tag + ">"
+    ].join("");
+  }
+
+  function renderStepperCategory(category, stepIndex) {
+    var state = getState().selections[category.id] || {};
+    var nominees = (category.nominees || []).slice(0, 8);
+    return [
+      '<section class="vote-stepper__panel section-card" data-step-category="' + escapeHtml(category.id) + '" data-step-index="' + stepIndex + '">',
+        '<div class="vote-stepper__panel-head">',
+          '<div>',
+            '<p class="eyebrow">Category ' + String(stepIndex + 1).padStart(2, "0") + "</p>",
+            '<h2>' + escapeHtml(category.title) + "</h2>",
+            '<p>' + escapeHtml(category.description) + "</p>",
+          "</div>",
+          '<div class="vote-stepper__panel-meta">',
+            '<span>' + formatNumber(nominees.length) + " nominees</span>",
+            '<span>' + formatNumber(getCompletedCount()) + " of " + formatNumber(getCategories().length) + " complete</span>",
+          "</div>",
+        "</div>",
+        '<div class="vote-stepper__grid">' + nominees.map(function (nominee, index) {
+          return renderNomineeCard(nominee, index, "pick", state.nomineeId === nominee.id);
+        }).join("") + "</div>",
+        '<div class="vote-stepper__panel-foot">',
+          '<button class="btn btn--ghost" type="button" data-step-back="' + stepIndex + '"' + (stepIndex === 0 ? " disabled" : "") + ">Previous</button>",
+          '<button class="btn btn--primary" type="button" data-step-next="' + stepIndex + '"' + (state.nomineeId ? "" : " disabled") + ">Next</button>",
+        "</div>",
+      "</section>"
+    ].join("");
+  }
+
+  function renderFinalStep() {
+    var state = getState();
+    var completed = getCompletedCount();
+    var categories = getCategories();
+    var districts = (siteData.districts || []).slice();
+    return [
+      '<section class="vote-final section-card" data-final-step>',
+        '<div class="vote-final__header">',
+          '<p class="eyebrow">Final submission</p>',
+          '<h2>Confirm your ballot</h2>',
+          '<p>All four categories are complete. Enter your details to submit the vote.</p>',
+        "</div>",
+        '<div class="vote-final__summary">',
+          '<div class="vote-final__summary-meta">',
+            '<span>' + formatNumber(completed) + " of " + formatNumber(categories.length) + " complete</span>",
+            '<span>District list starts with Others</span>',
+          "</div>",
+          '<div class="vote-final__summary-grid">' + categories.map(function (category) {
+            var selected = getSelectedNominee(category);
+            return [
+              '<article class="vote-final__summary-card">',
+                '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
+                '<strong>' + escapeHtml(selected ? selected.title : "Not selected") + "</strong>",
+              "</article>"
+            ].join("");
+          }).join("") + "</div>",
+        "</div>",
+        '<form class="vote-final__form" data-vote-final-form novalidate>',
+          '<label class="vote-final__field">',
+            '<span>Name</span>',
+            '<input type="text" name="name" autocomplete="name" minlength="2" placeholder="Your name" value="' + escapeHtml(state.phone.name) + '">',
+          "</label>",
+          '<label class="vote-final__field">',
+            '<span>District</span>',
+            '<select name="district">',
+              districts.map(function (district) {
+                return '<option value="' + escapeHtml(district) + '"' + (state.phone.district === district ? " selected" : "") + ">" + escapeHtml(district) + "</option>";
+              }).join(""),
+            "</select>",
+          "</label>",
+          '<label class="vote-final__field">',
+            '<span>Mobile</span>',
+            '<input type="tel" name="mobile" inputmode="numeric" autocomplete="tel" maxlength="14" placeholder="9876543210" value="' + escapeHtml(state.phone.mobile) + '">',
+          "</label>",
+          '<p class="vote-final__helper">Name must be at least 2 characters. Mobile must be a valid Indian number starting 6 to 9.</p>',
+          '<div class="vote-final__actions">',
+            '<button class="btn btn--ghost" type="button" data-step-back="' + categories.length + '">Previous</button>',
+            '<button class="btn btn--primary" type="submit" data-final-submit>Submit vote</button>',
+          "</div>",
+          '<p class="vote-final__status" data-final-status aria-live="polite"></p>',
+        "</form>",
+      "</section>"
+    ].join("");
+  }
+
+  function renderVotingClosed(stage) {
+    var title = stage === STAGES.post ? "Voting is closed" : "Voting opens soon";
+    var copy = stage === STAGES.post
+      ? "The winners page now carries the main event CTA."
+      : "Use the home page to follow the countdown until the ballot opens.";
+    var href = stage === STAGES.post ? "#/winners" : "#/";
+    var label = stage === STAGES.post ? "View winners" : "Back to home";
+    return [
+      '<section class="section-card route-locked">',
+        '<p class="eyebrow">Voting</p>',
+        '<h1>' + escapeHtml(title) + "</h1>",
+        '<p>' + escapeHtml(copy) + "</p>",
+        '<a class="btn btn--primary" href="' + href + '">' + escapeHtml(label) + "</a>",
+      "</section>"
+    ].join("");
+  }
+
+  function renderVotingRoute(root) {
+    if (!root) {
+      return;
+    }
+
+    var stage = getStage();
+    if (stage !== STAGES.during) {
+      root.innerHTML = renderVotingClosed(stage);
+      return;
+    }
+
+    var categories = getCategories();
+    var state = ensureSelectionState();
+    var currentStep = Math.max(0, Math.min(state.currentStep || 0, categories.length));
+    if (currentStep > categories.length) {
+      currentStep = categories.length;
+    }
+
+    var sections = [
+      '<section class="section-card vote-stepper__intro">',
+        '<p class="eyebrow">Voting</p>',
+        '<h1>Vote category by category</h1>',
+        '<p>Pick one nominee per category. The flow advances automatically, and the final screen appears only after all four categories are complete.</p>',
+      "</section>",
+      '<section class="vote-stepper section-card" data-vote-stepper>',
+        '<header class="vote-stepper__header">',
+          '<div>',
+            '<p class="eyebrow">Progress</p>',
+            '<h2>' + formatNumber(getCompletedCount()) + " of " + formatNumber(categories.length) + " complete</h2>",
+          "</div>",
+          '<div class="vote-stepper__header-actions">',
+            '<a class="btn btn--ghost" href="#/nominations">Open nominations</a>',
+          "</div>",
+        "</header>",
+        '<div class="vote-stepper__status" data-step-status></div>',
+      "</section>"
+    ];
+
+    if (currentStep < categories.length) {
+      sections[1] = sections[1].replace("</section>", renderStepperCategory(categories[currentStep], currentStep) + "</section>");
+    } else {
+      sections[1] = sections[1].replace("</section>", renderFinalStep() + "</section>");
+    }
+
+    root.innerHTML = sections.join("");
+    syncVotingRoute(root);
+  }
+
+  function renderNominationsRoute(root) {
+    if (!root) {
+      return;
+    }
+
+    var stage = getStage();
+    var categories = getCategories();
+    var sections = [
+      '<section class="section-card nominations-hero">',
+        '<p class="eyebrow">Nominations</p>',
+        '<h1>' + (stage === STAGES.post ? "Archive and winners browser" : "Jump through the categories") + "</h1>",
+        '<p>' + (stage === STAGES.post ? "Use the floating selector to jump through the full archive and winner surfaces." : "Use the floating selector to jump directly to any category.") + "</p>",
+        '<a class="btn btn--primary" href="#/voting">' + (stage === STAGES.post ? "Go to winners" : "Start voting") + "</a>",
+      "</section>",
+      '<aside class="nomination-widget section-card" data-nomination-widget>',
+        '<label>',
+          '<span class="eyebrow">Jump to category</span>',
+          '<select data-nomination-select>',
+            '<option value="">Choose a category</option>',
+            categories.map(function (category) {
+              return '<option value="' + escapeHtml(category.id) + '">' + escapeHtml(category.title) + "</option>";
+            }).join(""),
+          "</select>",
+        "</label>",
+        '<p class="nomination-widget__note">The widget auto-scrolls to the selected section.</p>',
+      "</aside>",
+      '<div class="nomination-list">' + categories.map(function (category) {
+        return [
+          '<section class="section-card nomination-section" data-nomination-section="' + escapeHtml(category.id) + '">',
+            '<div class="nomination-section__header">',
+              '<div>',
+                '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
+                '<h2>' + escapeHtml(category.description) + "</h2>",
+              "</div>",
+            "</div>",
+            '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 8).map(function (nominee, index) {
+              return renderNomineeCard(nominee, index, "browse", false);
+            }).join("") + "</div>",
+          "</section>"
+        ].join("");
+      }).join("") + "</div>"
+    ];
+
+    root.innerHTML = sections.join("");
+    initNominationWidget(root);
+  }
+
+  function renderWinnersRoute(root) {
+    if (!root) {
+      return;
+    }
+
+    var stage = getStage();
+    var winners = (siteData.winnerHighlights || []).slice();
+    var categories = getCategories();
+    var publicWinners = categories.map(function (category) {
+      var winner = getSelectedNominee(category) || (category.nominees || [])[0];
+      return winner ? {
+        category: category.title,
+        title: winner.title,
+        subtitle: winner.subtitle || "Public winner",
+        summary: winner.summary || "",
+        image: winner.image
+      } : null;
+    }).filter(Boolean);
 
     root.innerHTML = [
-      '<section class="section-card voting-intro">',
-        '<p class="eyebrow">Voting</p>',
-        '<h1>Vote for Your Favourites</h1>',
-        '<p>Swipe through the nominees in each category and tap Vote Now to make your pick. Complete all categories to submit.</p>',
+      '<section class="section-card winners-hero">',
+        '<p class="eyebrow">Winners</p>',
+        '<h1>' + (stage === STAGES.post ? "The winners are in" : "Winner preview") + "</h1>",
+        '<p>The winners page shows the public category results and the additional recognition cards.</p>',
+        '<div class="winners-hero__actions">',
+          '<a class="btn btn--primary" href="#/nominations">Browse nominations</a>',
+          '<a class="btn btn--ghost" href="#/">Back to home</a>',
+        "</div>",
+      "</section>",
+      '<section class="content-block section-card">',
+        '<div class="content-block__header">',
+          '<div>',
+            '<p class="eyebrow">Public winners</p>',
+            '<h2>Category leaders</h2>',
+          "</div>",
+        "</div>",
+        '<div class="winner-grid">' + publicWinners.map(function (winner) {
+          return [
+            '<article class="winner-card">',
+              '<img src="' + escapeHtml(winner.image) + '" alt="' + escapeHtml(winner.title) + '">',
+              '<div class="winner-card__copy">',
+                '<p class="eyebrow">' + escapeHtml(winner.category) + "</p>",
+                '<h3>' + escapeHtml(winner.title) + "</h3>",
+                '<p>' + escapeHtml(winner.subtitle) + "</p>",
+              "</div>",
+            "</article>"
+          ].join("");
+        }).join("") + "</div>",
+      "</section>",
+      '<section class="content-block section-card">',
+        '<div class="content-block__header">',
+          '<div>',
+            '<p class="eyebrow">Extended winners</p>',
+            '<h2>Additional recognition cards</h2>',
+          "</div>",
+        "</div>",
+        '<div class="winner-grid">' + winners.map(function (winner) {
+          return [
+            '<article class="winner-card">',
+              '<img src="' + escapeHtml(winner.image) + '" alt="' + escapeHtml(winner.title) + '">',
+              '<div class="winner-card__copy">',
+                '<p class="eyebrow">' + escapeHtml(winner.category) + "</p>",
+                '<h3>' + escapeHtml(winner.title) + "</h3>",
+                '<p>' + escapeHtml(winner.subtitle) + "</p>",
+              "</div>",
+            "</article>"
+          ].join("");
+        }).join("") + "</div>",
       "</section>"
-    ].join("") +
-      siteData.votingCategories.map(renderCategory).join("") +
-      renderPhoneStep();
-
-    return root;
+    ].join("");
   }
 
-  function refreshActiveButtons(section, category) {
-    var state = getCategoryState()[category.id];
-    var button = qs("[data-vote-now]", section);
-    if (!button) {
+  function initNominationWidget(root) {
+    var select = qs("[data-nomination-select]", root);
+    if (!select) {
       return;
     }
 
-    var isSelected = !!state.selectedNomineeId;
-    var isLocked = isSelected && !state.isEditing;
-
-    qsa(".swiper-slide", section).forEach(function (slide) {
-      var nomineeId = slide.getAttribute("data-nominee-id") ||
-        (qs("[data-nominee-id]", slide) || {}).getAttribute && qs("[data-nominee-id]", slide).getAttribute("data-nominee-id") || "";
-      slide.classList.toggle("is-selected", isSelected && state.selectedNomineeId === nomineeId);
+    select.addEventListener("change", function () {
+      var categoryId = select.value;
+      if (!categoryId) {
+        return;
+      }
+      var section = qs('[data-nomination-section="' + categoryId + '"]', root);
+      scrollToElement(section);
     });
-
-    button.textContent = isLocked ? "Change vote" : "Vote Now";
-    button.setAttribute("aria-pressed", isLocked ? "true" : "false");
-    button.classList.toggle("is-selected", isLocked);
   }
 
-  function syncCategoryInteraction(section, category) {
-    var state = getCategoryState()[category.id];
-    var swiper = state.swiper;
-    var isLocked = !!state.selectedNomineeId && !state.isEditing;
-
-    section.classList.toggle("is-locked", isLocked);
-    section.classList.toggle("is-editing", !!state.selectedNomineeId && state.isEditing);
-
-    if (!swiper) {
-      return;
-    }
-
-    swiper.allowTouchMove = !isLocked;
-
-    if (swiper.mousewheel && typeof swiper.mousewheel.enable === "function" && typeof swiper.mousewheel.disable === "function") {
-      if (isLocked) {
-        swiper.mousewheel.disable();
-      } else {
-        swiper.mousewheel.enable();
-      }
-    }
-
-    if (swiper.keyboard && typeof swiper.keyboard.enable === "function" && typeof swiper.keyboard.disable === "function") {
-      if (isLocked) {
-        swiper.keyboard.disable();
-      } else {
-        swiper.keyboard.enable();
-      }
-    }
-  }
-
-  function refreshVotingCategory(categoryId) {
-    var state = getCategoryState()[categoryId];
-    if (!state) {
-      return;
-    }
-
-    var category = getCategory(categoryId);
-    if (!category) {
-      return;
-    }
-
-    var section = qs('.vote-category[data-category-id="' + categoryId + '"]');
-    if (!section) {
-      return;
-    }
-
-    section.classList.toggle("is-complete", !!state.selectedNomineeId);
-    refreshActiveButtons(section, category);
-    syncCategoryInteraction(section, category);
-    refreshPhoneStep();
-  }
-
-  function refreshPhoneStep() {
-    var flow = getFlowState();
-    var section = qs("[data-phone-step]");
-    if (!section) {
-      return;
-    }
-
-    var categories = siteData.votingCategories || [];
-    var total = categories.length || 1;
+  function getCategoryProgressMessage(stepIndex) {
+    var categories = getCategories();
     var completed = getCompletedCount();
-    var allComplete = completed === total;
-    var progressLabel = qs("[data-progress-label]", section);
-    var progressHint = qs("[data-progress-hint]", section);
-    var progressFill = qs("[data-progress-fill]", section);
-    var phoneInput = qs("[data-phone-input]", section);
-    var phoneHelper = qs("[data-phone-helper]", section);
-    var submitButton = qs("[data-phone-submit]", section);
-    var statusNode = qs("[data-phone-status]", section);
-    var formNode = qs("[data-phone-form]", section);
-    var successPanel = qs("[data-success-panel]", section);
-    var successCopy = qs("[data-success-copy]", section);
-    var summaryGrid = qs("[data-summary-grid]", section);
-    section.classList.toggle("is-locked", !allComplete);
-    section.classList.toggle("is-unlocked", allComplete);
-    section.classList.toggle("is-submitting", flow.submissionStatus === "submitting");
-    section.classList.toggle("is-success", flow.submissionStatus === "success");
-
-    if (progressLabel) {
-      progressLabel.textContent = completed + " of " + total + " categories complete";
+    if (stepIndex >= categories.length) {
+      return completed === categories.length
+        ? "All categories are complete. Review your ballot and submit."
+        : "Finish all categories to unlock submission.";
     }
+    var selection = getState().selections[categories[stepIndex].id];
+    return selection && selection.nomineeId
+      ? "Selection saved. Continue to the next category."
+      : "Choose one nominee to unlock the next step.";
+  }
 
-    if (progressHint) {
-      progressHint.textContent = allComplete
-        ? "Enter your number below to submit"
-        : "Complete all categories to unlock submission";
+  function refreshStepStatus(root) {
+    var status = qs("[data-step-status]", root);
+    if (!status) {
+      return;
     }
+    var state = getState();
+    var categories = getCategories();
+    status.textContent = getCategoryProgressMessage(Math.min(state.currentStep || 0, categories.length));
+  }
 
-    if (progressFill) {
-      progressFill.style.width = Math.round((completed / total) * 100) + "%";
+  function refreshFinalStatus(root) {
+    var status = qs("[data-final-status]", root);
+    if (!status) {
+      return;
     }
+    var state = getState();
+    if (state.submissionStatus === "success") {
+      status.textContent = state.submissionMessage || "Submission complete.";
+    } else if (state.submissionStatus === "error") {
+      status.textContent = state.submissionMessage || "Please check the form and try again.";
+    } else {
+      status.textContent = "";
+    }
+  }
 
-    var pendingCount = 0;
-    qsa("[data-summary-card]", section).forEach(function (card, index) {
-      var category = categories[index];
-      if (!category) {
+  function syncVotingRoute(root) {
+    var state = getState();
+    var categories = getCategories();
+    refreshStepStatus(root);
+
+    if (root.__pvcsVotingBound) {
+      refreshFinalState(root);
+      return;
+    }
+    root.__pvcsVotingBound = true;
+
+    root.addEventListener("click", function (event) {
+      var backButton = event.target.closest("[data-step-back]");
+      if (backButton) {
+        event.preventDefault();
+        var backIndex = Number(backButton.getAttribute("data-step-back"));
+        state.currentStep = Math.max(0, backIndex - 1);
+        renderRouteContent();
         return;
       }
 
-      var state = getCategoryState()[category.id] || {};
-      var choiceNode = qs("[data-summary-choice]", card);
-      var jumpButton = qs("[data-summary-jump]", card);
-      var isComplete = !!state.selectedNomineeTitle;
-
-      card.classList.toggle("is-complete", isComplete);
-      card.hidden = isComplete;
-      if (!isComplete) {
-        pendingCount += 1;
+      var nextButton = event.target.closest("[data-step-next]");
+      if (nextButton) {
+        event.preventDefault();
+        var stepIndex = Number(nextButton.getAttribute("data-step-next"));
+        var category = categories[stepIndex];
+        if (!category || !state.selections[category.id] || !state.selections[category.id].nomineeId) {
+          refreshStepStatus(root);
+          return;
+        }
+        state.currentStep = Math.min(categories.length, stepIndex + 1);
+        renderRouteContent();
+        return;
       }
 
-      if (choiceNode) {
-        choiceNode.textContent = state.selectedNomineeTitle || "Not selected yet";
-      }
-
-      if (jumpButton) {
-        jumpButton.textContent = "Vote now";
-        jumpButton.disabled = flow.submissionStatus === "submitting" || isComplete;
+      var nomineeButton = event.target.closest("[data-nominee-id]");
+      if (nomineeButton) {
+        event.preventDefault();
+        var categoryIndex = Math.max(0, Math.min(state.currentStep || 0, categories.length - 1));
+        var category = categories[categoryIndex];
+        if (!category) {
+          return;
+        }
+        var nomineeId = nomineeButton.getAttribute("data-nominee-id");
+        var nomineeIndex = Number(nomineeButton.getAttribute("data-nominee-index") || 0);
+        var nominee = (category.nominees || []).filter(function (item) {
+          return item.id === nomineeId;
+        })[0];
+        if (!nominee) {
+          return;
+        }
+        state.selections[category.id] = {
+          nomineeId: nominee.id,
+          nomineeTitle: nominee.title,
+          nomineeIndex: nomineeIndex
+        };
+        if (state.submissionStatus !== "idle") {
+          state.submissionStatus = "idle";
+          state.submissionMessage = "";
+        }
+        state.currentStep = Math.min(categories.length, categoryIndex + 1);
+        renderRouteContent();
+        if (state.currentStep < categories.length) {
+          window.setTimeout(function () {
+            scrollToElement(qs('[data-step-category="' + categories[state.currentStep].id + '"]'));
+          }, 120);
+        } else {
+          window.setTimeout(function () {
+            scrollToElement(qs("[data-final-step]", root));
+          }, 120);
+        }
       }
     });
 
-    if (summaryGrid) {
-      summaryGrid.hidden = pendingCount === 0;
-    }
-
-    if (phoneInput) {
-      phoneInput.value = flow.phoneInput;
-      phoneInput.disabled = !allComplete || flow.submissionStatus === "submitting" || flow.submissionStatus === "success";
-    }
-
-    if (phoneHelper) {
-      phoneHelper.textContent = allComplete
-        ? "Enter a 10-digit Indian mobile number. We strip +91 and 0 prefixes automatically."
-        : "Complete all four categories to unlock this field.";
-    }
-
-    if (submitButton) {
-      if (flow.submissionStatus === "submitting") {
-        submitButton.textContent = "Submitting...";
-      } else if (!allComplete) {
-        submitButton.textContent = "Complete all categories";
-      } else if (flow.submissionStatus === "success") {
-        submitButton.textContent = "Submitted";
-      } else {
-        submitButton.textContent = "Submit My Votes";
+    root.addEventListener("input", function (event) {
+      var input = event.target.closest("[name]");
+      if (!input) {
+        return;
       }
-
-      submitButton.disabled = !allComplete ||
-        flow.submissionStatus === "submitting" ||
-        flow.submissionStatus === "success" ||
-        !isValidPhone(normalizePhoneInput(flow.phoneInput));
-    }
-
-    if (statusNode) {
-      if (flow.submissionStatus === "submitting") {
-        statusNode.textContent = "Submitting your ballot...";
-      } else if (flow.submissionStatus === "duplicate") {
-        statusNode.textContent = flow.submissionMessage || "This phone number already voted.";
-      } else if (flow.submissionStatus === "error") {
-        statusNode.textContent = flow.submissionMessage || "Submission failed. Please try again.";
-      } else if (flow.submissionStatus === "success") {
-        statusNode.textContent = flow.submissionMessage || "Your ballot was accepted.";
-      } else if (!allComplete) {
-        statusNode.textContent = "Complete all categories to unlock submission.";
-      } else if (!isValidPhone(normalizePhoneInput(flow.phoneInput)) && flow.phoneInput) {
-        statusNode.textContent = "Enter a valid 10-digit mobile number.";
-      } else {
-        statusNode.textContent = "";
-      }
-    }
-
-    if (formNode && successPanel) {
-      var isSuccess = flow.submissionStatus === "success";
-      formNode.hidden = isSuccess;
-      successPanel.hidden = !isSuccess;
-      if (isSuccess) {
-        var summaryText = qs("[data-success-summary]", section);
-        if (summaryText) {
-          summaryText.innerHTML = getSelectionSummary()
-            .map(function (item) {
-              return (
-                '<article class="vote-success-chip">' +
-                  '<span>' + escapeHtml(item.category.title) + "</span>" +
-                  '<strong>' + escapeHtml(item.title || "Not selected yet") + "</strong>" +
-                "</article>"
-              );
-            })
-            .join("");
+      if (input.closest("[data-vote-final-form]")) {
+        state.phone[input.name] = input.value;
+        if (state.submissionStatus !== "idle") {
+          state.submissionStatus = "idle";
+          state.submissionMessage = "";
         }
-
-        if (successCopy) {
-          successCopy.textContent = "Thank you for participating in Praja Vaani Cine Sammana!";
-        }
+        refreshFinalStatus(root);
+        refreshSubmitButton(root);
       }
+    });
+
+    var form = qs("[data-vote-final-form]", root);
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        submitBallot(root);
+      });
+
+      form.addEventListener("change", function (event) {
+        var field = event.target.closest("[name]");
+        if (!field) {
+          return;
+        }
+        state.phone[field.name] = field.value;
+        if (state.submissionStatus !== "idle") {
+          state.submissionStatus = "idle";
+          state.submissionMessage = "";
+        }
+        refreshFinalStatus(root);
+        refreshSubmitButton(root);
+      });
+    }
+
+    refreshFinalState(root);
+  }
+
+  function refreshFinalState(root) {
+    var state = getState();
+    var form = qs("[data-vote-final-form]", root);
+    if (!form) {
+      return;
+    }
+
+    qsa("[name]", form).forEach(function (field) {
+      if (field.name === "district") {
+        field.value = state.phone.district || "Others";
+      } else {
+        field.value = state.phone[field.name] || "";
+      }
+    });
+    refreshFinalStatus(root);
+    refreshSubmitButton(root);
+  }
+
+  function refreshSubmitButton(root) {
+    var state = getState();
+    var form = qs("[data-vote-final-form]", root);
+    if (!form) {
+      return;
+    }
+    var submit = qs("[data-final-submit]", form);
+    if (!submit) {
+      return;
+    }
+
+    var nameOk = String(state.phone.name || "").trim().length >= 2;
+    var mobileOk = isValidPhone(normalizePhoneInput(state.phone.mobile));
+    var allComplete = getCompletedCount() === getCategories().length;
+
+    submit.disabled = !(nameOk && mobileOk && allComplete);
+    if (state.submissionStatus === "submitting") {
+      submit.textContent = "Submitting...";
+    } else if (state.submissionStatus === "success") {
+      submit.textContent = "Submitted";
+    } else {
+      submit.textContent = "Submit vote";
     }
   }
 
-  function advanceAfterSelection(categoryId, shouldAutoAdvance) {
-    if (!shouldAutoAdvance) {
-      return;
-    }
-
-    var categories = siteData.votingCategories || [];
-    var currentIndex = getCategoryIndex(categoryId);
-    if (currentIndex < 0) {
-      return;
-    }
-
-    var nextCategory = categories[currentIndex + 1];
-    if (nextCategory) {
-      window.setTimeout(function () {
-        scrollToElement(qs('.vote-category[data-category-id="' + nextCategory.id + '"]'));
-      }, 180);
-      return;
-    }
-
-    window.setTimeout(function () {
-      scrollToElement(qs("[data-phone-step]"));
-    }, 220);
-  }
-
-  function openCategoryEditing(categoryId) {
-    var state = getCategoryState()[categoryId];
-    var category = getCategory(categoryId);
-    var section = qs('.vote-category[data-category-id="' + categoryId + '"]');
-    if (!state || !category || !section || !state.selectedNomineeId) {
-      return;
-    }
-
-    state.isEditing = true;
-    refreshVotingCategory(categoryId);
-
-    if (state.swiper && typeof state.swiper.slideToLoop === "function") {
-      state.swiper.slideToLoop(state.selectedNomineeIndex || 0, 0, false);
-    }
-  }
-
-  function invalidateSubmissionIfNeeded() {
-    var flow = getFlowState();
-    if (flow.submissionStatus === "success" || flow.submissionStatus === "duplicate" || flow.submissionStatus === "error") {
-      flow.submissionStatus = "idle";
-      flow.submissionMode = "";
-      flow.submissionMessage = "";
-    }
-  }
-
-  function registerVote(categoryId) {
-    var state = getCategoryState()[categoryId];
-    var category = getCategory(categoryId);
-    if (!state || !category) {
-      return;
-    }
-
-    var nominee = category.nominees[state.activeIndex || 0];
-    if (!nominee) {
-      return;
-    }
-
-    var wasSelected = !!state.selectedNomineeId;
-    state.selectedNomineeId = nominee.id;
-    state.selectedNomineeTitle = nominee.title;
-    state.selectedNomineeIndex = state.activeIndex || 0;
-    state.isEditing = false;
-
-    invalidateSubmissionIfNeeded();
-    refreshVotingCategory(categoryId);
-    refreshPhoneStep();
-    advanceAfterSelection(categoryId, !wasSelected);
-  }
-
-  function buildSubmissionPayload() {
+  function buildPayload() {
+    var state = getState();
     var selections = {};
-    (siteData.votingCategories || []).forEach(function (category) {
-      var state = getCategoryState()[category.id] || {};
-      selections[category.id] = state.selectedNomineeId || "";
+    getCategories().forEach(function (category) {
+      var selection = state.selections[category.id] || {};
+      selections[category.id] = selection.nomineeId || "";
     });
 
     return {
-      phone: normalizePhoneInput(getFlowState().phoneInput),
+      name: String(state.phone.name || "").trim(),
+      district: state.phone.district || "Others",
+      mobile: normalizePhoneInput(state.phone.mobile),
       selections: selections,
       submittedAt: new Date().toISOString()
     };
   }
 
-  function submitVotes() {
-    var flow = getFlowState();
-    var phone = normalizePhoneInput(flow.phoneInput);
-    var categories = siteData.votingCategories || [];
-    var allComplete = getCompletedCount() === categories.length;
+  function submitBallot(root) {
+    var state = getState();
+    var name = String(state.phone.name || "").trim();
+    var mobile = normalizePhoneInput(state.phone.mobile);
+    var allComplete = getCompletedCount() === getCategories().length;
+    var formStatus = qs("[data-final-status]", root);
 
     if (!allComplete) {
-      flow.submissionStatus = "error";
-      flow.submissionMessage = "Complete all four categories first.";
-      refreshPhoneStep();
+      state.submissionStatus = "error";
+      state.submissionMessage = "Complete all four categories first.";
+      refreshFinalStatus(root);
+      refreshSubmitButton(root);
       return;
     }
 
-    if (!isValidPhone(phone)) {
-      flow.phoneError = "Enter a valid 10-digit Indian mobile number.";
-      flow.submissionStatus = "error";
-      flow.submissionMessage = flow.phoneError;
-      refreshPhoneStep();
+    if (name.length < 2) {
+      state.submissionStatus = "error";
+      state.submissionMessage = "Enter a name with at least 2 characters.";
+      refreshFinalStatus(root);
+      refreshSubmitButton(root);
       return;
     }
 
-    flow.phoneInput = phone;
-    flow.phoneError = "";
-    flow.submissionStatus = "submitting";
-    flow.submissionMessage = "";
-    refreshPhoneStep();
+    if (!isValidPhone(mobile)) {
+      state.submissionStatus = "error";
+      state.submissionMessage = "Enter a valid 10-digit Indian mobile number.";
+      refreshFinalStatus(root);
+      refreshSubmitButton(root);
+      return;
+    }
 
-    var payload = buildSubmissionPayload();
+    state.phone.name = name;
+    state.phone.mobile = mobile;
+    state.submissionStatus = "submitting";
+    state.submissionMessage = "Submitting your ballot...";
+    refreshFinalStatus(root);
+    refreshSubmitButton(root);
+
     var submitUrl = window.CINE_VOTING_SUBMIT_URL || "";
+    var payload = buildPayload();
 
     if (!submitUrl) {
       window.setTimeout(function () {
-        flow.submissionStatus = "success";
-        flow.submissionMessage = "Your vote has been submitted successfully.";
-        refreshPhoneStep();
-      }, 550);
+        state.submissionStatus = "success";
+        state.submissionMessage = "Your ballot was accepted.";
+        refreshFinalStatus(root);
+        refreshSubmitButton(root);
+        if (formStatus) {
+          formStatus.textContent = state.submissionMessage;
+        }
+      }, 500);
       return;
     }
 
@@ -587,10 +726,10 @@
       })
       .then(function (result) {
         if (result.data && result.data.status === "duplicate") {
-          flow.submissionStatus = "duplicate";
-          flow.submissionMode = "";
-          flow.submissionMessage = "This phone number already voted.";
-          refreshPhoneStep();
+          state.submissionStatus = "error";
+          state.submissionMessage = "This phone number already voted.";
+          refreshFinalStatus(root);
+          refreshSubmitButton(root);
           return;
         }
 
@@ -598,246 +737,50 @@
           throw new Error("Submission failed");
         }
 
-        flow.submissionStatus = "success";
-        flow.submissionMode = "";
-        flow.submissionMessage = "Your ballot was accepted.";
-        refreshPhoneStep();
+        state.submissionStatus = "success";
+        state.submissionMessage = "Your ballot was accepted.";
+        refreshFinalStatus(root);
+        refreshSubmitButton(root);
       })
       .catch(function () {
-        flow.submissionStatus = "error";
-        flow.submissionMode = "";
-        flow.submissionMessage = "Submission failed. Please try again.";
-        refreshPhoneStep();
+        state.submissionStatus = "error";
+        state.submissionMessage = "Submission failed. Please try again.";
+        refreshFinalStatus(root);
+        refreshSubmitButton(root);
       });
   }
 
-  function initCategory(category) {
-    var section = qs('.vote-category[data-category-id="' + category.id + '"]');
-    var swiperEl = qs('[data-swiper-id="' + category.id + '"]', section);
-    var prev = qs("[data-swiper-prev]", section);
-    var next = qs("[data-swiper-next]", section);
-    var state = getCategoryState()[category.id];
-    if (!section || !swiperEl || typeof Swiper === "undefined") {
-      return;
-    }
+  function renderRouteContent() {
+    var route = getRoute();
+    var stage = getStage();
+    var votingRoot = qs("[data-voting-root]");
+    var nominationsRoot = qs("[data-nominations-root]");
+    var winnersRoot = qs("[data-winners-root]");
 
-    function go(delta) {
-      var total = category.nominees.length;
-      if (!total) {
-        return;
-      }
-
-      var nextIndex = (swiper.realIndex + delta + total) % total;
-      swiper.slideToLoop(nextIndex);
-    }
-
-    var swiper = new Swiper(swiperEl, {
-      slidesPerView: "auto",
-      centeredSlides: true,
-      loop: true,
-      grabCursor: true,
-      watchSlidesProgress: true,
-      followFinger: true,
-      threshold: 0,
-      touchRatio: 1,
-      touchAngle: 45,
-      longSwipesRatio: 0.2,
-      speed: 500,
-      spaceBetween: 18,
-      slideToClickedSlide: false,
-      // Keep tap events available for in-card action buttons on touch devices.
-      preventClicks: false,
-      preventClicksPropagation: false,
-      touchStartPreventDefault: false,
-      passiveListeners: false,
-      mousewheel: {
-        enabled: true,
-        forceToAxis: true,
-        releaseOnEdges: true,
-        sensitivity: 0.8
-      },
-      keyboard: {
-        enabled: true,
-        onlyInViewport: true
-      },
-      breakpoints: {
-        760: {
-          threshold: 8,
-          touchRatio: 1,
-          touchAngle: 45
-        }
-      },
-      effect: "creative",
-      creativeEffect: {
-        limitProgress: 2,
-        perspective: true,
-        progressMultiplier: 1,
-        prev: {
-          translate: ["-88%", 18, -220],
-          rotate: [0, 0, -8],
-          scale: 0.84,
-          opacity: 1
-        },
-        next: {
-          translate: ["88%", 18, -220],
-          rotate: [0, 0, 8],
-          scale: 0.84,
-          opacity: 1
-        }
-      },
-      on: {
-        init: function () {
-          state.activeIndex = this.realIndex || 0;
-          refreshActiveButtons(section, category);
-          refreshVotingCategory(category.id);
-        },
-        slideChange: function () {
-          state.activeIndex = this.realIndex || 0;
-          refreshActiveButtons(section, category);
-          refreshVotingCategory(category.id);
-        }
-      }
-    });
-
-    state.swiper = swiper;
-
-    if (prev) {
-      prev.addEventListener("click", function () {
-        go(-1);
-      });
-    }
-
-    if (next) {
-      next.addEventListener("click", function () {
-        go(1);
-      });
+    if (route === "voting") {
+      renderVotingRoute(votingRoot, stage);
+    } else if (route === "nominations") {
+      renderNominationsRoute(nominationsRoot, stage);
+    } else if (route === "winners") {
+      renderWinnersRoute(winnersRoot, stage);
     }
   }
 
-  function initPhoneStep(root) {
-    root.addEventListener("click", function (event) {
-      var jumpButton = event.target.closest("[data-summary-jump]");
-      if (jumpButton) {
-        event.preventDefault();
-        var categoryId = jumpButton.getAttribute("data-summary-jump");
-        openCategoryEditing(categoryId);
-        scrollToElement(qs('.vote-category[data-category-id="' + categoryId + '"]'));
-        return;
-      }
+  window.__initVotingSwiper = renderRouteContent;
+  window.__pvcsRenderRoute = renderRouteContent;
 
-      var submitButton = event.target.closest("[data-phone-submit]");
-      if (submitButton) {
-        event.preventDefault();
-        submitVotes();
-      }
-    });
-
-    root.addEventListener("input", function (event) {
-      var input = event.target.closest("[data-phone-input]");
-      if (!input) {
-        return;
-      }
-
-      var flow = getFlowState();
-      flow.phoneInput = input.value;
-      if (flow.phoneError) {
-        flow.phoneError = "";
-      }
-      refreshPhoneStep();
-    });
-
-    root.addEventListener("blur", function (event) {
-      var input = event.target.closest("[data-phone-input]");
-      if (!input) {
-        return;
-      }
-
-      var flow = getFlowState();
-      flow.phoneInput = normalizePhoneInput(input.value);
-      input.value = flow.phoneInput;
-      refreshPhoneStep();
-    }, true);
-  }
+  window.addEventListener("pvcs:render", function () {
+    renderRouteContent();
+  });
 
   function init() {
-    var root = renderPage();
-    if (!root || !siteData.votingCategories) {
-      return;
-    }
-
-    var state = getCategoryState();
-    siteData.votingCategories.forEach(function (category) {
-      if (!state[category.id]) {
-        state[category.id] = {
-          activeIndex: 0,
-          selectedNomineeId: "",
-          selectedNomineeTitle: "",
-          selectedNomineeIndex: 0,
-          isEditing: false,
-          swiper: null
-        };
-      }
-    });
-
-    qsa(".vote-category", root).forEach(function (section) {
-      var category = getCategory(section.getAttribute("data-category-id"));
-      if (category) {
-        initCategory(category);
-      }
-    });
-
-    var lastVoteActionKey = "";
-    var lastVoteActionAt = 0;
-
-    function handleVoteButton(voteButton) {
-      if (!voteButton) {
-        return;
-      }
-
-      var categoryId = voteButton.getAttribute("data-category-id");
-      if (!categoryId) {
-        return;
-      }
-
-      var actionKey = categoryId + ":" + (voteButton.textContent || "").trim();
-      var now = Date.now();
-      if (lastVoteActionKey === actionKey && now - lastVoteActionAt < 500) {
-        return;
-      }
-
-      lastVoteActionKey = actionKey;
-      lastVoteActionAt = now;
-
-      var state = getCategoryState()[categoryId];
-      if (state && state.selectedNomineeId && !state.isEditing) {
-        openCategoryEditing(categoryId);
-        return;
-      }
-
-      registerVote(categoryId);
-    }
-
-    root.addEventListener("click", function (event) {
-      var voteButton = event.target.closest("[data-vote-now]");
-      if (!voteButton) {
-        return;
-      }
-
-      event.preventDefault();
-      handleVoteButton(voteButton);
-    });
-
-    initPhoneStep(root);
-
-    qsa(".vote-category", root).forEach(function (section) {
-      refreshVotingCategory(section.getAttribute("data-category-id"));
-    });
-    refreshPhoneStep();
+    ensureSelectionState();
+    renderRouteContent();
   }
 
-  window.__initVotingSwiper = init;
-  if (window.__votingSwiperPending) {
-    window.__votingSwiperPending = false;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
     init();
   }
 })();
