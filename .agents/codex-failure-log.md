@@ -346,6 +346,38 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Working approach: Use a pre-existing valid token or complete the browser login outside the timeout window.
 - Next-time rule: If `gh auth login --web` hangs in this environment, treat it as incomplete and ask for an already-valid token or manual completion.
 
+## 2026-05-07 - Keep local Playwright host outside the sandbox
+- Context: Opening `index.html` in the Playwright browser tool after `file://` navigation was refused by the harness.
+- Command/workflow: Detached `python -m http.server` launch for localhost browser access.
+- Failed approach: Started the HTTP server inside the sandbox and immediately handed the URL to Playwright.
+- Symptom: The shell could fetch one `200` response, but the detached server process exited and Playwright got `net::ERR_CONNECTION_REFUSED`.
+- Working approach: Relaunch the server outside the sandbox with the real Python executable, verify `http://127.0.0.1:8767/index.html` returns `200`, then navigate Playwright to that URL.
+- Next-time rule: For Playwright access to local files in this workspace, serve them over localhost from an escalated detached server rather than relying on `file://` or a sandboxed background host.
+
+## 2026-05-07 - Re-read live controller keys before patching app shell controls
+- Context: Adding a collapsible stage-controller to `app.js`.
+- Command/workflow: `apply_patch` against the stage constants and `renderStageController()`.
+- Failed approach: Patched against an assumed storage key/value block (`cineStage`) instead of the live `pvcs-stage` controller code.
+- Symptom: `apply_patch` failed to match the expected lines near the top of `app.js`.
+- Working approach: Re-read the exact live header and controller block, then patch smaller hunks against the current `pvcs-stage` code.
+- Next-time rule: For app-shell UI controls in this repo, inspect the exact current storage keys and render function before patching; do not rely on remembered identifiers.
+
+## 2026-05-07 - Patch stage hero string arrays in small hunks
+- Context: Replacing the trophy-side English hero copy with the restored Kannada title/subheadline in `app.js`.
+- Command/workflow: `apply_patch` against the `copyHtml` array strings inside `renderHomeHero()`.
+- Failed approach: Tried to replace all three stage branches in one large patch hunk.
+- Symptom: `apply_patch` could not match the pre-vote string block even though the content looked correct in prior output.
+- Working approach: Re-read the exact live line ranges and patch the during/post branches first, then patch the pre-vote branch separately with smaller anchors.
+- Next-time rule: For long inline HTML/string arrays in this repo, prefer branch-by-branch patches over one combined hunk.
+
+## 2026-05-07 - Patch partially-edited hero functions incrementally
+- Context: Simplifying `renderHomeHero()` to remove stage panels/cards and unify countdown behavior.
+- Command/workflow: `apply_patch` against a function block that had already been partially edited earlier in the turn.
+- Failed approach: Replaced the full `renderHomeHero()` / `renderStageCards()` block in one pass after earlier small edits had already changed some anchors.
+- Symptom: `apply_patch` kept missing the expected function body even though the numbered readback looked close.
+- Working approach: Inspect the live numbered lines, patch variable declarations first, then remove stale branches and stray string lines in very small hunks.
+- Next-time rule: After partial edits land in a function, stop attempting whole-function replacements; switch to incremental hunks based on fresh numbered readback.
+
 ## 2026-05-07 - Patch drifting inline HTML
 - Context: Reworking the pre-vote hero countdown block in `app.js`.
 - Command/workflow: Large `apply_patch` edits against inline HTML array strings.
@@ -353,3 +385,35 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: Patch context missed because the string block had drifted and a few quotes differed from the earlier readback.
 - Working approach: Re-read the exact line range, then patch the smallest stable block and verify with `node --check`.
 - Next-time rule: For inline HTML string arrays, inspect the current block immediately before patching and prefer smaller surgical replacements over large rewrites.
+
+## 2026-05-07 - Avoid shell globs with rg in PowerShell
+- Context: Searching the microsite repo for existing video/gallery data before splitting the home media sections.
+- Command/workflow: `rg -n "..." *.js *.json *.md`
+- Failed approach: Passed shell-style globs directly to `rg` from PowerShell.
+- Symptom: `rg` treated the globs as invalid literal paths and returned `os error 123`.
+- Working approach: Search the repo root directly with `rg -n "..." .` or use `rg --glob` explicitly when path filtering is needed.
+- Next-time rule: In this PowerShell workspace, do not pass bare `*.ext` arguments to `rg`; search `.` or use `--glob`.
+
+## 2026-05-07 - Patch gallery string builders in small hunks
+- Context: Converting the home photo gallery cards into clickable lightbox triggers.
+- Command/workflow: `apply_patch` against the inline HTML string array inside `renderPhotoGallerySection()`.
+- Failed approach: Tried to land the lightbox behavior, overlay sync, and gallery markup conversion in one large patch.
+- Symptom: `apply_patch` failed because the expected gallery markup context no longer matched the live file.
+- Working approach: Re-read the exact numbered ranges, then patch the overlay helpers, event handlers, and gallery markup as separate small hunks.
+- Next-time rule: For `app.js` string-builder sections in this repo, avoid combined behavior-plus-markup patches; patch helpers and inline HTML separately.
+
+## 2026-05-07 - Use Select-String when regex escaping gets noisy
+- Context: Validating newly added gallery lightbox bindings and YouTube Shorts links in `app.js`.
+- Command/workflow: `rg -n "youtube.com/shorts|...|lightbox.addEventListener\("`
+- Failed approach: Used a complex `rg` pattern with unescaped grouping/parentheses directly in PowerShell.
+- Symptom: `rg` failed with a regex parse error for an unclosed group.
+- Working approach: Switch to `Select-String` for a simple literal validation pass when the pattern list contains characters that are easy to mis-escape.
+- Next-time rule: For quick Windows validation of literal strings with parentheses or mixed regex meta-characters, prefer `Select-String` unless you need full `rg` regex behavior.
+
+## 2026-05-07 - Avoid multi-pattern Select-String with quoted pipes
+- Context: Verifying gallery iframe embed markup after switching reels from links to embedded Shorts.
+- Command/workflow: `Select-String -Path app.js,styles.css,index.html -Pattern "a|b|c"`
+- Failed approach: Passed a combined quoted pattern list that PowerShell parsed as a positional argument instead of a single pattern.
+- Symptom: `Select-String` returned `A positional parameter cannot be found` and did not run the search.
+- Working approach: Use separate `rg --fixed-strings` checks or pass each pattern explicitly.
+- Next-time rule: In PowerShell, do not rely on a single quoted `Select-String -Pattern` string when the content includes pipe separators; split patterns or use `rg --fixed-strings`.

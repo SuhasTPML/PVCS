@@ -153,5 +153,26 @@
         <a class="btn btn--primary" data-popup-cta href="#/process"></a>
       </div>
     </div>
+
+    <div class="gallery-lightbox" data-gallery-lightbox aria-labelledby="gallery-lightbox-caption" aria-modal="true" role="dialog" hidden>
+      <div class="gallery-lightbox__panel">
+        <button class="gallery-lightbox__close" type="button" data-gallery-lightbox-close aria-label="Close gallery">
+          <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="gallery-lightbox__stage">
+          <button class="gallery-lightbox__nav gallery-lightbox__nav--prev" type="button" data-gallery-lightbox-prev aria-label="Previous image">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <img data-gallery-lightbox-image data-fallback-src="PVCS_Trophy_with_bg.svg" alt="">
+          <button class="gallery-lightbox__nav gallery-lightbox__nav--next" type="button" data-gallery-lightbox-next aria-label="Next image">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <div class="gallery-lightbox__footer">
+          <p class="gallery-lightbox__count" data-gallery-lightbox-count></p>
+          <p class="gallery-lightbox__caption" id="gallery-lightbox-caption" data-gallery-lightbox-caption></p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

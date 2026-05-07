@@ -1,6 +1,9 @@
 (function () {
   var siteData = window.CINE_SITE_DATA || {};
   var STAGE_KEY = "pvcs-stage";
+  var STAGE_CONTROLLER_KEY = "pvcs-stage-controller-collapsed";
+  var VOTING_CLOSE_DATE = "2026-05-24";
+  var MEDIA_FALLBACK_SRC = "PVCS_Trophy_with_bg.svg";
   var STAGES = {
     pre: "pre-vote",
     during: "during-vote",
@@ -52,6 +55,15 @@
     window.dispatchEvent(new Event("pvcs:render"));
   }
 
+  function isStageControllerCollapsed() {
+    return window.localStorage.getItem(STAGE_CONTROLLER_KEY) === "true";
+  }
+
+  function setStageControllerCollapsed(collapsed) {
+    window.localStorage.setItem(STAGE_CONTROLLER_KEY, collapsed ? "true" : "false");
+    renderStageController();
+  }
+
   function getRoute() {
     return location.hash.replace(/^#\/?/, "").trim() || "home";
   }
@@ -75,6 +87,37 @@
   function getCurrentPageValue(route) {
     var map = getRoutePageMap();
     return map.hasOwnProperty(route) ? map[route] : map.home;
+  }
+
+  function initImageFallbacks() {
+    if (document.body.__pvcsImageFallbacksBound) {
+      return;
+    }
+    document.body.__pvcsImageFallbacksBound = true;
+    document.addEventListener("error", function (event) {
+      var img = event.target;
+      if (!img || img.tagName !== "IMG") {
+        return;
+      }
+      var fallbackSrc = img.getAttribute("data-fallback-src");
+      if (!fallbackSrc || img.getAttribute("data-fallback-applied") === "true") {
+        return;
+      }
+      img.setAttribute("data-fallback-applied", "true");
+      img.src = fallbackSrc;
+    }, true);
+  }
+
+  function syncOverlayState() {
+    var menu = qs("[data-side-menu]");
+    var popup = qs("[data-popup]");
+    var lightbox = qs("[data-gallery-lightbox]");
+    var hasOverlay = Boolean(
+      (menu && menu.classList.contains("is-open")) ||
+      (popup && popup.classList.contains("is-visible")) ||
+      (lightbox && lightbox.classList.contains("is-visible"))
+    );
+    document.body.classList.toggle("has-overlay", hasOverlay);
   }
 
   function getEffectiveHref(item) {
@@ -268,7 +311,7 @@
     if (!hasSeen && getRoute() === "home") {
       requestAnimationFrame(function () {
         popup.classList.add("is-visible");
-        document.body.classList.add("has-overlay");
+        syncOverlayState();
         sessionStorage.setItem("cine-popup-seen", "1");
       });
     }
@@ -276,7 +319,7 @@
     qsa("[data-popup-close]", popup).forEach(function (button) {
       button.addEventListener("click", function () {
         popup.classList.remove("is-visible");
-        document.body.classList.remove("has-overlay");
+        syncOverlayState();
       });
     });
   }
@@ -290,7 +333,8 @@
     if (overlay) {
       overlay.hidden = true;
     }
-    document.body.classList.remove("has-overlay", "has-menu-open");
+    document.body.classList.remove("has-menu-open");
+    syncOverlayState();
   }
 
   function openMenu() {
@@ -306,7 +350,172 @@
     if (overlay) {
       overlay.hidden = false;
     }
-    document.body.classList.add("has-overlay", "has-menu-open");
+    document.body.classList.add("has-menu-open");
+    syncOverlayState();
+  }
+
+  function isDesktopGalleryLightbox() {
+    return window.matchMedia("(min-width: 1024px)").matches;
+  }
+
+  function closeGalleryLightbox() {
+    var lightbox = qs("[data-gallery-lightbox]");
+    if (!lightbox) {
+      return;
+    }
+    lightbox.classList.remove("is-visible");
+    lightbox.hidden = true;
+    syncOverlayState();
+  }
+
+  function getPhotoGalleryItems() {
+    return qsa("[data-gallery-trigger]").map(function (node) {
+      return {
+        src: node.getAttribute("data-gallery-src") || "",
+        alt: node.getAttribute("data-gallery-alt") || "",
+        caption: node.getAttribute("data-gallery-caption") || ""
+      };
+    }).filter(function (item) {
+      return item.src;
+    });
+  }
+
+  function renderGalleryLightboxFrame(lightbox) {
+    var items = lightbox.__galleryItems || [];
+    if (!items.length) {
+      closeGalleryLightbox();
+      return;
+    }
+
+    var index = Math.max(0, Math.min(lightbox.__galleryIndex || 0, items.length - 1));
+    var item = items[index];
+    var image = qs("[data-gallery-lightbox-image]", lightbox);
+    var caption = qs("[data-gallery-lightbox-caption]", lightbox);
+    var count = qs("[data-gallery-lightbox-count]", lightbox);
+    var prev = qs("[data-gallery-lightbox-prev]", lightbox);
+    var next = qs("[data-gallery-lightbox-next]", lightbox);
+
+    lightbox.__galleryIndex = index;
+    image.removeAttribute("data-fallback-applied");
+    image.src = item.src;
+    image.alt = item.alt;
+    caption.textContent = item.caption;
+    count.textContent = String(index + 1) + " / " + String(items.length);
+    prev.disabled = items.length < 2;
+    next.disabled = items.length < 2;
+  }
+
+  function stepGalleryLightbox(delta) {
+    var lightbox = qs("[data-gallery-lightbox]");
+    if (!lightbox || !lightbox.classList.contains("is-visible")) {
+      return;
+    }
+
+    var items = lightbox.__galleryItems || [];
+    if (!items.length) {
+      return;
+    }
+
+    lightbox.__galleryIndex = (lightbox.__galleryIndex + delta + items.length) % items.length;
+    renderGalleryLightboxFrame(lightbox);
+  }
+
+  function openGalleryLightbox(index) {
+    if (!isDesktopGalleryLightbox()) {
+      return;
+    }
+
+    var lightbox = qs("[data-gallery-lightbox]");
+    var items = getPhotoGalleryItems();
+    if (!lightbox || !items.length) {
+      return;
+    }
+
+    lightbox.__galleryItems = items;
+    lightbox.__galleryIndex = Math.max(0, Math.min(index || 0, items.length - 1));
+    renderGalleryLightboxFrame(lightbox);
+    lightbox.hidden = false;
+    lightbox.classList.add("is-visible");
+    syncOverlayState();
+
+    var closeButton = qs("[data-gallery-lightbox-close]", lightbox);
+    if (closeButton) {
+      closeButton.focus();
+    }
+  }
+
+  function initGalleryLightbox() {
+    var lightbox = qs("[data-gallery-lightbox]");
+    if (!lightbox || lightbox.__pvcsGalleryLightboxBound) {
+      return;
+    }
+    lightbox.__pvcsGalleryLightboxBound = true;
+    var panel = qs(".gallery-lightbox__panel", lightbox);
+    var closeButton = qs("[data-gallery-lightbox-close]", lightbox);
+    var prevButton = qs("[data-gallery-lightbox-prev]", lightbox);
+    var nextButton = qs("[data-gallery-lightbox-next]", lightbox);
+
+    if (panel) {
+      panel.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
+    }
+    if (closeButton) {
+      closeButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeGalleryLightbox();
+      });
+    }
+    if (prevButton) {
+      prevButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        stepGalleryLightbox(-1);
+      });
+    }
+    if (nextButton) {
+      nextButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        stepGalleryLightbox(1);
+      });
+    }
+    lightbox.addEventListener("click", function () {
+      closeGalleryLightbox();
+    });
+
+    document.addEventListener("click", function (event) {
+      var trigger = event.target.closest("[data-gallery-trigger]");
+      if (trigger) {
+        event.preventDefault();
+        openGalleryLightbox(Number(trigger.getAttribute("data-gallery-index") || 0));
+        return;
+      }
+
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!lightbox.classList.contains("is-visible")) {
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        stepGalleryLightbox(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        stepGalleryLightbox(1);
+      } else if (event.key === "Escape") {
+        closeGalleryLightbox();
+      }
+    });
+
+    window.addEventListener("resize", function () {
+      if (!isDesktopGalleryLightbox()) {
+        closeGalleryLightbox();
+      }
+    });
   }
 
   function initMenu() {
@@ -342,7 +551,8 @@
         if (popup) {
           popup.classList.remove("is-visible");
         }
-        document.body.classList.remove("has-overlay");
+        closeGalleryLightbox();
+        syncOverlayState();
       }
     });
   }
@@ -372,10 +582,48 @@
     return String(value || 0).padStart(2, "0");
   }
 
+  function renderStageIntro() {
+    return [
+      '<div class="stage-hero__intro">',
+        '<h2>ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅತಿದೊಡ್ಡ ಪ್ರಶಸ್ತಿ ಸಂಭ್ರಮಕ್ಕೆ ಸುಸ್ವಾಗತ</h2>',
+        '<p>ಚಂದನವನದ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗೌರವಿಸುವ, ಕನ್ನಡ ಚಿತ್ರರಂಗದ ಅತ್ಯಂತ ಪ್ರತಿಷ್ಠಿತ ಸಿನಿ ಸಮ್ಮಾನದ ವೇದಿಕೆ.</p>',
+      "</div>"
+    ].join("");
+  }
+
+  function renderHeroTimeline(label, targetDate, ariaLabel) {
+    var countdown = getCountdownParts(targetDate);
+    return [
+      '<aside class="stage-hero__timeline" data-countdown-timer data-countdown-target="' + escapeHtml(targetDate) + '">',
+        '<div class="stage-hero__timeline-head">',
+          '<span class="stage-hero__panel-label">' + escapeHtml(label) + "</span>",
+          '<span class="stage-hero__timeline-date">on ' + escapeHtml(formatDate(targetDate)) + "</span>",
+        "</div>",
+        '<div class="stage-hero__timer-grid" aria-label="' + escapeHtml(ariaLabel) + '">',
+          '<div class="stage-hero__timer-unit">',
+            '<strong data-countdown-days>' + formatCountdownUnit(countdown.days) + "</strong>",
+            '<span>Days</span>',
+          "</div>",
+          '<div class="stage-hero__timer-unit">',
+            '<strong data-countdown-hours>' + formatCountdownUnit(countdown.hours) + "</strong>",
+            '<span>Hours</span>',
+          "</div>",
+          '<div class="stage-hero__timer-unit">',
+            '<strong data-countdown-minutes>' + formatCountdownUnit(countdown.minutes) + "</strong>",
+            '<span>Minutes</span>',
+          "</div>",
+          '<div class="stage-hero__timer-unit">',
+            '<strong data-countdown-seconds>' + formatCountdownUnit(countdown.seconds) + "</strong>",
+            '<span>Seconds</span>',
+          "</div>",
+        "</div>",
+      "</aside>"
+    ].join("");
+  }
+
   function updateCountdownTimers() {
-    var eventDate = siteData.eventDate || "";
-    var countdown = getCountdownParts(eventDate);
     qsa("[data-countdown-timer]").forEach(function (node) {
+      var countdown = getCountdownParts(node.getAttribute("data-countdown-target") || "");
       var days = qs("[data-countdown-days]", node);
       var hours = qs("[data-countdown-hours]", node);
       var minutes = qs("[data-countdown-minutes]", node);
@@ -435,106 +683,33 @@
 
   function renderHomeHero(stage) {
     var eventDate = siteData.eventDate || "";
-    var countdown = getCountdownParts(eventDate);
-    var publicCategories = getPublicCategories();
-    var stageTitle = "";
-    var stageCopy = "";
-    var copyHtml = "";
+    var copyParts = [renderStageIntro()];
     var actionsHtml = "";
-    var panelHtml = "";
-    var panelTitle = "";
-    var panelValue = "";
-    var panelCopy = "";
 
     if (stage === STAGES.during) {
-      stageTitle = "Voting is live";
-      stageCopy = "Choose your favourites across the four public categories, then finish with the final submission screen.";
       actionsHtml = [
         '<div class="stage-hero__actions">',
           '<a class="btn btn--primary" href="#/voting">Start voting</a>',
           '<a class="btn btn--ghost" href="#/nominations">Browse nominations</a>',
         "</div>"
       ].join("");
-      panelTitle = "Open categories";
-      panelValue = String(publicCategories.length);
-      panelCopy = "The stepper walks one category at a time with click-to-vote cards.";
-      copyHtml = [
-        '<div class="stage-hero__copy-body">',
-          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
-          '<h1>' + escapeHtml(stageTitle) + "</h1>",
-          '<p>' + escapeHtml(stageCopy) + "</p>",
-        "</div>",
-        actionsHtml
-      ].join("");
-      panelHtml = [
-        '<aside class="stage-hero__panel">',
-          '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
-          '<strong class="stage-hero__panel-value">' + escapeHtml(panelValue) + "</strong>",
-          '<p>' + escapeHtml(panelCopy) + "</p>",
-        "</aside>"
-      ].join("");
+      copyParts.push(actionsHtml);
+      copyParts.push(renderHeroTimeline("Voting closes", VOTING_CLOSE_DATE, "Time remaining until voting closes"));
     } else if (stage === STAGES.post) {
-      stageTitle = "Winners are live";
-      stageCopy = "The post-vote home now points visitors to the results surface, winner highlights, and the archive path.";
       actionsHtml = [
         '<div class="stage-hero__actions">',
           '<a class="btn btn--primary" href="#/winners">View winners</a>',
-          '<a class="btn btn--ghost" href="#/winners">Browse winners</a>',
         "</div>"
-      ].join("");
-      panelTitle = "Winner cards";
-      panelValue = String((siteData.winnerHighlights || []).length);
-      panelCopy = "The winner surface is wider than the public ballot and can show additional recognitions.";
-      copyHtml = [
-        '<div class="stage-hero__copy-body">',
-          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
-          '<h1>' + escapeHtml(stageTitle) + "</h1>",
-          '<p>' + escapeHtml(stageCopy) + "</p>",
-        "</div>",
-        actionsHtml
-      ].join("");
-      panelHtml = [
-        '<aside class="stage-hero__panel">',
-          '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
-          '<strong class="stage-hero__panel-value">' + escapeHtml(panelValue) + "</strong>",
-          '<p>' + escapeHtml(panelCopy) + "</p>",
-        "</aside>"
       ].join("");
     } else {
-      stageTitle = "Voting opens timeline";
-      stageCopy = "The pre-vote home keeps the opening date in focus with a live countdown timer.";
-      panelTitle = "Voting opens";
-      actionsHtml = "";
-      copyHtml = [
-        '<div class="stage-hero__copy-body">',
-          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
-          '<h1>' + escapeHtml(stageTitle) + "</h1>",
-          '<p>' + escapeHtml(stageCopy) + "</p>",
-          '<aside class="stage-hero__timeline" data-countdown-timer data-countdown-target="' + escapeHtml(eventDate) + '">',
-            '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
-            '<div class="stage-hero__timer-grid" aria-label="Time remaining until voting opens">',
-              '<div class="stage-hero__timer-unit">',
-                '<strong data-countdown-days>' + formatCountdownUnit(countdown.days) + "</strong>",
-                '<span>Days</span>',
-              "</div>",
-              '<div class="stage-hero__timer-unit">',
-                '<strong data-countdown-hours>' + formatCountdownUnit(countdown.hours) + "</strong>",
-                '<span>Hours</span>',
-              "</div>",
-              '<div class="stage-hero__timer-unit">',
-                '<strong data-countdown-minutes>' + formatCountdownUnit(countdown.minutes) + "</strong>",
-                '<span>Minutes</span>',
-              "</div>",
-              '<div class="stage-hero__timer-unit">',
-                '<strong data-countdown-seconds>' + formatCountdownUnit(countdown.seconds) + "</strong>",
-                '<span>Seconds</span>',
-              "</div>",
-            "</div>",
-          "</aside>",
-        "</div>"
-      ].join("");
-      panelHtml = "";
+      copyParts.push(renderHeroTimeline("Voting opens", eventDate, "Time remaining until voting opens"));
     }
+
+    if (actionsHtml && stage !== STAGES.during) {
+      copyParts.push(actionsHtml);
+    }
+
+    copyParts.push('<img class="stage-hero__ilu" src="https://images.assettype.com/prajavani/2023-05/3c0c9a4d-1465-4205-b225-bcb20ae0d843/sponsors_banner_logo.png" alt="Sponsors banner logo" loading="eager">');
 
     return [
       '<section class="section-card stage-hero stage-hero--' + stage + '">',
@@ -542,141 +717,144 @@
           '<img class="stage-hero__trophy" src="https://images.assettype.com/deccanherald/2026-04-30/zrlojphv/PVCS-Trophy.png" alt="PVCS trophy">',
         "</div>",
         '<div class="stage-hero__copy">',
-          copyHtml,
+          copyParts.join(""),
         "</div>",
-        panelHtml,
       "</section>"
     ].join("");
   }
 
-  function renderStageCards(stage) {
-    var cards = [];
-
-    if (stage === STAGES.during) {
-      cards = [
-        {
-          eyebrow: "One flow",
-          title: "Click to vote",
-          copy: "The ballot keeps the interaction simple. No swipe logic, just clear card taps and a linear stepper."
-        },
-        {
-          eyebrow: "Nomination browser",
-          title: "Jump anywhere",
-          copy: "The floating nomination widget takes you straight to any category without leaving the page."
-        },
-        {
-          eyebrow: "Results control",
-          title: "Stats stay gated",
-          copy: "Vote-share charts stay hidden until two days before the event date and only show share, not counts."
+  function buildPhotoGalleryCards(stage) {
+    return (siteData.votingCategories || []).reduce(function (cards, category) {
+      var nominees = (category.nominees || []).slice();
+      var featuredNominee = stage === STAGES.post ? (getCategoryWinner(category) || nominees[0]) : nominees[0];
+      var orderedNominees = [];
+      if (featuredNominee) {
+        orderedNominees.push(featuredNominee);
+      }
+      nominees.forEach(function (nominee) {
+        if (!featuredNominee || nominee.id !== featuredNominee.id) {
+          orderedNominees.push(nominee);
         }
-      ];
-    } else if (stage === STAGES.post) {
-      cards = [
-        {
-          eyebrow: "Winner surface",
-          title: "Show all results",
-          copy: "The post-vote view gives the winners room to breathe, including the extra recognition cards."
-        },
-        {
-          eyebrow: "CTA shift",
-          title: "Voting routes to winners",
-          copy: "Once the event closes, the hero actions and the voting CTA land on the winners page."
-        },
-        {
-          eyebrow: "Archive path",
-          title: "Keep exploring",
-          copy: "The archive, previous editions, and supporting pages remain available from the shared shell."
-        }
-      ];
-    } else {
-      cards = [
-        {
-          eyebrow: "Vote start",
-          title: "Opening date " + formatDate(siteData.eventDate),
-          copy: "The hero keeps the countdown in view so the start date is explicit and the next step stays obvious."
-        },
-        {
-          eyebrow: "Sponsors",
-          title: "Visible early",
-          copy: "The sponsor band stays high in the stack so the first fold carries the commercial layer as well."
-        },
-        {
-          eyebrow: "Discovery",
-          title: "Galleries and clips",
-          copy: "Photo and video cards keep the home page lively without pulling the user away from the event narrative."
-        }
-      ];
-    }
-
-    return [
-      '<section class="stage-grid">',
-        cards.map(function (card) {
-          return [
-            '<article class="section-card stage-grid__card">',
-              '<p class="eyebrow">' + escapeHtml(card.eyebrow) + "</p>",
-              '<h2>' + escapeHtml(card.title) + "</h2>",
-              '<p>' + escapeHtml(card.copy) + "</p>",
-            "</article>"
-          ].join("");
-        }).join(""),
-      "</section>"
-    ].join("");
+      });
+      orderedNominees.forEach(function (nominee) {
+        cards.push({
+          title: nominee.title,
+          subtitle: category.title,
+          meta: nominee.subtitle || "",
+          image: nominee.image
+        });
+      });
+      return cards;
+    }, []).slice(0, 12);
   }
 
-  function renderGallerySection() {
-    var categories = siteData.votingCategories || [];
-    var photoCards = categories.map(function (category) {
-      var nominee = getCategoryWinner(category) || (category.nominees || [])[0];
-      return nominee ? {
-        title: nominee.title,
-        subtitle: category.title,
-        image: nominee.image
-      } : null;
-    }).filter(Boolean).slice(0, 4);
-
-    var videoCards = [
+  function buildVideoReelCards(stage) {
+    var placeholderShorts = [
+      "https://www.youtube.com/embed/F_1ZFblYT_c",
+      "https://www.youtube.com/embed/7ZCRBMlX9OY",
+      "https://www.youtube.com/embed/tDeGkWrkOOo",
+      "https://www.youtube.com/embed/F_1ZFblYT_c",
+      "https://www.youtube.com/embed/7ZCRBMlX9OY",
+      "https://www.youtube.com/embed/tDeGkWrkOOo",
+      "https://www.youtube.com/embed/F_1ZFblYT_c",
+      "https://www.youtube.com/embed/7ZCRBMlX9OY"
+    ];
+    var labels = {
+      "pre-vote": {
+        title: "Countdown reel",
+        subtitle: "What to watch before voting opens"
+      },
+      "during-vote": {
+        title: "Vote spotlight",
+        subtitle: "Short picks from each public category"
+      },
+      "post-vote": {
+        title: "Winner reel",
+        subtitle: "Quick recap from the final results"
+      }
+    };
+    var durations = ["00:42", "01:08", "00:56", "01:14", "00:37", "01:02", "00:49", "01:11"];
+    var copy = labels[stage] || labels[STAGES.pre];
+    var reelVariants = [
       {
-        title: "Festival reel",
-        subtitle: "Highlights and arrivals",
-        image: "https://images.assettype.com/deccanherald/2026-04-30/zrlojphv/PVCS-Trophy.png"
+        subtitle: copy.title,
+        meta: copy.subtitle
       },
       {
-        title: "Winner recap",
-        subtitle: "Post-vote summary",
-        image: "https://picsum.photos/seed/winnerreel/560/420"
-      },
-      {
-        title: "Sponsor wall",
-        subtitle: "Commercial partners",
-        image: "https://picsum.photos/seed/sponsorwall/560/420"
+        subtitle: "Behind the frame",
+        meta: stage === STAGES.post ? "Second look at the winners and standout moments" : "Quick backstage-style cut from the same category"
       }
     ];
 
-    function cardMarkup(card, kind) {
-      return [
-        '<article class="media-card media-card--' + kind + '">',
-          '<img src="' + card.image + '" alt="' + escapeHtml(card.title) + '">',
-          '<div class="media-card__copy">',
-            '<p class="eyebrow">' + escapeHtml(card.subtitle) + "</p>",
-            '<h3>' + escapeHtml(card.title) + "</h3>",
-          "</div>",
-        "</article>"
-      ].join("");
-    }
+    return (siteData.votingCategories || []).reduce(function (cards, category) {
+      var nominees = category.nominees || [];
+      var featuredNominee = stage === STAGES.post ? (getCategoryWinner(category) || nominees[0]) : nominees[0];
+      var alternateNominee = nominees.filter(function (nominee) {
+        return !featuredNominee || nominee.id !== featuredNominee.id;
+      })[0] || featuredNominee;
+      var reelNominees = [featuredNominee, alternateNominee];
 
+      reelNominees.forEach(function (nominee, index) {
+        var variant = reelVariants[index];
+        if (!nominee || !variant) {
+          return;
+        }
+        cards.push({
+          title: category.title,
+          subtitle: variant.subtitle,
+          meta: variant.meta,
+          duration: durations[cards.length] || "00:45",
+          image: nominee.image,
+          embedUrl: placeholderShorts[cards.length] || placeholderShorts[0]
+        });
+      });
+      return cards;
+    }, []).filter(Boolean).slice(0, 8);
+  }
+
+  function renderPhotoGallerySection(stage) {
+    var cards = buildPhotoGalleryCards(stage);
     return [
-      '<section class="content-block section-card">',
+      '<section class="content-block section-card media-section media-section--photos">',
         '<div class="content-block__header">',
           '<div>',
             '<p class="eyebrow">Gallery</p>',
-            '<h2>Photos and clips</h2>',
+            '<h2>Photo gallery</h2>',
           "</div>",
         "</div>",
-        '<div class="gallery-grid gallery-grid--photos">' + photoCards.map(function (card) {
-          return cardMarkup(card, "photo");
+        '<div class="photo-gallery" aria-label="Photo gallery">' + cards.map(function (card, index) {
+          return [
+            '<button class="media-card media-card--photo media-card--trigger" type="button" data-gallery-trigger data-gallery-index="' + index + '" data-gallery-src="' + escapeHtml(card.image) + '" data-gallery-alt="' + escapeHtml(card.title) + '" data-gallery-caption="' + escapeHtml(card.title) + '" aria-label="Open ' + escapeHtml(card.title) + ' in gallery viewer">',
+              '<img src="' + card.image + '" alt="' + escapeHtml(card.title) + '" loading="lazy" data-fallback-src="' + MEDIA_FALLBACK_SRC + '">',
+              '<div class="media-card__copy">',
+                '<h3 class="media-card__caption">' + escapeHtml(card.title) + "</h3>",
+              "</div>",
+            "</button>"
+          ].join("");
         }).join("") + "</div>",
-        '<div class="gallery-grid gallery-grid--videos">' + videoCards.map(function (card) {
-          return cardMarkup(card, "video");
+      "</section>"
+    ].join("");
+  }
+
+  function renderVideoGallerySection(stage) {
+    var cards = buildVideoReelCards(stage);
+    return [
+      '<section class="content-block section-card media-section media-section--videos">',
+        '<div class="content-block__header">',
+          '<div>',
+            '<p class="eyebrow">Videos</p>',
+            '<h2>Video reels</h2>',
+          "</div>",
+        "</div>",
+        '<div class="reel-strip" aria-label="Video reels">' + cards.map(function (card) {
+          return [
+            '<article class="media-card reel-card">',
+              '<iframe class="reel-card__frame" src="' + escapeHtml(card.embedUrl) + '" title="' + escapeHtml(card.title) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
+              '<div class="media-card__copy">',
+                '<h3 class="media-card__caption">' + escapeHtml(card.title) + "</h3>",
+              "</div>",
+            "</article>"
+          ].join("");
         }).join("") + "</div>",
       "</section>"
     ].join("");
@@ -750,7 +928,7 @@
         '<div class="winner-grid">' + winners.slice(0, 4).map(function (winner) {
           return [
             '<article class="winner-card">',
-              '<img src="' + winner.image + '" alt="' + escapeHtml(winner.title) + '">',
+              '<img src="' + winner.image + '" alt="' + escapeHtml(winner.title) + '" data-fallback-src="' + MEDIA_FALLBACK_SRC + '">',
               '<div class="winner-card__copy">',
                 '<p class="eyebrow">' + escapeHtml(winner.category) + "</p>",
                 '<h3>' + escapeHtml(winner.title) + "</h3>",
@@ -778,19 +956,17 @@
         '<div class="sponsor-band__track" data-sponsor-track></div>' +
       "</section>"
     );
-    if (stage !== STAGES.pre) {
-      sections.push(renderStageCards(stage));
-    }
     if (stage === STAGES.post) {
       sections.push(renderWinnersPreview());
     }
-    sections.push(renderGallerySection());
+    sections.push(renderPhotoGallerySection(stage));
+    sections.push(renderVideoGallerySection(stage));
     sections.push(renderStatsSection());
 
     root.setAttribute("data-stage", stage);
     root.innerHTML = sections.join("");
     renderSponsors();
-    if (stage === STAGES.pre) {
+    if (stage === STAGES.pre || stage === STAGES.during) {
       updateCountdownTimers();
     }
   }
@@ -805,19 +981,34 @@
     }
 
     var stage = getStage();
+    var collapsed = isStageControllerCollapsed();
+    existing.classList.toggle("is-collapsed", collapsed);
     existing.innerHTML = [
-      '<div class="stage-controller__label">',
-        '<span class="eyebrow">Stage</span>',
-        '<strong>' + (stage === STAGES.post ? "Post Vote" : stage === STAGES.during ? "During Vote" : "Pre Vote") + "</strong>",
+      '<div class="stage-controller__head">',
+        '<div class="stage-controller__label">',
+          '<span class="eyebrow">Stage</span>',
+          '<strong>' + (stage === STAGES.post ? "Post Vote" : stage === STAGES.during ? "During Vote" : "Pre Vote") + "</strong>",
+        "</div>",
+        '<button type="button" class="stage-controller__toggle" data-stage-controller-toggle aria-expanded="' + (!collapsed) + '">' + (collapsed ? "Show" : "Hide") + "</button>",
       "</div>",
-      '<div class="stage-controller__group">',
-        '<button type="button" data-stage-target="' + STAGES.pre + '"' + (stage === STAGES.pre ? ' class="is-active"' : "") + ">Pre Vote</button>",
-        '<button type="button" data-stage-target="' + STAGES.during + '"' + (stage === STAGES.during ? ' class="is-active"' : "") + ">During Vote</button>",
-        '<button type="button" data-stage-target="' + STAGES.post + '"' + (stage === STAGES.post ? ' class="is-active"' : "") + ">Post Vote</button>",
-      "</div>"
+      collapsed
+        ? ""
+        : [
+            '<div class="stage-controller__group">',
+              '<button type="button" data-stage-target="' + STAGES.pre + '"' + (stage === STAGES.pre ? ' class="is-active"' : "") + ">Pre Vote</button>",
+              '<button type="button" data-stage-target="' + STAGES.during + '"' + (stage === STAGES.during ? ' class="is-active"' : "") + ">During Vote</button>",
+              '<button type="button" data-stage-target="' + STAGES.post + '"' + (stage === STAGES.post ? ' class="is-active"' : "") + ">Post Vote</button>",
+            "</div>"
+          ].join("")
     ].join("");
 
     existing.onclick = function (event) {
+      var toggle = event.target.closest("[data-stage-controller-toggle]");
+      if (toggle) {
+        setStageControllerCollapsed(!isStageControllerCollapsed());
+        return;
+      }
+
       var button = event.target.closest("[data-stage-target]");
       if (!button) {
         return;
@@ -874,6 +1065,8 @@
     if (!window.localStorage.getItem(STAGE_KEY)) {
       window.localStorage.setItem(STAGE_KEY, siteData.defaultStage || STAGES.pre);
     }
+    initImageFallbacks();
+    initGalleryLightbox();
     startCountdownTicker();
     renderSharedChrome();
     initMenu();
