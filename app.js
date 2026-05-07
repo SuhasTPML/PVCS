@@ -357,13 +357,44 @@
     var target = new Date(String(targetDate) + "T00:00:00");
     var diff = target.getTime() - Date.now();
     if (isNaN(target.getTime()) || diff <= 0) {
-      return { days: 0, hours: 0, minutes: 0 };
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     }
-    var minutesTotal = Math.floor(diff / 60000);
+    var secondsTotal = Math.floor(diff / 1000);
+    var minutesTotal = Math.floor(secondsTotal / 60);
     var days = Math.floor(minutesTotal / (60 * 24));
     var hours = Math.floor((minutesTotal % (60 * 24)) / 60);
     var minutes = minutesTotal % 60;
-    return { days: days, hours: hours, minutes: minutes };
+    var seconds = secondsTotal % 60;
+    return { days: days, hours: hours, minutes: minutes, seconds: seconds };
+  }
+
+  function formatCountdownUnit(value) {
+    return String(value || 0).padStart(2, "0");
+  }
+
+  function updateCountdownTimers() {
+    var eventDate = siteData.eventDate || "";
+    var countdown = getCountdownParts(eventDate);
+    qsa("[data-countdown-timer]").forEach(function (node) {
+      var days = qs("[data-countdown-days]", node);
+      var hours = qs("[data-countdown-hours]", node);
+      var minutes = qs("[data-countdown-minutes]", node);
+      var seconds = qs("[data-countdown-seconds]", node);
+      if (days) days.textContent = formatCountdownUnit(countdown.days);
+      if (hours) hours.textContent = formatCountdownUnit(countdown.hours);
+      if (minutes) minutes.textContent = formatCountdownUnit(countdown.minutes);
+      if (seconds) seconds.textContent = formatCountdownUnit(countdown.seconds);
+    });
+  }
+
+  var countdownTickerStarted = false;
+  function startCountdownTicker() {
+    if (countdownTickerStarted) {
+      return;
+    }
+    countdownTickerStarted = true;
+    updateCountdownTimers();
+    window.setInterval(updateCountdownTimers, 1000);
   }
 
   function getPublicCategories() {
@@ -404,16 +435,13 @@
 
   function renderHomeHero(stage) {
     var eventDate = siteData.eventDate || "";
-    var eventLabel = formatDate(eventDate);
     var countdown = getCountdownParts(eventDate);
     var publicCategories = getPublicCategories();
-    var stageLabel = stage === STAGES.during ? "During Vote" : stage === STAGES.post ? "Post Vote" : "Pre Vote";
     var stageTitle = "";
     var stageCopy = "";
-    var primaryHref = "#/process";
-    var primaryLabel = "View process";
-    var secondaryHref = "#/contest";
-    var secondaryLabel = "Contest";
+    var copyHtml = "";
+    var actionsHtml = "";
+    var panelHtml = "";
     var panelTitle = "";
     var panelValue = "";
     var panelCopy = "";
@@ -421,57 +449,102 @@
     if (stage === STAGES.during) {
       stageTitle = "Voting is live";
       stageCopy = "Choose your favourites across the four public categories, then finish with the final submission screen.";
-      primaryHref = "#/voting";
-      primaryLabel = "Start voting";
-      secondaryHref = "#/nominations";
-      secondaryLabel = "Browse nominations";
+      actionsHtml = [
+        '<div class="stage-hero__actions">',
+          '<a class="btn btn--primary" href="#/voting">Start voting</a>',
+          '<a class="btn btn--ghost" href="#/nominations">Browse nominations</a>',
+        "</div>"
+      ].join("");
       panelTitle = "Open categories";
       panelValue = String(publicCategories.length);
       panelCopy = "The stepper walks one category at a time with click-to-vote cards.";
+      copyHtml = [
+        '<div class="stage-hero__copy-body">',
+          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
+          '<h1>' + escapeHtml(stageTitle) + "</h1>",
+          '<p>' + escapeHtml(stageCopy) + "</p>",
+        "</div>",
+        actionsHtml
+      ].join("");
+      panelHtml = [
+        '<aside class="stage-hero__panel">',
+          '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
+          '<strong class="stage-hero__panel-value">' + escapeHtml(panelValue) + "</strong>",
+          '<p>' + escapeHtml(panelCopy) + "</p>",
+        "</aside>"
+      ].join("");
     } else if (stage === STAGES.post) {
       stageTitle = "Winners are live";
       stageCopy = "The post-vote home now points visitors to the results surface, winner highlights, and the archive path.";
-      primaryHref = "#/winners";
-      primaryLabel = "View winners";
-      secondaryHref = "#/winners";
-      secondaryLabel = "Browse winners";
+      actionsHtml = [
+        '<div class="stage-hero__actions">',
+          '<a class="btn btn--primary" href="#/winners">View winners</a>',
+          '<a class="btn btn--ghost" href="#/winners">Browse winners</a>',
+        "</div>"
+      ].join("");
       panelTitle = "Winner cards";
       panelValue = String((siteData.winnerHighlights || []).length);
       panelCopy = "The winner surface is wider than the public ballot and can show additional recognitions.";
+      copyHtml = [
+        '<div class="stage-hero__copy-body">',
+          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
+          '<h1>' + escapeHtml(stageTitle) + "</h1>",
+          '<p>' + escapeHtml(stageCopy) + "</p>",
+        "</div>",
+        actionsHtml
+      ].join("");
+      panelHtml = [
+        '<aside class="stage-hero__panel">',
+          '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
+          '<strong class="stage-hero__panel-value">' + escapeHtml(panelValue) + "</strong>",
+          '<p>' + escapeHtml(panelCopy) + "</p>",
+        "</aside>"
+      ].join("");
     } else {
-      stageTitle = "Countdown to voting";
-      stageCopy = "The pre-vote home focuses on the clock, sponsor visibility, and discovery content while the ballot is closed.";
-      primaryHref = "#/process";
-      primaryLabel = "View schedule";
-      secondaryHref = "#/previous-years";
-      secondaryLabel = "Previous editions";
+      stageTitle = "Voting opens timeline";
+      stageCopy = "The pre-vote home keeps the opening date in focus with a live countdown timer.";
       panelTitle = "Voting opens";
-      panelValue = eventLabel;
-      panelCopy = countdown.days > 0
-        ? countdown.days + " days, " + countdown.hours + " hours and " + countdown.minutes + " minutes remain."
-        : "The countdown has reached zero.";
+      actionsHtml = "";
+      copyHtml = [
+        '<div class="stage-hero__copy-body">',
+          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
+          '<h1>' + escapeHtml(stageTitle) + "</h1>",
+          '<p>' + escapeHtml(stageCopy) + "</p>",
+          '<aside class="stage-hero__timeline" data-countdown-timer data-countdown-target="' + escapeHtml(eventDate) + '">',
+            '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
+            '<div class="stage-hero__timer-grid" aria-label="Time remaining until voting opens">',
+              '<div class="stage-hero__timer-unit">',
+                '<strong data-countdown-days>' + formatCountdownUnit(countdown.days) + "</strong>",
+                '<span>Days</span>',
+              "</div>",
+              '<div class="stage-hero__timer-unit">',
+                '<strong data-countdown-hours>' + formatCountdownUnit(countdown.hours) + "</strong>",
+                '<span>Hours</span>',
+              "</div>",
+              '<div class="stage-hero__timer-unit">',
+                '<strong data-countdown-minutes>' + formatCountdownUnit(countdown.minutes) + "</strong>",
+                '<span>Minutes</span>',
+              "</div>",
+              '<div class="stage-hero__timer-unit">',
+                '<strong data-countdown-seconds>' + formatCountdownUnit(countdown.seconds) + "</strong>",
+                '<span>Seconds</span>',
+              "</div>",
+            "</div>",
+          "</aside>",
+        "</div>"
+      ].join("");
+      panelHtml = "";
     }
 
     return [
       '<section class="section-card stage-hero stage-hero--' + stage + '">',
         '<div class="stage-hero__media">',
           '<img class="stage-hero__trophy" src="https://images.assettype.com/deccanherald/2026-04-30/zrlojphv/PVCS-Trophy.png" alt="PVCS trophy">',
-          '<div class="stage-hero__badge">' + escapeHtml(stageLabel) + "</div>",
         "</div>",
         '<div class="stage-hero__copy">',
-          '<p class="eyebrow">Praja Vaani Cine Sammana</p>',
-          '<h1>' + escapeHtml(stageTitle) + "</h1>",
-          '<p>' + escapeHtml(stageCopy) + "</p>",
-          '<div class="stage-hero__actions">' +
-            '<a class="btn btn--primary" href="' + primaryHref + '">' + escapeHtml(primaryLabel) + "</a>" +
-            '<a class="btn btn--ghost" href="' + secondaryHref + '">' + escapeHtml(secondaryLabel) + "</a>" +
-          "</div>",
+          copyHtml,
         "</div>",
-        '<aside class="stage-hero__panel">',
-          '<span class="stage-hero__panel-label">' + escapeHtml(panelTitle) + "</span>",
-          '<strong class="stage-hero__panel-value">' + escapeHtml(panelValue) + "</strong>",
-          '<p>' + escapeHtml(panelCopy) + "</p>",
-        "</aside>",
+        panelHtml,
       "</section>"
     ].join("");
   }
@@ -705,7 +778,9 @@
         '<div class="sponsor-band__track" data-sponsor-track></div>' +
       "</section>"
     );
-    sections.push(renderStageCards(stage));
+    if (stage !== STAGES.pre) {
+      sections.push(renderStageCards(stage));
+    }
     if (stage === STAGES.post) {
       sections.push(renderWinnersPreview());
     }
@@ -715,6 +790,9 @@
     root.setAttribute("data-stage", stage);
     root.innerHTML = sections.join("");
     renderSponsors();
+    if (stage === STAGES.pre) {
+      updateCountdownTimers();
+    }
   }
 
   function renderStageController() {
@@ -796,6 +874,7 @@
     if (!window.localStorage.getItem(STAGE_KEY)) {
       window.localStorage.setItem(STAGE_KEY, siteData.defaultStage || STAGES.pre);
     }
+    startCountdownTicker();
     renderSharedChrome();
     initMenu();
     initYear();

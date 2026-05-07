@@ -345,3 +345,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: The command timed out and `gh auth status` still reported invalid tokens.
 - Working approach: Use a pre-existing valid token or complete the browser login outside the timeout window.
 - Next-time rule: If `gh auth login --web` hangs in this environment, treat it as incomplete and ask for an already-valid token or manual completion.
+
+## 2026-05-07 - Patch drifting inline HTML
+- Context: Reworking the pre-vote hero countdown block in `app.js`.
+- Command/workflow: Large `apply_patch` edits against inline HTML array strings.
+- Failed approach: Tried to replace a long HTML fragment without re-reading the exact current file contents.
+- Symptom: Patch context missed because the string block had drifted and a few quotes differed from the earlier readback.
+- Working approach: Re-read the exact line range, then patch the smallest stable block and verify with `node --check`.
+- Next-time rule: For inline HTML string arrays, inspect the current block immediately before patching and prefer smaller surgical replacements over large rewrites.
