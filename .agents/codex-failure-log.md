@@ -314,3 +314,26 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: The code paths looked correct, but users still could not activate the card CTA on mobile.
 - Working approach: Measure the button and bottom-nav rectangles and use `elementFromPoint(...)` on the button area; this showed the CTA was mostly below the viewport and the only visible sliver was inside the fixed bottom-nav zone.
 - Next-time rule: For mobile tap bugs in transformed/swipe layouts, inspect live element geometry and hit-testing first; a layout/overlay collision can fully explain a “tap does nothing” report even when event handlers are wired correctly.
+## 2026-05-07 - PowerShell command separator
+- Context: Committing tracked changes in this repo.
+- Command/workflow: `git add -u && git commit -m "Update PVCS microsite interactions"`
+- Failed approach: Used `&&` in PowerShell.
+- Symptom: PowerShell parser rejected `&&` as an invalid statement separator.
+- Working approach: Use `;` between commands in PowerShell.
+- Next-time rule: Prefer PowerShell-native separators and avoid shell syntax copied from bash.
+
+## 2026-05-07 - Git metadata write blocked
+- Context: Creating a commit in this workspace.
+- Command/workflow: `git add -u; git commit -m "Update PVCS microsite interactions"`
+- Failed approach: Ran git commit in the sandbox without escalation.
+- Symptom: Git could not create `.git/index.lock` and returned `Permission denied`.
+- Working approach: Reran the commit with escalated permissions.
+- Next-time rule: If git needs to write metadata under `.git`, expect sandbox approval may be required.
+
+## 2026-05-07 - GitHub push auth
+- Context: Pushing the local commit to `origin/master`.
+- Command/workflow: `git push origin master`
+- Failed approach: Relied on the existing HTTPS credential helper.
+- Symptom: Push failed because the credential prompt had no TTY and stored GitHub tokens were invalid.
+- Working approach: Check `gh auth status` first and refresh GitHub auth before retrying the push.
+- Next-time rule: Verify GitHub CLI/auth state before attempting a push in this environment.
