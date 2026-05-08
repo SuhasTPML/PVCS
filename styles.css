@@ -1286,6 +1286,11 @@ h2,
     padding: 16px 44px;
   }
 
+  .reel-lightbox__stage {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .gallery-lightbox__stage img {
     width: 100%;
     max-height: min(74vh, 700px);
