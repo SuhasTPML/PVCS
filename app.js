@@ -3,6 +3,7 @@
   var STAGE_KEY = "pvcs-stage";
   var VOTING_CLOSE_DATE = "2026-05-24";
   var MEDIA_FALLBACK_SRC = "PVCS_Trophy_with_bg.svg";
+  var pendingHomeScrollTarget = "";
   var LOCAL_GALLERY_IMAGES = [
     "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80",
     "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=80",
@@ -222,6 +223,10 @@
     return item.pageUrl;
   }
 
+  function getScrollTarget(item) {
+    return item && item.scrollTarget ? String(item.scrollTarget) : "";
+  }
+
   function getStageNavigation() {
     var navigation = siteData.navigation || {};
     var stageNavigation = navigation[getStage()];
@@ -240,6 +245,9 @@
   }
 
   function isNavItemActive(item, currentPage) {
+    if (item && item.scrollTarget) {
+      return false;
+    }
     var href = getEffectiveHref(item);
     if (href === "#/") {
       return currentPage === "home";
@@ -248,6 +256,20 @@
       return currentPage === "voting" || currentPage === "nominations";
     }
     return href === "#/" + currentPage;
+  }
+
+  function scrollToElementById(id) {
+    var target = id ? document.getElementById(id) : null;
+    var header = qs(".site-header");
+    var headerHeight = header ? header.getBoundingClientRect().height : 0;
+    var offset = headerHeight + 16;
+    var top;
+    if (!target) {
+      return false;
+    }
+    top = Math.max(0, window.pageYOffset + target.getBoundingClientRect().top - offset);
+    window.scrollTo({ top: top, behavior: "smooth" });
+    return true;
   }
 
   function createNavIcon(name) {
@@ -270,6 +292,9 @@
   }
 
   function itemIconName(item) {
+    if (item && item.icon) {
+      return item.icon;
+    }
     var page = item.pageUrl || "";
     if (item.menuTrigger) return "menu";
     if (page === "#/") return "home";
@@ -312,7 +337,8 @@
         }
         return (
           '<a class="' + classes.join(" ") + '" href="' + href + '"' +
-          (item.menuTrigger ? ' data-menu-trigger="true"' : "") + ">" +
+          (item.menuTrigger ? ' data-menu-trigger="true"' : "") +
+          (item.scrollTarget ? ' data-scroll-target="' + escapeHtml(item.scrollTarget) + '"' : "") + ">" +
           '<span class="bottom-nav__icon">' + createNavIcon(item.icon) + "</span>" +
           '<span class="bottom-nav__label">' + escapeHtml(item.label) + "</span>" +
           "</a>"
@@ -335,7 +361,14 @@
         var href = getEffectiveHref(item);
         if (item.emphasis) classes.push("is-emphasis");
         if (isNavItemActive(item, currentPage)) classes.push("is-active");
-        return '<a class="' + classes.join(" ") + '" href="' + href + '">' + escapeHtml(item.label) + "</a>";
+        return (
+          '<a class="' + classes.join(" ") + '" href="' + href + '"' +
+          (item.scrollTarget ? ' data-scroll-target="' + escapeHtml(item.scrollTarget) + '"' : "") +
+          '>' +
+          '<span class="header-nav__icon">' + createNavIcon(itemIconName(item)) + "</span>" +
+          '<span class="header-nav__label">' + escapeHtml(item.label) + "</span>" +
+          "</a>"
+        );
       })
       .join("");
   }
@@ -358,7 +391,8 @@
       return (
         "<li><a" +
         (classes.length ? ' class="' + classes.join(" ") + '"' : "") +
-        ' href="' + getEffectiveHref(item) + '">' +
+        ' href="' + getEffectiveHref(item) + '"' +
+        (item.scrollTarget ? ' data-scroll-target="' + escapeHtml(item.scrollTarget) + '"' : "") + ">" +
         '<span class="side-menu__icon">' + createNavIcon(itemIconName(item)) + "</span>" +
         '<span class="side-menu__label">' + escapeHtml(item.label) + "</span>" +
         '<span class="side-menu__chevron" aria-hidden="true">›</span>' +
@@ -801,6 +835,33 @@
     });
   }
 
+  function initNavScrollTargets() {
+    document.addEventListener("click", function (event) {
+      var link = event.target.closest("[data-scroll-target]");
+      var targetId;
+      if (!link) {
+        return;
+      }
+      targetId = link.getAttribute("data-scroll-target") || "";
+      if (!targetId) {
+        return;
+      }
+
+      event.preventDefault();
+      pendingHomeScrollTarget = targetId;
+      if (getCurrentPageValue(getRoute()) === "home") {
+        pendingHomeScrollTarget = "";
+        scrollToElementById(targetId);
+        return;
+      }
+      if (getRoute() === "home") {
+        applyPendingHomeScroll();
+        return;
+      }
+      location.hash = "#/";
+    });
+  }
+
   function initMenu() {
     document.addEventListener("click", function (event) {
       if (event.target.closest("[data-menu-trigger]")) {
@@ -1075,22 +1136,22 @@
   function renderPhotoGallerySection(stage) {
     var cards = buildPhotoGalleryCards(stage);
     return [
-      '<section class="content-block section-card media-section media-section--photos">',
+      '<section class="content-block section-card media-section media-section--photos" id="home-photo-section">',
         '<div class="content-block__header">',
           '<div>',
             '<p class="eyebrow">Gallery</p>',
             '<h2>Photo gallery</h2>',
           "</div>",
-          '<div class="strip-controls" aria-label="Scroll photo gallery">',
-            '<button class="strip-control" type="button" data-strip-control="prev" data-strip-target="home-photo-gallery" aria-label="Scroll photos left">',
+        '<div class="strip-controls" aria-label="Scroll photo gallery">',
+            '<button class="strip-control" type="button" data-strip-control="prev" data-strip-target="home-photo-strip" aria-label="Scroll photos left">',
               '<span aria-hidden="true">&larr;</span>',
             "</button>",
-            '<button class="strip-control" type="button" data-strip-control="next" data-strip-target="home-photo-gallery" aria-label="Scroll photos right">',
+            '<button class="strip-control" type="button" data-strip-control="next" data-strip-target="home-photo-strip" aria-label="Scroll photos right">',
               '<span aria-hidden="true">&rarr;</span>',
             "</button>",
           "</div>",
         "</div>",
-        '<div class="photo-gallery" id="home-photo-gallery" aria-label="Photo gallery">' + cards.map(function (card, index) {
+        '<div class="photo-gallery" id="home-photo-strip" aria-label="Photo gallery">' + cards.map(function (card, index) {
           return [
             '<button class="media-card media-card--photo media-card--trigger" type="button" data-gallery-trigger data-gallery-index="' + index + '" data-gallery-src="' + escapeHtml(card.image) + '" data-gallery-alt="' + escapeHtml(card.title) + '" data-gallery-caption="' + escapeHtml(card.title) + '" aria-label="Open ' + escapeHtml(card.title) + ' in gallery viewer">',
               '<img src="' + card.image + '" alt="' + escapeHtml(card.title) + '" loading="lazy" data-fallback-src="' + MEDIA_FALLBACK_SRC + '">',
@@ -1107,22 +1168,22 @@
   function renderVideoGallerySection(stage) {
     var cards = buildVideoReelCards(stage);
     return [
-      '<section class="content-block section-card media-section media-section--videos">',
+      '<section class="content-block section-card media-section media-section--videos" id="home-video-section">',
         '<div class="content-block__header">',
           '<div>',
             '<p class="eyebrow">Videos</p>',
             '<h2>Video reels</h2>',
           "</div>",
-          '<div class="strip-controls" aria-label="Scroll video reels">',
-            '<button class="strip-control" type="button" data-strip-control="prev" data-strip-target="home-reel-strip" aria-label="Scroll reels left">',
+        '<div class="strip-controls" aria-label="Scroll video reels">',
+            '<button class="strip-control" type="button" data-strip-control="prev" data-strip-target="home-video-strip" aria-label="Scroll reels left">',
               '<span aria-hidden="true">&larr;</span>',
             "</button>",
-            '<button class="strip-control" type="button" data-strip-control="next" data-strip-target="home-reel-strip" aria-label="Scroll reels right">',
+            '<button class="strip-control" type="button" data-strip-control="next" data-strip-target="home-video-strip" aria-label="Scroll reels right">',
               '<span aria-hidden="true">&rarr;</span>',
             "</button>",
           "</div>",
         "</div>",
-        '<div class="reel-strip" id="home-reel-strip" aria-label="Video reels">' + cards.map(function (card, index) {
+        '<div class="reel-strip" id="home-video-strip" aria-label="Video reels">' + cards.map(function (card, index) {
           return [
             '<button class="media-card reel-card reel-card--trigger" type="button" data-reel-trigger data-reel-index="' + index + '" data-reel-src="' + escapeHtml(card.embedUrl) + '" data-reel-caption="' + escapeHtml(card.title) + '" aria-label="Play ' + escapeHtml(card.title) + ' reel">',
               '<img src="' + card.image + '" alt="' + escapeHtml(card.title) + '" loading="lazy" data-fallback-src="' + MEDIA_FALLBACK_SRC + '">',
@@ -1248,6 +1309,17 @@
     }
   }
 
+  function applyPendingHomeScroll() {
+    if (!pendingHomeScrollTarget) {
+      return;
+    }
+    if (!scrollToElementById(pendingHomeScrollTarget)) {
+      pendingHomeScrollTarget = "";
+      return;
+    }
+    pendingHomeScrollTarget = "";
+  }
+
   function renderPhotosPage() {
     var root = qs("[data-photos-root]");
     if (!root) {
@@ -1282,6 +1354,7 @@
     renderVideosPage();
     if (getRoute() === "home") {
       renderHome();
+      window.requestAnimationFrame(applyPendingHomeScroll);
     } else {
       var homeRoot = qs("[data-home-shell]");
       if (homeRoot) {
@@ -1325,6 +1398,7 @@
     initGalleryLightbox();
     initReelLightbox();
     initStripControls();
+    initNavScrollTargets();
     startCountdownTicker();
     renderSharedChrome();
     initMenu();

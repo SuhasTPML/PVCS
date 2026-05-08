@@ -2379,6 +2379,7 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
   .header-nav__link {
     display: flex;
     align-items: center;
+    gap: 8px;
     padding: 6px 14px;
     border-radius: 10px;
     color: var(--muted);
@@ -2401,6 +2402,30 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
 
   .header-nav__link.is-emphasis {
     color: var(--accent-strong);
+    animation: nav-pulse 1.4s ease-in-out infinite;
+  }
+
+  .header-nav__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+  }
+
+  .header-nav__icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-nav__label {
+    line-height: 1;
   }
 
   .header-menu-btn {

@@ -425,3 +425,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: Patch context did not match the live file tail and the replace failed repeatedly.
 - Working approach: Append the new `navigation` object alongside the legacy fields first, then switch the renderers to the new source of truth.
 - Next-time rule: For end-of-file config migrations in this repo, add the new config adjacent to the legacy block first and only remove old fields after the consumers are switched.
+
+## 2026-05-08 - Prefer literal search for quoted HTML attributes
+- Context: Verifying new home-section scroll targets after changing Photos/Videos to scroll back to home.
+- Command/workflow: `rg --fixed-strings` against `index.html` with quoted `data-route="..."` patterns.
+- Failed approach: Used `rg` with heavily quoted literal patterns in PowerShell.
+- Symptom: `rg` misparsed the quoted string and treated part of the pattern as a path argument.
+- Working approach: Use `Select-String -SimpleMatch` for the literal HTML attribute check.
+- Next-time rule: For quoted HTML attributes in PowerShell, prefer `Select-String -SimpleMatch` over `rg` unless the quoting is trivial.
