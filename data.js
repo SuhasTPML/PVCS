@@ -289,5 +289,96 @@ window.CINE_SITE_DATA = {
     { label: "ಸ್ಪರ್ಧೆ", pageUrl: "#/contest", icon: "contest" },
     { label: "ಪ್ರಕ್ರಿಯೆ", pageUrl: "#/process", icon: "process" },
     { label: "ಮೆನು", pageUrl: "#menu", icon: "menu", menuTrigger: true }
-  ]
+  ],
+  navigation: {
+    "pre-vote": {
+      desktop: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Process", pageUrl: "#/process", icon: "process" },
+        { label: "About Us", pageUrl: "#/about", icon: "about" }
+      ],
+      mobile: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Menu", pageUrl: "#menu", icon: "menu", menuTrigger: true }
+      ],
+      menu: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Process", pageUrl: "#/process", icon: "process" },
+        { label: "About Us", pageUrl: "#/about", icon: "about" },
+        { label: "Jury", pageUrl: "#/jury", icon: "jury" },
+        { label: "Cine Corner", pageUrl: "#/cine-corner", icon: "cineCorner" },
+        { label: "Previous Editions", pageUrl: "#/previous-years", icon: "previousYears" },
+        { label: "Terms and Conditions", pageUrl: "#/terms", icon: "terms" }
+      ]
+    },
+    "during-vote": {
+      desktop: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Vote Now", pageUrl: "#/voting", icon: "vote", emphasis: true },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Process", pageUrl: "#/process", icon: "process" }
+      ],
+      mobile: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Vote Now", pageUrl: "#/voting", icon: "vote", emphasis: true },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Process", pageUrl: "#/process", icon: "process" },
+        { label: "Menu", pageUrl: "#menu", icon: "menu", menuTrigger: true }
+      ],
+      menu: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Vote Now", pageUrl: "#/voting", icon: "vote", emphasis: true },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Process", pageUrl: "#/process", icon: "process" },
+        { label: "About Us", pageUrl: "#/about", icon: "about" },
+        { label: "Jury", pageUrl: "#/jury", icon: "jury" },
+        { label: "Cine Corner", pageUrl: "#/cine-corner", icon: "cineCorner" },
+        { label: "Previous Editions", pageUrl: "#/previous-years", icon: "previousYears" },
+        { label: "Terms and Conditions", pageUrl: "#/terms", icon: "terms" }
+      ]
+    },
+    "post-vote": {
+      desktop: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Winners", pageUrl: "#/winners", icon: "winners", emphasis: true },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Process", pageUrl: "#/process", icon: "process" }
+      ],
+      mobile: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Winners", pageUrl: "#/winners", icon: "winners", emphasis: true },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Menu", pageUrl: "#menu", icon: "menu", menuTrigger: true }
+      ],
+      menu: [
+        { label: "Home", pageUrl: "#/", icon: "home" },
+        { label: "Winners", pageUrl: "#/winners", icon: "winners", emphasis: true },
+        { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Photos", pageUrl: "#/photos", icon: "photo" },
+        { label: "Videos", pageUrl: "#/videos", icon: "video" },
+        { label: "Process", pageUrl: "#/process", icon: "process" },
+        { label: "About Us", pageUrl: "#/about", icon: "about" },
+        { label: "Jury", pageUrl: "#/jury", icon: "jury" },
+        { label: "Cine Corner", pageUrl: "#/cine-corner", icon: "cineCorner" },
+        { label: "Previous Editions", pageUrl: "#/previous-years", icon: "previousYears" },
+        { label: "Terms and Conditions", pageUrl: "#/terms", icon: "terms" }
+      ]
+    }
+  }
 };

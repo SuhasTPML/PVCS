@@ -167,6 +167,8 @@
       about: "about",
       contest: "contest",
       process: "process",
+      photos: "photos",
+      videos: "videos",
       jury: "jury",
       "cine-corner": "cine-corner",
       "previous-years": "previous-years",
@@ -220,12 +222,43 @@
     return item.pageUrl;
   }
 
+  function getStageNavigation() {
+    var navigation = siteData.navigation || {};
+    var stageNavigation = navigation[getStage()];
+    if (stageNavigation) {
+      return stageNavigation;
+    }
+    return {
+      desktop: (siteData.bottomNav || []).filter(function (item) {
+        return !item.menuTrigger;
+      }).concat(siteData.menuLinks || []).slice(0, 6),
+      mobile: siteData.bottomNav || [],
+      menu: (siteData.bottomNav || []).filter(function (item) {
+        return !item.menuTrigger;
+      }).concat(siteData.menuLinks || [])
+    };
+  }
+
+  function isNavItemActive(item, currentPage) {
+    var href = getEffectiveHref(item);
+    if (href === "#/") {
+      return currentPage === "home";
+    }
+    if (href === "#/voting") {
+      return currentPage === "voting" || currentPage === "nominations";
+    }
+    return href === "#/" + currentPage;
+  }
+
   function createNavIcon(name) {
     var pathMap = {
       home: "M12 3.5 3.5 10v10.5h5.5v-6h6v6h5.5V10z",
       vote: "M5 6.5h14v11H5zm2 2v7h10v-7zm2.5-4h5l1 2h-7z",
       contest: "M7 5h10v3h2v10H5V8h2zm2 5.5 2 2 4-4",
       process: "M6 6h12v3H6zm0 5h12v3H6zm0 5h8v3H6z",
+      photo: "M5 6.5h14v11H5zm2 2v7h10v-7zm1.5 6 2.5-3 2 2 1.5-2 2 3z",
+      video: "M6 6.5h12v11H6zm4 2.5 4 3-4 3z",
+      winners: "M12 4.5l2.2 4.45 4.91.71-3.55 3.46.84 4.88L12 15.9 7.58 18l.84-4.88L4.87 9.66l4.91-.71z",
       menu: "M4.5 7h15M4.5 12h15M4.5 17h15",
       about: "M12 2.75a3.25 3.25 0 1 1 0 6.5a3.25 3.25 0 0 1 0-6.5zm-4 8.75h8a2 2 0 0 1 2 2v7H6v-7a2 2 0 0 1 2-2z",
       jury: "M12 3.5l6 2v4.5c0 4-2.5 7.5-6 10-3.5-2.5-6-6-6-10V5.5l6-2zm0 3a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-2 4.5v1h4v-1h-4z",
@@ -241,8 +274,11 @@
     if (item.menuTrigger) return "menu";
     if (page === "#/") return "home";
     if (page === "#/voting") return "vote";
+    if (page === "#/winners") return "winners";
     if (page === "#/contest") return "contest";
     if (page === "#/process") return "process";
+    if (page === "#/photos") return "photo";
+    if (page === "#/videos") return "video";
     if (page === "#/about") return "about";
     if (page === "#/jury") return "jury";
     if (page === "#/cine-corner") return "cineCorner";
@@ -253,27 +289,22 @@
 
   function renderBottomNav() {
     var nav = qs("[data-bottom-nav]");
-    if (!nav || !siteData.bottomNav) {
+    var stageNavigation = getStageNavigation();
+    var items = stageNavigation.mobile || [];
+    if (!nav || !items.length) {
       return;
     }
 
-    var currentRoute = getRoute();
-    var currentPage = getCurrentPageValue(currentRoute);
-    var stage = getStage();
-    var isVotingPage = currentPage === "voting" || currentPage === "nominations";
+    var currentPage = getCurrentPageValue(getRoute());
 
-    nav.innerHTML = siteData.bottomNav
+    nav.innerHTML = items
       .map(function (item) {
         var classes = ["bottom-nav__link"];
         var href = getEffectiveHref(item);
         if (item.emphasis) {
           classes.push("is-emphasis");
         }
-        if (
-          (href === "#/" && currentPage === "home") ||
-          (href === "#/voting" && isVotingPage) ||
-          (href === "#/" + currentPage)
-        ) {
+        if (isNavItemActive(item, currentPage)) {
           classes.push("is-active");
         }
         if (item.menuTrigger) {
@@ -292,26 +323,18 @@
 
   function renderHeaderNav() {
     var el = qs("[data-header-nav]");
-    if (!el || !siteData.bottomNav) return;
+    var stageNavigation = getStageNavigation();
+    var items = stageNavigation.desktop || [];
+    if (!el || !items.length) return;
 
-    var currentRoute = getRoute();
-    var currentPage = getCurrentPageValue(currentRoute);
-    var isVotingPage = currentPage === "voting" || currentPage === "nominations";
-    var items = siteData.bottomNav
-      .filter(function (item) { return !item.menuTrigger; })
-      .concat(siteData.menuLinks || [])
-      .slice(0, 6);
+    var currentPage = getCurrentPageValue(getRoute());
 
     el.innerHTML = items
       .map(function (item) {
         var classes = ["header-nav__link"];
         var href = getEffectiveHref(item);
         if (item.emphasis) classes.push("is-emphasis");
-        if (
-          (href === "#/" && currentPage === "home") ||
-          (href === "#/voting" && isVotingPage) ||
-          (href === "#/" + currentPage)
-        ) classes.push("is-active");
+        if (isNavItemActive(item, currentPage)) classes.push("is-active");
         return '<a class="' + classes.join(" ") + '" href="' + href + '">' + escapeHtml(item.label) + "</a>";
       })
       .join("");
@@ -323,30 +346,19 @@
       return;
     }
 
-    var currentRoute = getRoute();
-    var currentPage = getCurrentPageValue(currentRoute);
+    var currentPage = getCurrentPageValue(getRoute());
     var currentStage = getStage();
-    var primaryLinks = (siteData.bottomNav || [])
-      .filter(function (item) {
-        return !item.menuTrigger;
-      })
-      .map(function (item) {
-        return { label: item.label, pageUrl: getEffectiveHref(item) };
-      });
-    var secondaryLinks = siteData.menuLinks || [];
+    var menuLinks = getStageNavigation().menu || [];
 
     function renderLink(item) {
       var classes = [];
-      if (
-        (item.pageUrl === "#/" && currentPage === "home") ||
-        (item.pageUrl === "#/" + currentPage)
-      ) {
+      if (isNavItemActive(item, currentPage)) {
         classes.push("is-active");
       }
       return (
         "<li><a" +
         (classes.length ? ' class="' + classes.join(" ") + '"' : "") +
-        ' href="' + item.pageUrl + '">' +
+        ' href="' + getEffectiveHref(item) + '">' +
         '<span class="side-menu__icon">' + createNavIcon(itemIconName(item)) + "</span>" +
         '<span class="side-menu__label">' + escapeHtml(item.label) + "</span>" +
         '<span class="side-menu__chevron" aria-hidden="true">›</span>' +
@@ -366,15 +378,9 @@
 
     list.innerHTML =
       '<section class="side-menu__section">' +
-        '<div class="side-menu__section-title">Primary</div>' +
+        '<div class="side-menu__section-title">All sections</div>' +
         '<ul class="side-menu__list">' +
-          primaryLinks.map(renderLink).join("") +
-        "</ul>" +
-      "</section>" +
-      '<section class="side-menu__section">' +
-        '<div class="side-menu__section-title">More</div>' +
-        '<ul class="side-menu__list">' +
-          secondaryLinks.map(renderLink).join("") +
+          menuLinks.map(renderLink).join("") +
         "</ul>" +
       "</section>" +
       '<section class="side-menu__section side-menu__section--review">' +
@@ -1242,12 +1248,38 @@
     }
   }
 
+  function renderPhotosPage() {
+    var root = qs("[data-photos-root]");
+    if (!root) {
+      return;
+    }
+    if (getRoute() !== "photos") {
+      root.innerHTML = "";
+      return;
+    }
+    root.innerHTML = renderPhotoGallerySection(getStage());
+  }
+
+  function renderVideosPage() {
+    var root = qs("[data-videos-root]");
+    if (!root) {
+      return;
+    }
+    if (getRoute() !== "videos") {
+      root.innerHTML = "";
+      return;
+    }
+    root.innerHTML = renderVideoGallerySection(getStage());
+  }
+
   function renderSharedChrome() {
     document.body.setAttribute("data-stage", getStage());
     renderBottomNav();
     renderHeaderNav();
     renderMenu();
     renderSponsors();
+    renderPhotosPage();
+    renderVideosPage();
     if (getRoute() === "home") {
       renderHome();
     } else {

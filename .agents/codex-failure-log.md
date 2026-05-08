@@ -417,3 +417,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: `Select-String` returned `A positional parameter cannot be found` and did not run the search.
 - Working approach: Use separate `rg --fixed-strings` checks or pass each pattern explicitly.
 - Next-time rule: In PowerShell, do not rely on a single quoted `Select-String -Pattern` string when the content includes pipe separators; split patterns or use `rg --fixed-strings`.
+
+## 2026-05-08 - Append new config before removing legacy nav blocks
+- Context: Replacing the static nav config in `data.js` with stage-specific desktop/mobile/menu navigation.
+- Command/workflow: `apply_patch` against the tail of `data.js`.
+- Failed approach: Tried to replace the existing `menuLinks` and `bottomNav` tail block in one patch.
+- Symptom: Patch context did not match the live file tail and the replace failed repeatedly.
+- Working approach: Append the new `navigation` object alongside the legacy fields first, then switch the renderers to the new source of truth.
+- Next-time rule: For end-of-file config migrations in this repo, add the new config adjacent to the legacy block first and only remove old fields after the consumers are switched.
