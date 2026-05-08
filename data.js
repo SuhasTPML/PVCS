@@ -306,7 +306,7 @@ window.CINE_SITE_DATA = {
     description:
       "2026ರಲ್ಲಿ ಬಿಡುಗಡೆಯಾದ ಕನ್ನಡ ಚಲನಚಿತ್ರಗಳ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸುವ ಮೂರನೇ ಆವೃತ್ತಿಯ ವೇದಿಕೆ.",
     ctaLabel: "ಆಯ್ಕೆ ಪ್ರಕ್ರಿಯೆ ನೋಡಿ",
-    ctaLink: "#/process"
+    ctaLink: "#/contest"
   },
   sponsors: [
     {
