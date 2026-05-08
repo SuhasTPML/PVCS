@@ -56,9 +56,7 @@ body {
   min-width: 320px;
   font-family: var(--font-body);
   color: var(--text);
-  background:
-    radial-gradient(circle at top, rgba(255, 209, 122, 0.24), transparent 28%),
-    linear-gradient(180deg, #7e101d 0%, var(--bg) 38%, var(--bg-deep) 100%);
+  background: var(--bg-deep);
   min-height: 100vh;
 }
 
@@ -3379,10 +3377,25 @@ body[data-page="home"] .home-shell {
 }
 
 .nomination-section__header {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 3;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 54px;
+  padding: 10px 12px;
+  margin: -14px -12px 0;
+  border-bottom: 1px solid rgba(255, 248, 239, 0.08);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: rgba(33, 2, 6, 0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.nomination-section__header.is-stuck {
+  border-radius: 0;
 }
 
 .nomination-section__actions {
@@ -3820,6 +3833,10 @@ body[data-page="home"] .home-shell {
 
   .nomination-section {
     padding: 22px;
+  }
+
+  .nomination-section__header {
+    margin: -22px -22px 0;
   }
 
   .vote-final,

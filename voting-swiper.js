@@ -811,6 +811,18 @@
         try { select.click(); } catch (e2) {}
       }
     });
+
+    var headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 76;
+    qsa(".nomination-section__header", root).forEach(function (header) {
+      var sentinel = document.createElement("div");
+      sentinel.style.cssText = "position:absolute;top:0;height:1px;width:1px;pointer-events:none";
+      header.parentElement.style.position = "relative";
+      header.parentElement.insertBefore(sentinel, header);
+      var observer = new IntersectionObserver(function (entries) {
+        header.classList.toggle("is-stuck", !entries[0].isIntersecting);
+      }, { rootMargin: "-" + headerH + "px 0px 0px 0px", threshold: 0 });
+      observer.observe(sentinel);
+    });
   }
 
   function refreshFinalStatus(root) {
