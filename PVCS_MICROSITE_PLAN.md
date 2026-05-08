@@ -10,18 +10,23 @@ Implemented:
 - Review-only stage switch inside the hamburger menu
 - Shared microsite shell with stage-aware home hero
 - Pre-vote hero, sponsor band, photo gallery, and video gallery sections
-- During-vote voting flow with 4 categories, 2-column nominee grid, previous/next navigation, click-to-vote, auto-advance, and final submission screen
+- During-vote voting flow with 4 categories, 4-column nominee grid on desktop / 2-column on mobile, previous/next navigation, click-to-vote, 380ms selection feedback delay, auto-advance, and final submission screen
 - Voting stats gating and vote-share-only rendering
 - Post-vote winners destination wiring and winners pages
 - Stage-aware desktop header nav, mobile bottom nav, and hamburger menu model
 - Dedicated `Photos` and `Videos` routes backed by the existing gallery and reel sections
-- Gallery lightbox for desktop and mobile photo cards
+- Gallery lightbox for desktop; full-width image and video on mobile lightbox
 - Embedded YouTube Shorts reels in the video gallery
+- Nomination page as a full route with 19 craft categories, sticky section headers (rounded at rest, sharp when stuck), and 4-column card grid on desktop
+- Portrait aspect-ratio (3:4) nominee and voting cards on desktop replacing fixed-height image rows
+- Flat `#210206` background across all pages — gradient removed
+- Content deliverables CSV (`content-deliverables.csv`) tracking all 448 client-provided items across 3 stages
+- All page container widths aligned to `1120px` content width on desktop including home page
+- Popup CTA routes to contest page
 
 Partial or still to refine:
 
 - During-vote home messaging still uses countdown language in some places
-- Nomination page still renders as a full route shell rather than a compact floating widget
 - Exact stage date boundaries are still unresolved
 - ILU meaning is still not documented in the plan
 
@@ -134,7 +139,7 @@ If sponsor assets are available, the sponsor band should be visible in the first
 
 ## 2. During Vote
 
-Status: core voting flow implemented; some home-page messaging and nomination behavior still need refinement.
+Status: core voting flow and nomination page implemented; home-page messaging still uses countdown language in some places.
 
 ### Home Page Structure
 
@@ -182,6 +187,7 @@ Desktop visible items:
 - `Home`
 - `Vote Now`
 - `Contests`
+- `Nominees`
 - `Photos`
 - `Videos`
 - `Process`
@@ -191,7 +197,7 @@ Mobile bottom nav:
 - `Home`
 - `Vote Now`
 - `Contests`
-- `Process`
+- `Nominees`
 - `Menu`
 
 Hamburger menu:
@@ -201,6 +207,7 @@ Hamburger menu:
   - `Home`
   - `Vote Now`
   - `Contests`
+  - `Nominees`
   - `Photos`
   - `Videos`
   - `Process`
@@ -228,10 +235,11 @@ Layout rules:
 - Use 1 screen per vote category.
 - Provide previous and next buttons for category navigation.
 - Allow up to 8 nominees per category.
-- Render nominee cards in a 2-column grid.
+- Render nominee cards in a 4-column grid on desktop, 2-column on mobile.
+- Cards use a portrait 3:4 aspect-ratio image with name and description below.
 - Vote by clicking a card.
 - Do not use swipe, drag, or other hidden gesture interactions.
-- As soon as a user selects a nominee, advance to the next category screen.
+- On selection, show the green chosen state for 380ms before advancing to the next category screen.
 
 Voting interaction rules:
 
@@ -245,8 +253,9 @@ Voting interaction rules:
 Stepper rules:
 
 - Use a full-page stepper on both mobile and desktop.
-- `Previous` and `Next` buttons should move between category screens.
-- If the current category is not voted, block forward progress.
+- Selecting a nominee card auto-advances to the next category after a 380ms feedback delay.
+- A `Previous` button is always available to go back and change a selection.
+- There is no explicit `Next` button — forward progress only happens via card selection.
 
 ### Final Submission Screen
 
@@ -269,14 +278,23 @@ Rules:
 
 ### Nomination Page
 
-The nomination page should be a floating widget, not a separate heavy page shell.
+Status: implemented as a full route with 19 craft categories.
+
+The nomination page is a full scrollable route, not a floating widget. A compact floating jump-to-category selector sits fixed on the right for quick navigation.
+
+Layout:
+
+- Hero section at the top with page heading and description.
+- 19 craft categories rendered as section cards in sequence.
+- Each section card has a sticky header bar (rounded corners at rest, sharp when stuck) showing the category title and an optional vote CTA.
+- Nominees rendered in a 4-column grid on desktop, 2-column on mobile.
+- Cards use portrait 3:4 aspect-ratio images matching the voting page style.
+- Floating category selector widget on the right for jump navigation.
 
 Behavior:
 
-- Open from a dropdown that lists all categories.
-- After choosing a category, auto-scroll to that specific section.
-- Keep the widget compact and easy to dismiss.
-- Use it as a quick jump tool, not a second primary flow.
+- Selecting a category from the floating widget auto-scrolls to that section.
+- The sticky header makes the active category always visible while scrolling through nominees.
 
 ### Voting Stats
 
@@ -343,6 +361,7 @@ Desktop visible items:
 - `Home`
 - `Winners`
 - `Contests`
+- `Nominees`
 - `Photos`
 - `Videos`
 - `Process`
@@ -362,6 +381,7 @@ Hamburger menu:
   - `Home`
   - `Winners`
   - `Contests`
+  - `Nominees`
   - `Photos`
   - `Videos`
   - `Process`
