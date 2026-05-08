@@ -433,3 +433,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: `rg` misparsed the quoted string and treated part of the pattern as a path argument.
 - Working approach: Use `Select-String -SimpleMatch` for the literal HTML attribute check.
 - Next-time rule: For quoted HTML attributes in PowerShell, prefer `Select-String -SimpleMatch` over `rg` unless the quoting is trivial.
+
+## 2026-05-08 - Patch submenu around encoded arrow glyphs
+- Context: Converting the hamburger `Previous Editions` item into a submenu.
+- Command/workflow: `apply_patch` against the side-menu renderer.
+- Failed approach: Replaced the original link helper around a mojibake-heavy chevron line in one large hunk.
+- Symptom: The patch kept failing to match the live text around the encoded arrow glyph.
+- Working approach: Leave the original link helper untouched, add submenu helpers beside it, and redirect only the menu list map call.
+- Next-time rule: When a line contains garbled glyphs, do not patch the literal text; add adjacent helpers and swap the call site instead.

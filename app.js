@@ -400,6 +400,38 @@
       );
     }
 
+    function renderSubmenuLink(item) {
+      return (
+        '<li><a class="side-menu__sublink" href="' + escapeHtml(item.pageUrl) + '">' +
+        '<span class="side-menu__label">' + escapeHtml(item.label) + "</span>" +
+        '<span class="side-menu__chevron" aria-hidden="true">&#8250;</span>' +
+        "</a></li>"
+      );
+    }
+
+    function renderMenuSubmenu(item) {
+      var submenuId = item.submenuId || "submenu";
+      return [
+        '<li class="side-menu__submenu">',
+          '<button type="button" class="side-menu__submenu-toggle" data-menu-submenu-toggle="' + escapeHtml(submenuId) + '" aria-expanded="false" aria-controls="' + escapeHtml(submenuId) + '">',
+            '<span class="side-menu__icon">' + createNavIcon(itemIconName(item)) + "</span>",
+            '<span class="side-menu__label">' + escapeHtml(item.label) + "</span>",
+            '<span class="side-menu__submenu-chevron" aria-hidden="true">&#8250;</span>',
+          "</button>",
+          '<ul class="side-menu__submenu-list" id="' + escapeHtml(submenuId) + '" data-menu-submenu="' + escapeHtml(submenuId) + '" hidden>',
+            (item.submenu || []).map(renderSubmenuLink).join(""),
+          "</ul>",
+        "</li>"
+      ].join("");
+    }
+
+    function renderMenuItem(item) {
+      if (item.submenu && item.submenu.length) {
+        return renderMenuSubmenu(item);
+      }
+      return renderLink(item);
+    }
+
     function renderStageButton(stage, label) {
       return (
         '<button type="button"' +
@@ -414,7 +446,7 @@
       '<section class="side-menu__section">' +
         '<div class="side-menu__section-title">All sections</div>' +
         '<ul class="side-menu__list">' +
-          menuLinks.map(renderLink).join("") +
+          menuLinks.map(renderMenuItem).join("") +
         "</ul>" +
       "</section>" +
       '<section class="side-menu__section side-menu__section--review">' +
@@ -488,11 +520,24 @@
     syncOverlayState();
   }
 
+  function resetMenuSubmenus(menu) {
+    if (!menu) {
+      return;
+    }
+    qsa("[data-menu-submenu]", menu).forEach(function (submenu) {
+      submenu.hidden = true;
+    });
+    qsa("[data-menu-submenu-toggle]", menu).forEach(function (toggle) {
+      toggle.setAttribute("aria-expanded", "false");
+    });
+  }
+
   function openMenu() {
     var menu = qs("[data-side-menu]");
     var overlay = qs("[data-menu-overlay]");
     if (menu) {
       menu.classList.add("is-open");
+      resetMenuSubmenus(menu);
       var firstControl = qs("a, button", menu);
       if (firstControl) {
         firstControl.focus();
@@ -877,6 +922,19 @@
     var menuLinksList = qs("[data-menu-links]");
     if (menuLinksList) {
       menuLinksList.addEventListener("click", function (event) {
+        var submenuToggle = event.target.closest("[data-menu-submenu-toggle]");
+        if (submenuToggle) {
+          event.preventDefault();
+          var submenuId = submenuToggle.getAttribute("data-menu-submenu-toggle");
+          var submenu = submenuId ? qs('[data-menu-submenu="' + submenuId + '"]', menuLinksList) : null;
+          var expanded = submenuToggle.getAttribute("aria-expanded") === "true";
+          if (submenu) {
+            submenu.hidden = expanded;
+          }
+          submenuToggle.setAttribute("aria-expanded", expanded ? "false" : "true");
+          return;
+        }
+
         if (event.target.closest("a")) {
           closeMenu();
           return;

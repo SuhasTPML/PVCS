@@ -53,7 +53,26 @@
   }
 
   function getCategories() {
-    return siteData.votingCategories || [];
+    var categories = siteData.votingCategories || [];
+    var publicIds = siteData.publicVoteCategoryIds || [];
+    return categories.filter(function (category) {
+      return publicIds.indexOf(category.id) !== -1;
+    });
+  }
+
+  function getNominationCategories() {
+    return siteData.nominationCategories || [];
+  }
+
+  function isPublicNominationCategory(category) {
+    if (!category) {
+      return false;
+    }
+    if (category.isPublicVotingCategory) {
+      return true;
+    }
+    return Boolean(category.linkedVotingCategoryId) &&
+      (siteData.publicVoteCategoryIds || []).indexOf(category.linkedVotingCategoryId) !== -1;
   }
 
   function getCategory(categoryId) {
@@ -113,6 +132,23 @@
     }, 0);
   }
 
+  function getStatsVisible() {
+    var eventDate = siteData.eventDate;
+    if (!eventDate) {
+      return false;
+    }
+    return Date.now() >= (new Date(String(eventDate) + "T00:00:00").getTime() - (2 * 24 * 60 * 60 * 1000));
+  }
+
+  function getTopNominees(category, count) {
+    return (category.nominees || [])
+      .slice()
+      .sort(function (a, b) {
+        return Number(b.votes || 0) - Number(a.votes || 0);
+      })
+      .slice(0, count || 3);
+  }
+
   function isValidPhone(value) {
     return /^[6-9]\d{9}$/.test(value);
   }
@@ -144,8 +180,20 @@
     }
     if (mode === "browse") {
       classes.push("vote-tile--browse");
+    } else if (mode === "pick") {
+      classes.push("vote-tile--pick");
     }
     var tag = mode === "browse" ? "article" : "button";
+    if (mode === "pick") {
+      return [
+        '<' + tag + ' class="' + classes.join(" ") + '"' + (mode === "browse" ? "" : ' type="button" data-nominee-id="' + escapeHtml(nominee.id) + '" data-nominee-index="' + index + '"') + '>',
+          '<span class="vote-tile__body vote-tile__body--pick">',
+            '<strong>' + escapeHtml(nominee.title) + "</strong>",
+            '<span>' + escapeHtml(nominee.summary || "") + "</span>",
+          "</span>",
+        "</" + tag + ">"
+      ].join("");
+    }
     return [
       '<' + tag + ' class="' + classes.join(" ") + '"' + (mode === "browse" ? "" : ' type="button" data-nominee-id="' + escapeHtml(nominee.id) + '" data-nominee-index="' + index + '"') + '>',
         '<img class="vote-tile__image" src="' + escapeHtml(nominee.image) + '" alt="' + escapeHtml(nominee.title) + '">',
@@ -156,6 +204,98 @@
           '<span>' + escapeHtml(nominee.summary || "") + "</span>",
         "</span>",
       "</" + tag + ">"
+    ].join("");
+  }
+
+  function renderVotingLeadIn() {
+    return [
+      '<section class="section-card voting-intro voting-intro--lead">',
+        '<div class="voting-intro__copy">',
+          '<p class="eyebrow">Voting</p>',
+          '<h1>Vote category by category</h1>',
+          '<p>Pick one nominee per category. The flow advances automatically, and the final screen appears only after all four categories are complete.</p>',
+        "</div>",
+        '<div class="voting-intro__media">',
+          '<img class="stage-hero__ilu voting-intro__ilu" src="https://images.assettype.com/prajavani/2023-05/3c0c9a4d-1465-4205-b225-bcb20ae0d843/sponsors_banner_logo.png" alt="Sponsors banner logo" loading="eager">',
+        "</div>",
+      "</section>"
+    ].join("");
+  }
+
+  function renderVotingSponsorBand() {
+    var sponsors = siteData.sponsors || [];
+    if (!sponsors.length) {
+      return "";
+    }
+    var repeated = sponsors.concat(sponsors);
+    return [
+      '<section class="sponsor-band sponsor-band--bare voting-sponsor-band" aria-labelledby="voting-sponsors-title">',
+        '<h2 id="voting-sponsors-title" class="sr-only">Sponsors</h2>',
+        '<div class="sponsor-band__track">',
+          repeated.map(function (item) {
+            return (
+              '<a class="sponsor-chip" href="' + escapeHtml(item.destination) + '">' +
+              '<span class="sponsor-chip__label">' + escapeHtml(item.label) + "</span>" +
+              '<img src="' + escapeHtml(item.imageUrl) + '" alt="' + escapeHtml(item.label) + '" loading="lazy">' +
+              "</a>"
+            );
+          }).join(""),
+        "</div>",
+      "</section>"
+    ].join("");
+  }
+
+  function renderVotingStatsSection() {
+    var categories = getCategories();
+    if (!getStatsVisible() || !categories.length) {
+      return "";
+    }
+
+    return [
+      '<section class="content-block section-card stats-panel">',
+        '<div class="content-block__header">',
+          '<div>',
+            '<p class="eyebrow">Voting stats</p>',
+            '<h2>Vote share snapshot</h2>',
+          "</div>",
+        "</div>",
+        '<div class="stats-grid">' + categories.map(function (category) {
+          var nominees = getTopNominees(category, 3);
+          var total = nominees.reduce(function (sum, nominee) {
+            return sum + Number(nominee.votes || 0);
+          }, 0) || 1;
+          var running = 0;
+          var segments = nominees.map(function (nominee, index) {
+            var pct = Math.max(1, Math.round((Number(nominee.votes || 0) / total) * 100));
+            var start = running;
+            running += pct;
+            return {
+              nominee: nominee,
+              pct: pct,
+              start: start,
+              end: index === nominees.length - 1 ? 100 : running
+            };
+          });
+          var chart = "conic-gradient(" + segments.map(function (segment) {
+            return segment.nominee.accent[0] + " " + segment.start + "% " + segment.end + "%";
+          }).join(", ") + ")";
+          return [
+            '<article class="stats-card">',
+              '<div class="stats-card__chart" style="--stats-chart: ' + chart + ';">',
+                '<strong>' + escapeHtml(String(segments[0].pct)) + '%</strong>',
+                '<span>share</span>',
+              "</div>",
+              '<div class="stats-card__copy">',
+                '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
+                '<h3>' + escapeHtml(segments[0].nominee.title) + "</h3>",
+                '<ul>' + segments.map(function (segment) {
+                  return '<li><span>' + escapeHtml(segment.nominee.title) + "</span><strong>" + escapeHtml(String(segment.pct)) + "%</strong></li>";
+                }).join("") + "</ul>",
+              "</div>",
+            "</article>"
+          ].join("");
+        }).join("") + "</div>",
+      "</section>"
     ].join("");
   }
 
@@ -277,19 +417,13 @@
     }
 
     var sections = [
-      '<section class="section-card vote-stepper__intro">',
-        '<p class="eyebrow">Voting</p>',
-        '<h1>Vote category by category</h1>',
-        '<p>Pick one nominee per category. The flow advances automatically, and the final screen appears only after all four categories are complete.</p>',
-      "</section>",
+      renderVotingLeadIn(),
+      renderVotingSponsorBand(),
       '<section class="vote-stepper section-card" data-vote-stepper>',
         '<header class="vote-stepper__header">',
           '<div>',
             '<p class="eyebrow">Progress</p>',
             '<h2>' + formatNumber(getCompletedCount()) + " of " + formatNumber(categories.length) + " complete</h2>",
-          "</div>",
-          '<div class="vote-stepper__header-actions">',
-            '<a class="btn btn--ghost" href="#/nominations">Open nominations</a>',
           "</div>",
         "</header>",
         '<div class="vote-stepper__status" data-step-status></div>',
@@ -304,6 +438,10 @@
 
     root.innerHTML = sections.join("");
     syncVotingRoute(root);
+    var statsHtml = renderVotingStatsSection();
+    if (statsHtml) {
+      root.insertAdjacentHTML("beforeend", statsHtml);
+    }
   }
 
   function renderNominationsRoute(root) {
@@ -312,13 +450,12 @@
     }
 
     var stage = getStage();
-    var categories = getCategories();
+    var categories = getNominationCategories();
     var sections = [
       '<section class="section-card nominations-hero">',
         '<p class="eyebrow">Nominations</p>',
         '<h1>' + (stage === STAGES.post ? "Archive and winners browser" : "Jump through the categories") + "</h1>",
-        '<p>' + (stage === STAGES.post ? "Use the floating selector to jump through the full archive and winner surfaces." : "Use the floating selector to jump directly to any category.") + "</p>",
-        '<a class="btn btn--primary" href="#/voting">' + (stage === STAGES.post ? "Go to winners" : "Start voting") + "</a>",
+        '<p>' + (stage === STAGES.post ? "Use the selector to jump through the full archive and winner surfaces." : "Use the selector to jump directly to any category.") + "</p>",
       "</section>",
       '<aside class="nomination-widget section-card" data-nomination-widget>',
         '<label>',
@@ -333,6 +470,7 @@
         '<p class="nomination-widget__note">The widget auto-scrolls to the selected section.</p>',
       "</aside>",
       '<div class="nomination-list">' + categories.map(function (category) {
+        var canVote = stage === STAGES.during && isPublicNominationCategory(category);
         return [
           '<section class="section-card nomination-section" data-nomination-section="' + escapeHtml(category.id) + '">',
             '<div class="nomination-section__header">',
@@ -340,6 +478,7 @@
                 '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
                 '<h2>' + escapeHtml(category.description) + "</h2>",
               "</div>",
+              canVote ? '<div class="nomination-section__actions"><a class="btn btn--ghost" href="#/voting">Vote in this category</a></div>' : "",
             "</div>",
             '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 8).map(function (nominee, index) {
               return renderNomineeCard(nominee, index, "browse", false);

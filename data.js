@@ -1,3 +1,46 @@
+function makeDummyNominees(seed, title) {
+  var safeSeed = String(seed || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return [1, 2, 3].map(function (index) {
+    return {
+      id: safeSeed + "-nominee-" + index,
+      title: title + " Nominee " + index,
+      subtitle: "Temporary nominee",
+      summary: "Placeholder copy for the nominations browser.",
+      image: "https://picsum.photos/seed/" + safeSeed + "-" + index + "/400/560",
+      votes: 0,
+      accent: ["#d9c7a0", "#654432"]
+    };
+  });
+}
+
+function makeNominationCategory(id, title, linkedVotingCategoryId) {
+  return {
+    id: id,
+    title: title,
+    description: "Temporary nominations category for " + title + ".",
+    nominees: makeDummyNominees(id, title),
+    isPublicVotingCategory: Boolean(linkedVotingCategoryId),
+    linkedVotingCategoryId: linkedVotingCategoryId || ""
+  };
+}
+
+function makePreviousEditionsMenuItem() {
+  return {
+    label: "Previous Editions",
+    icon: "previousYears",
+    submenuId: "previous-editions",
+    submenu: [
+      { label: "Season 1", pageUrl: "https://www.prajavani.net/cinesamman/", external: true },
+      { label: "Season 2", pageUrl: "https://www.prajavani.net/cinesamman/season2", external: true },
+      { label: "Season 3", pageUrl: "https://www.prajavani.net/cinesamman/season3", external: true }
+    ]
+  };
+}
+
 window.CINE_SITE_DATA = {
   votingCategories: [
     {
@@ -145,6 +188,27 @@ window.CINE_SITE_DATA = {
       ]
     }
   ],
+  nominationCategories: [
+    makeNominationCategory("best-actor", "Best actor", "best-performance"),
+    makeNominationCategory("best-actress", "Best actress", "best-performance"),
+    makeNominationCategory("excellent-direction", "Excellent direction", "best-director"),
+    makeNominationCategory("best-debut-direction", "Best debut direction"),
+    makeNominationCategory("best-supporting-actor", "Best supporting actor"),
+    makeNominationCategory("best-supporting-actress", "Best Supporting Actress"),
+    makeNominationCategory("best-music-direction", "Best Music Direction"),
+    makeNominationCategory("best-background-singer", "Best background singer"),
+    makeNominationCategory("excellent-background-singer", "Excellent background singer"),
+    makeNominationCategory("excellent-screenplay", "Excellent screenplay"),
+    makeNominationCategory("excellent-song-lyrics", "Excellent song lyrics"),
+    makeNominationCategory("excellent-compilation", "Excellent compilation"),
+    makeNominationCategory("excellent-aduaya-eclipse", "Excellent aduaya eclipse"),
+    makeNominationCategory("best-picture-of-the-year-2022", "Best Picture of the Year (2022)", "best-film"),
+    makeNominationCategory("excellent-construction-design", "Excellent construction design"),
+    makeNominationCategory("vfx-sfx-post-production-and-animation-excellence", "VFX,SFX, Post Production and Animation Excellence"),
+    makeNominationCategory("excellent-soundtrack-and-sound-design", "Excellent soundtrack and sound design"),
+    makeNominationCategory("best-picture-social-impact", "The best picture that has had a social impact"),
+    makeNominationCategory("excellent-dance-direction", "Excellent dance direction")
+  ],
   publicVoteCategoryIds: [
     "best-film",
     "best-director",
@@ -240,7 +304,7 @@ window.CINE_SITE_DATA = {
   popup: {
     title: "ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ",
     description:
-      "2024ರಲ್ಲಿ ಬಿಡುಗಡೆಯಾದ ಕನ್ನಡ ಚಲನಚಿತ್ರಗಳ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸುವ ಮೂರನೇ ಆವೃತ್ತಿಯ ವೇದಿಕೆ.",
+      "2026ರಲ್ಲಿ ಬಿಡುಗಡೆಯಾದ ಕನ್ನಡ ಚಲನಚಿತ್ರಗಳ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸುವ ಮೂರನೇ ಆವೃತ್ತಿಯ ವೇದಿಕೆ.",
     ctaLabel: "ಆಯ್ಕೆ ಪ್ರಕ್ರಿಯೆ ನೋಡಿ",
     ctaLink: "#/process"
   },
@@ -316,7 +380,7 @@ window.CINE_SITE_DATA = {
         { label: "About Us", pageUrl: "#/about", icon: "about" },
         { label: "Jury", pageUrl: "#/jury", icon: "jury" },
         { label: "Cine Corner", pageUrl: "#/cine-corner", icon: "cineCorner" },
-        { label: "Previous Editions", pageUrl: "#/previous-years", icon: "previousYears" },
+        makePreviousEditionsMenuItem(),
         { label: "Terms and Conditions", pageUrl: "#/terms", icon: "terms" }
       ]
     },
@@ -346,7 +410,7 @@ window.CINE_SITE_DATA = {
         { label: "About Us", pageUrl: "#/about", icon: "about" },
         { label: "Jury", pageUrl: "#/jury", icon: "jury" },
         { label: "Cine Corner", pageUrl: "#/cine-corner", icon: "cineCorner" },
-        { label: "Previous Editions", pageUrl: "#/previous-years", icon: "previousYears" },
+        makePreviousEditionsMenuItem(),
         { label: "Terms and Conditions", pageUrl: "#/terms", icon: "terms" }
       ]
     },
@@ -376,7 +440,7 @@ window.CINE_SITE_DATA = {
         { label: "About Us", pageUrl: "#/about", icon: "about" },
         { label: "Jury", pageUrl: "#/jury", icon: "jury" },
         { label: "Cine Corner", pageUrl: "#/cine-corner", icon: "cineCorner" },
-        { label: "Previous Editions", pageUrl: "#/previous-years", icon: "previousYears" },
+        makePreviousEditionsMenuItem(),
         { label: "Terms and Conditions", pageUrl: "#/terms", icon: "terms" }
       ]
     }
