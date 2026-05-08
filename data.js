@@ -4,7 +4,7 @@ function makeDummyNominees(seed, title) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-  return [1, 2, 3].map(function (index) {
+  return [1, 2, 3, 4, 5, 6].map(function (index) {
     return {
       id: safeSeed + "-nominee-" + index,
       title: title + " Nominee " + index,

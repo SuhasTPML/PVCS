@@ -258,7 +258,8 @@
     }
     return [
       '<' + tag + ' class="' + classes.join(" ") + '"' + (mode === "browse" ? "" : ' type="button" data-nominee-id="' + escapeHtml(nominee.id) + '" data-nominee-index="' + index + '"') + '>',
-        '<span class="vote-tile__body">',
+        '<img class="vote-tile__image vote-tile__image--pick" src="' + escapeHtml(nominee.image || VOTE_PLACEHOLDER_IMAGE) + '" alt="' + escapeHtml(nominee.title) + '" loading="lazy">',
+        '<span class="vote-tile__body vote-tile__body--pick">',
           '<strong>' + escapeHtml(nominee.title) + "</strong>",
           '<span>' + escapeHtml(nominee.summary || "") + "</span>",
         "</span>",
@@ -526,12 +527,12 @@
           '<section class="section-card nomination-section" data-nomination-section="' + escapeHtml(category.id) + '">',
             '<div class="nomination-section__header">',
               '<div>',
-                '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
-                '<h2>' + escapeHtml(category.description) + "</h2>",
+                '<h2>' + escapeHtml(category.title) + "</h2>",
+                '<p>' + escapeHtml(category.description) + "</p>",
               "</div>",
-              canVote ? '<div class="nomination-section__actions"><a class="btn btn--ghost" href="#/voting">Vote in this category</a></div>' : "",
+              canVote ? '<div class="nomination-section__actions"><a class="btn btn--primary" href="#/voting">Vote in this category</a></div>' : "",
             "</div>",
-            '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 8).map(function (nominee, index) {
+            '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 6).map(function (nominee, index) {
               return renderNomineeCard(nominee, index, "browse", false);
             }).join("") + "</div>",
           "</section>"
@@ -595,12 +596,12 @@
           '<section class="section-card nomination-section" data-nomination-section="' + escapeHtml(category.id) + '">',
             '<div class="nomination-section__header">',
               '<div>',
-                '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
-                '<h2>' + escapeHtml(category.description) + "</h2>",
+                '<h2>' + escapeHtml(category.title) + "</h2>",
+                '<p>' + escapeHtml(category.description) + "</p>",
               "</div>",
-              canVote ? '<div class="nomination-section__actions"><a class="btn btn--ghost" href="#/voting">Vote in this category</a></div>' : "",
+              canVote ? '<div class="nomination-section__actions"><a class="btn btn--primary" href="#/voting">Vote in this category</a></div>' : "",
             "</div>",
-            '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 8).map(function (nominee, index) {
+            '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 6).map(function (nominee, index) {
               return renderNomineeCard(nominee, index, "browse", false);
             }).join("") + "</div>",
           "</section>"

@@ -94,7 +94,7 @@ button {
 .site-header__inner,
 .page-shell,
 .site-footer__inner {
-  width: min(calc(100% - 24px), var(--content-w));
+  width: min(calc(100% - 12px), var(--content-w));
   margin: 0 auto;
 }
 
@@ -3067,7 +3067,7 @@ body[data-page="home"] .home-shell {
 .vote-final {
   display: grid;
   gap: 14px;
-  padding: 18px;
+  padding: 14px 12px;
 }
 
 .route-locked h1,
@@ -3220,7 +3220,7 @@ body[data-page="home"] .home-shell {
 .nomination-section {
   display: grid;
   gap: 12px;
-  padding: 18px;
+  padding: 14px 12px;
 }
 
 .nomination-section__header {
@@ -3317,7 +3317,7 @@ body[data-page="home"] .home-shell {
 .vote-tile--pick .vote-tile__body {
   display: grid;
   gap: 6px;
-  padding: 14px 14px 16px;
+  padding: 10px 12px 12px;
   background: linear-gradient(to bottom, rgba(32, 3, 7, 0.96), rgba(20, 2, 5, 0.98));
 }
 
@@ -3353,7 +3353,7 @@ body[data-page="home"] .home-shell {
 .vote-tile__body {
   display: grid;
   gap: 6px;
-  padding: 16px;
+  padding: 12px;
 }
 
 .vote-tile__body strong {
@@ -3380,8 +3380,30 @@ body[data-page="home"] .home-shell {
 }
 
 .vote-tile--browse {
-  min-height: 0;
-  grid-template-rows: auto;
+  min-height: 246px;
+  grid-template-rows: 150px 1fr;
+  gap: 0;
+}
+
+.vote-tile--browse .vote-tile__body {
+  padding: 10px 12px 12px;
+  background: linear-gradient(to bottom, rgba(32, 3, 7, 0.96), rgba(20, 2, 5, 0.98));
+}
+
+.vote-tile--browse .vote-tile__body strong {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.08;
+}
+
+.vote-tile--browse .vote-tile__body span {
+  color: rgba(255, 248, 239, 0.82);
+  line-height: 1.5;
+  font-size: 0.86rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .vote-stepper__panel-head,
