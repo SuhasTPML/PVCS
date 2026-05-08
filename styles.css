@@ -164,8 +164,6 @@ body[data-page="home"] .page-shell {
 }
 
 .home-shell {
-  width: 100%;
-  max-width: none;
   display: grid;
   gap: 12px;
 }
@@ -3473,6 +3471,7 @@ body[data-page="home"] .home-shell {
 
 .vote-tile--pick .vote-tile__body {
   display: grid;
+  align-content: start;
   gap: 6px;
   padding: 10px 12px 12px;
   background: linear-gradient(to bottom, rgba(32, 3, 7, 0.96), rgba(20, 2, 5, 0.98));

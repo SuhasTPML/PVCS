@@ -887,17 +887,22 @@
           state.submissionStatus = "idle";
           state.submissionMessage = "";
         }
-        state.currentStep = Math.min(categories.length, categoryIndex + 1);
-        renderRouteContent();
-        if (state.currentStep < categories.length) {
-          window.setTimeout(function () {
-            scrollToElement(qs('[data-step-category="' + categories[state.currentStep].id + '"]'));
-          }, 120);
-        } else {
-          window.setTimeout(function () {
-            scrollToElement(qs("[data-final-step]", root));
-          }, 120);
+        var grid = nomineeButton.closest(".vote-stepper__grid");
+        if (grid) {
+          qsa("[data-nominee-id]", grid).forEach(function (t) { t.classList.remove("is-selected"); });
         }
+        nomineeButton.classList.add("is-selected");
+        window.setTimeout(function () {
+          state.currentStep = Math.min(categories.length, categoryIndex + 1);
+          renderRouteContent();
+          window.setTimeout(function () {
+            if (state.currentStep < categories.length) {
+              scrollToElement(qs('[data-step-category="' + categories[state.currentStep].id + '"]'));
+            } else {
+              scrollToElement(qs("[data-final-step]", root));
+            }
+          }, 120);
+        }, 380);
       }
     });
 
