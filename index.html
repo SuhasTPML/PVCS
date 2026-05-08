@@ -174,5 +174,26 @@
         </div>
       </div>
     </div>
+
+    <div class="reel-lightbox" data-reel-lightbox aria-labelledby="reel-lightbox-caption" aria-modal="true" role="dialog" hidden>
+      <div class="reel-lightbox__panel">
+        <button class="reel-lightbox__close" type="button" data-reel-lightbox-close aria-label="Close reel player">
+          <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="reel-lightbox__stage">
+          <button class="reel-lightbox__nav reel-lightbox__nav--prev" type="button" data-reel-lightbox-prev aria-label="Previous reel">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <iframe class="reel-lightbox__frame" data-reel-lightbox-frame title="" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          <button class="reel-lightbox__nav reel-lightbox__nav--next" type="button" data-reel-lightbox-next aria-label="Next reel">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <div class="reel-lightbox__footer">
+          <p class="reel-lightbox__count" data-reel-lightbox-count></p>
+          <p class="reel-lightbox__caption" id="reel-lightbox-caption" data-reel-lightbox-caption></p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

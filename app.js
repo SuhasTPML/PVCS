@@ -1,9 +1,19 @@
 (function () {
   var siteData = window.CINE_SITE_DATA || {};
   var STAGE_KEY = "pvcs-stage";
-  var STAGE_CONTROLLER_KEY = "pvcs-stage-controller-collapsed";
   var VOTING_CLOSE_DATE = "2026-05-24";
   var MEDIA_FALLBACK_SRC = "PVCS_Trophy_with_bg.svg";
+  var LOCAL_GALLERY_IMAGES = [
+    "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1518929458119-e5bf444c30f4?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1505685296765-3a2736de412f?auto=format&fit=crop&w=900&q=80"
+  ];
   var STAGES = {
     pre: "pre-vote",
     during: "during-vote",
@@ -25,6 +35,95 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function getYoutubeVideoId(url) {
+    var match = String(url || "").match(/\/embed\/([^?&]+)/);
+    return match ? match[1] : "";
+  }
+
+  function getYoutubeThumbnail(url) {
+    var videoId = getYoutubeVideoId(url);
+    return videoId ? "https://i.ytimg.com/vi/" + videoId + "/hqdefault.jpg" : MEDIA_FALLBACK_SRC;
+  }
+
+  function getYoutubeAutoplayUrl(url) {
+    if (!url) {
+      return "";
+    }
+    return url + (url.indexOf("?") === -1 ? "?" : "&") + "autoplay=1&playsinline=1&rel=0";
+  }
+
+  function getLocalGalleryImage(index) {
+    return LOCAL_GALLERY_IMAGES[index % LOCAL_GALLERY_IMAGES.length] || MEDIA_FALLBACK_SRC;
+  }
+
+  function bindSwipeNavigation(node, onPrev, onNext) {
+    if (!node) {
+      return;
+    }
+    var startX = 0;
+    var startY = 0;
+    var tracking = false;
+
+    node.addEventListener("touchstart", function (event) {
+      var touch = event.changedTouches && event.changedTouches[0];
+      if (!touch) {
+        return;
+      }
+      startX = touch.clientX;
+      startY = touch.clientY;
+      tracking = true;
+    }, { passive: true });
+
+    node.addEventListener("touchend", function (event) {
+      var touch = event.changedTouches && event.changedTouches[0];
+      var deltaX;
+      var deltaY;
+      if (!tracking || !touch) {
+        return;
+      }
+      tracking = false;
+      deltaX = touch.clientX - startX;
+      deltaY = touch.clientY - startY;
+
+      if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY)) {
+        return;
+      }
+      if (deltaX > 0) {
+        onPrev();
+      } else {
+        onNext();
+      }
+    }, { passive: true });
+
+    node.addEventListener("touchcancel", function () {
+      tracking = false;
+    }, { passive: true });
+  }
+
+  function getStripScrollAmount(strip) {
+    var firstItem;
+    var gap;
+    if (!strip) {
+      return 0;
+    }
+    firstItem = strip.firstElementChild;
+    gap = parseFloat(window.getComputedStyle(strip).columnGap || window.getComputedStyle(strip).gap || "0") || 0;
+    if (firstItem) {
+      return Math.round(firstItem.getBoundingClientRect().width + gap);
+    }
+    return Math.max(Math.round(strip.clientWidth * 0.82), 240);
+  }
+
+  function stepStrip(strip, direction) {
+    if (!strip) {
+      return;
+    }
+    strip.scrollBy({
+      left: getStripScrollAmount(strip) * direction,
+      behavior: "smooth"
+    });
   }
 
   function formatNumber(value) {
@@ -53,15 +152,6 @@
     document.body.setAttribute("data-stage", stage);
     renderSharedChrome();
     window.dispatchEvent(new Event("pvcs:render"));
-  }
-
-  function isStageControllerCollapsed() {
-    return window.localStorage.getItem(STAGE_CONTROLLER_KEY) === "true";
-  }
-
-  function setStageControllerCollapsed(collapsed) {
-    window.localStorage.setItem(STAGE_CONTROLLER_KEY, collapsed ? "true" : "false");
-    renderStageController();
   }
 
   function getRoute() {
@@ -112,10 +202,12 @@
     var menu = qs("[data-side-menu]");
     var popup = qs("[data-popup]");
     var lightbox = qs("[data-gallery-lightbox]");
+    var reelLightbox = qs("[data-reel-lightbox]");
     var hasOverlay = Boolean(
       (menu && menu.classList.contains("is-open")) ||
       (popup && popup.classList.contains("is-visible")) ||
-      (lightbox && lightbox.classList.contains("is-visible"))
+      (lightbox && lightbox.classList.contains("is-visible")) ||
+      (reelLightbox && reelLightbox.classList.contains("is-visible"))
     );
     document.body.classList.toggle("has-overlay", hasOverlay);
   }
@@ -233,6 +325,7 @@
 
     var currentRoute = getRoute();
     var currentPage = getCurrentPageValue(currentRoute);
+    var currentStage = getStage();
     var primaryLinks = (siteData.bottomNav || [])
       .filter(function (item) {
         return !item.menuTrigger;
@@ -261,6 +354,16 @@
       );
     }
 
+    function renderStageButton(stage, label) {
+      return (
+        '<button type="button"' +
+        ' class="side-menu__stage-button' + (currentStage === stage ? " is-active" : "") + '"' +
+        ' data-stage-target="' + stage + '">' +
+        escapeHtml(label) +
+        "</button>"
+      );
+    }
+
     list.innerHTML =
       '<section class="side-menu__section">' +
         '<div class="side-menu__section-title">Primary</div>' +
@@ -273,6 +376,14 @@
         '<ul class="side-menu__list">' +
           secondaryLinks.map(renderLink).join("") +
         "</ul>" +
+      "</section>" +
+      '<section class="side-menu__section side-menu__section--review">' +
+        '<div class="side-menu__section-title">Review</div>' +
+        '<div class="side-menu__stage-group">' +
+          renderStageButton(STAGES.pre, "Pre Vote") +
+          renderStageButton(STAGES.during, "During Vote") +
+          renderStageButton(STAGES.post, "Post Vote") +
+        "</div>" +
       "</section>";
   }
 
@@ -342,9 +453,9 @@
     var overlay = qs("[data-menu-overlay]");
     if (menu) {
       menu.classList.add("is-open");
-      var firstLink = qs("a", menu);
-      if (firstLink) {
-        firstLink.focus();
+      var firstControl = qs("a, button", menu);
+      if (firstControl) {
+        firstControl.focus();
       }
     }
     if (overlay) {
@@ -352,10 +463,6 @@
     }
     document.body.classList.add("has-menu-open");
     syncOverlayState();
-  }
-
-  function isDesktopGalleryLightbox() {
-    return window.matchMedia("(min-width: 1024px)").matches;
   }
 
   function closeGalleryLightbox() {
@@ -421,10 +528,6 @@
   }
 
   function openGalleryLightbox(index) {
-    if (!isDesktopGalleryLightbox()) {
-      return;
-    }
-
     var lightbox = qs("[data-gallery-lightbox]");
     var items = getPhotoGalleryItems();
     if (!lightbox || !items.length) {
@@ -444,6 +547,91 @@
     }
   }
 
+  function closeReelLightbox() {
+    var lightbox = qs("[data-reel-lightbox]");
+    var frame = qs("[data-reel-lightbox-frame]", lightbox);
+    if (!lightbox) {
+      return;
+    }
+    lightbox.classList.remove("is-visible");
+    lightbox.hidden = true;
+    if (frame) {
+      frame.src = "";
+      frame.title = "";
+    }
+    syncOverlayState();
+  }
+
+  function getReelItems() {
+    return qsa("[data-reel-trigger]").map(function (node) {
+      return {
+        src: node.getAttribute("data-reel-src") || "",
+        caption: node.getAttribute("data-reel-caption") || ""
+      };
+    }).filter(function (item) {
+      return item.src;
+    });
+  }
+
+  function renderReelLightboxFrame(lightbox) {
+    var items = lightbox.__reelItems || [];
+    if (!items.length) {
+      closeReelLightbox();
+      return;
+    }
+
+    var index = Math.max(0, Math.min(lightbox.__reelIndex || 0, items.length - 1));
+    var item = items[index];
+    var frame = qs("[data-reel-lightbox-frame]", lightbox);
+    var caption = qs("[data-reel-lightbox-caption]", lightbox);
+    var count = qs("[data-reel-lightbox-count]", lightbox);
+    var prev = qs("[data-reel-lightbox-prev]", lightbox);
+    var next = qs("[data-reel-lightbox-next]", lightbox);
+
+    lightbox.__reelIndex = index;
+    frame.src = getYoutubeAutoplayUrl(item.src);
+    frame.title = item.caption;
+    caption.textContent = item.caption;
+    count.textContent = String(index + 1) + " / " + String(items.length);
+    prev.disabled = items.length < 2;
+    next.disabled = items.length < 2;
+  }
+
+  function stepReelLightbox(delta) {
+    var lightbox = qs("[data-reel-lightbox]");
+    if (!lightbox || !lightbox.classList.contains("is-visible")) {
+      return;
+    }
+
+    var items = lightbox.__reelItems || [];
+    if (!items.length) {
+      return;
+    }
+
+    lightbox.__reelIndex = (lightbox.__reelIndex + delta + items.length) % items.length;
+    renderReelLightboxFrame(lightbox);
+  }
+
+  function openReelLightbox(index) {
+    var lightbox = qs("[data-reel-lightbox]");
+    var items = getReelItems();
+    if (!lightbox || !items.length) {
+      return;
+    }
+
+    lightbox.__reelItems = items;
+    lightbox.__reelIndex = Math.max(0, Math.min(index || 0, items.length - 1));
+    renderReelLightboxFrame(lightbox);
+    lightbox.hidden = false;
+    lightbox.classList.add("is-visible");
+    syncOverlayState();
+
+    var closeButton = qs("[data-reel-lightbox-close]", lightbox);
+    if (closeButton) {
+      closeButton.focus();
+    }
+  }
+
   function initGalleryLightbox() {
     var lightbox = qs("[data-gallery-lightbox]");
     if (!lightbox || lightbox.__pvcsGalleryLightboxBound) {
@@ -458,6 +646,11 @@
     if (panel) {
       panel.addEventListener("click", function (event) {
         event.stopPropagation();
+      });
+      bindSwipeNavigation(panel, function () {
+        stepGalleryLightbox(-1);
+      }, function () {
+        stepGalleryLightbox(1);
       });
     }
     if (closeButton) {
@@ -492,7 +685,6 @@
         openGalleryLightbox(Number(trigger.getAttribute("data-gallery-index") || 0));
         return;
       }
-
     });
 
     document.addEventListener("keydown", function (event) {
@@ -510,11 +702,96 @@
         closeGalleryLightbox();
       }
     });
+  }
 
-    window.addEventListener("resize", function () {
-      if (!isDesktopGalleryLightbox()) {
-        closeGalleryLightbox();
+  function initReelLightbox() {
+    var lightbox = qs("[data-reel-lightbox]");
+    if (!lightbox || lightbox.__pvcsReelLightboxBound) {
+      return;
+    }
+    lightbox.__pvcsReelLightboxBound = true;
+    var panel = qs(".reel-lightbox__panel", lightbox);
+    var closeButton = qs("[data-reel-lightbox-close]", lightbox);
+    var prevButton = qs("[data-reel-lightbox-prev]", lightbox);
+    var nextButton = qs("[data-reel-lightbox-next]", lightbox);
+
+    if (panel) {
+      panel.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
+      bindSwipeNavigation(panel, function () {
+        stepReelLightbox(-1);
+      }, function () {
+        stepReelLightbox(1);
+      });
+    }
+    if (closeButton) {
+      closeButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeReelLightbox();
+      });
+    }
+    if (prevButton) {
+      prevButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        stepReelLightbox(-1);
+      });
+    }
+    if (nextButton) {
+      nextButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        stepReelLightbox(1);
+      });
+    }
+    lightbox.addEventListener("click", function () {
+      closeReelLightbox();
+    });
+
+    document.addEventListener("click", function (event) {
+      var trigger = event.target.closest("[data-reel-trigger]");
+      if (trigger) {
+        event.preventDefault();
+        openReelLightbox(Number(trigger.getAttribute("data-reel-index") || 0));
       }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!lightbox.classList.contains("is-visible")) {
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        stepReelLightbox(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        stepReelLightbox(1);
+      } else if (event.key === "Escape") {
+        closeReelLightbox();
+      }
+    });
+  }
+
+  function initStripControls() {
+    document.addEventListener("click", function (event) {
+      var control = event.target.closest("[data-strip-control]");
+      var stripId;
+      var strip;
+      var direction;
+      if (!control) {
+        return;
+      }
+      stripId = control.getAttribute("data-strip-target");
+      strip = stripId ? document.getElementById(stripId) : null;
+      direction = control.getAttribute("data-strip-control") === "prev" ? -1 : 1;
+      if (!strip) {
+        return;
+      }
+      event.preventDefault();
+      stepStrip(strip, direction);
     });
   }
 
@@ -535,6 +812,12 @@
       menuLinksList.addEventListener("click", function (event) {
         if (event.target.closest("a")) {
           closeMenu();
+          return;
+        }
+        var stageButton = event.target.closest("[data-stage-target]");
+        if (stageButton) {
+          setStage(stageButton.getAttribute("data-stage-target"));
+          closeMenu();
         }
       });
     }
@@ -552,6 +835,7 @@
           popup.classList.remove("is-visible");
         }
         closeGalleryLightbox();
+        closeReelLightbox();
         syncOverlayState();
       }
     });
@@ -741,7 +1025,7 @@
           title: nominee.title,
           subtitle: category.title,
           meta: nominee.subtitle || "",
-          image: nominee.image
+          image: getLocalGalleryImage(cards.length)
         });
       });
       return cards;
@@ -749,7 +1033,7 @@
   }
 
   function buildVideoReelCards(stage) {
-    var placeholderShorts = [
+    var reelEmbeds = [
       "https://www.youtube.com/embed/F_1ZFblYT_c",
       "https://www.youtube.com/embed/7ZCRBMlX9OY",
       "https://www.youtube.com/embed/tDeGkWrkOOo",
@@ -758,32 +1042,6 @@
       "https://www.youtube.com/embed/tDeGkWrkOOo",
       "https://www.youtube.com/embed/F_1ZFblYT_c",
       "https://www.youtube.com/embed/7ZCRBMlX9OY"
-    ];
-    var labels = {
-      "pre-vote": {
-        title: "Countdown reel",
-        subtitle: "What to watch before voting opens"
-      },
-      "during-vote": {
-        title: "Vote spotlight",
-        subtitle: "Short picks from each public category"
-      },
-      "post-vote": {
-        title: "Winner reel",
-        subtitle: "Quick recap from the final results"
-      }
-    };
-    var durations = ["00:42", "01:08", "00:56", "01:14", "00:37", "01:02", "00:49", "01:11"];
-    var copy = labels[stage] || labels[STAGES.pre];
-    var reelVariants = [
-      {
-        subtitle: copy.title,
-        meta: copy.subtitle
-      },
-      {
-        subtitle: "Behind the frame",
-        meta: stage === STAGES.post ? "Second look at the winners and standout moments" : "Quick backstage-style cut from the same category"
-      }
     ];
 
     return (siteData.votingCategories || []).reduce(function (cards, category) {
@@ -794,18 +1052,14 @@
       })[0] || featuredNominee;
       var reelNominees = [featuredNominee, alternateNominee];
 
-      reelNominees.forEach(function (nominee, index) {
-        var variant = reelVariants[index];
-        if (!nominee || !variant) {
+      reelNominees.forEach(function (nominee) {
+        if (!nominee) {
           return;
         }
         cards.push({
-          title: category.title,
-          subtitle: variant.subtitle,
-          meta: variant.meta,
-          duration: durations[cards.length] || "00:45",
-          image: nominee.image,
-          embedUrl: placeholderShorts[cards.length] || placeholderShorts[0]
+          title: nominee.title,
+          image: getYoutubeThumbnail(reelEmbeds[cards.length] || reelEmbeds[0]),
+          embedUrl: reelEmbeds[cards.length] || reelEmbeds[0]
         });
       });
       return cards;
@@ -821,8 +1075,16 @@
             '<p class="eyebrow">Gallery</p>',
             '<h2>Photo gallery</h2>',
           "</div>",
+          '<div class="strip-controls" aria-label="Scroll photo gallery">',
+            '<button class="strip-control" type="button" data-strip-control="prev" data-strip-target="home-photo-gallery" aria-label="Scroll photos left">',
+              '<span aria-hidden="true">&larr;</span>',
+            "</button>",
+            '<button class="strip-control" type="button" data-strip-control="next" data-strip-target="home-photo-gallery" aria-label="Scroll photos right">',
+              '<span aria-hidden="true">&rarr;</span>',
+            "</button>",
+          "</div>",
         "</div>",
-        '<div class="photo-gallery" aria-label="Photo gallery">' + cards.map(function (card, index) {
+        '<div class="photo-gallery" id="home-photo-gallery" aria-label="Photo gallery">' + cards.map(function (card, index) {
           return [
             '<button class="media-card media-card--photo media-card--trigger" type="button" data-gallery-trigger data-gallery-index="' + index + '" data-gallery-src="' + escapeHtml(card.image) + '" data-gallery-alt="' + escapeHtml(card.title) + '" data-gallery-caption="' + escapeHtml(card.title) + '" aria-label="Open ' + escapeHtml(card.title) + ' in gallery viewer">',
               '<img src="' + card.image + '" alt="' + escapeHtml(card.title) + '" loading="lazy" data-fallback-src="' + MEDIA_FALLBACK_SRC + '">',
@@ -845,15 +1107,24 @@
             '<p class="eyebrow">Videos</p>',
             '<h2>Video reels</h2>',
           "</div>",
+          '<div class="strip-controls" aria-label="Scroll video reels">',
+            '<button class="strip-control" type="button" data-strip-control="prev" data-strip-target="home-reel-strip" aria-label="Scroll reels left">',
+              '<span aria-hidden="true">&larr;</span>',
+            "</button>",
+            '<button class="strip-control" type="button" data-strip-control="next" data-strip-target="home-reel-strip" aria-label="Scroll reels right">',
+              '<span aria-hidden="true">&rarr;</span>',
+            "</button>",
+          "</div>",
         "</div>",
-        '<div class="reel-strip" aria-label="Video reels">' + cards.map(function (card) {
+        '<div class="reel-strip" id="home-reel-strip" aria-label="Video reels">' + cards.map(function (card, index) {
           return [
-            '<article class="media-card reel-card">',
-              '<iframe class="reel-card__frame" src="' + escapeHtml(card.embedUrl) + '" title="' + escapeHtml(card.title) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
+            '<button class="media-card reel-card reel-card--trigger" type="button" data-reel-trigger data-reel-index="' + index + '" data-reel-src="' + escapeHtml(card.embedUrl) + '" data-reel-caption="' + escapeHtml(card.title) + '" aria-label="Play ' + escapeHtml(card.title) + ' reel">',
+              '<img src="' + card.image + '" alt="' + escapeHtml(card.title) + '" loading="lazy" data-fallback-src="' + MEDIA_FALLBACK_SRC + '">',
+              '<span class="reel-card__play" aria-hidden="true"></span>',
               '<div class="media-card__copy">',
                 '<h3 class="media-card__caption">' + escapeHtml(card.title) + "</h3>",
               "</div>",
-            "</article>"
+            "</button>"
           ].join("");
         }).join("") + "</div>",
       "</section>"
@@ -971,58 +1242,11 @@
     }
   }
 
-  function renderStageController() {
-    var existing = qs("[data-stage-controller]");
-    if (!existing) {
-      existing = document.createElement("aside");
-      existing.setAttribute("data-stage-controller", "true");
-      existing.className = "stage-controller";
-      document.body.appendChild(existing);
-    }
-
-    var stage = getStage();
-    var collapsed = isStageControllerCollapsed();
-    existing.classList.toggle("is-collapsed", collapsed);
-    existing.innerHTML = [
-      '<div class="stage-controller__head">',
-        '<div class="stage-controller__label">',
-          '<span class="eyebrow">Stage</span>',
-          '<strong>' + (stage === STAGES.post ? "Post Vote" : stage === STAGES.during ? "During Vote" : "Pre Vote") + "</strong>",
-        "</div>",
-        '<button type="button" class="stage-controller__toggle" data-stage-controller-toggle aria-expanded="' + (!collapsed) + '">' + (collapsed ? "Show" : "Hide") + "</button>",
-      "</div>",
-      collapsed
-        ? ""
-        : [
-            '<div class="stage-controller__group">',
-              '<button type="button" data-stage-target="' + STAGES.pre + '"' + (stage === STAGES.pre ? ' class="is-active"' : "") + ">Pre Vote</button>",
-              '<button type="button" data-stage-target="' + STAGES.during + '"' + (stage === STAGES.during ? ' class="is-active"' : "") + ">During Vote</button>",
-              '<button type="button" data-stage-target="' + STAGES.post + '"' + (stage === STAGES.post ? ' class="is-active"' : "") + ">Post Vote</button>",
-            "</div>"
-          ].join("")
-    ].join("");
-
-    existing.onclick = function (event) {
-      var toggle = event.target.closest("[data-stage-controller-toggle]");
-      if (toggle) {
-        setStageControllerCollapsed(!isStageControllerCollapsed());
-        return;
-      }
-
-      var button = event.target.closest("[data-stage-target]");
-      if (!button) {
-        return;
-      }
-      setStage(button.getAttribute("data-stage-target"));
-    };
-  }
-
   function renderSharedChrome() {
     document.body.setAttribute("data-stage", getStage());
     renderBottomNav();
     renderHeaderNav();
     renderMenu();
-    renderStageController();
     renderSponsors();
     if (getRoute() === "home") {
       renderHome();
@@ -1067,6 +1291,8 @@
     }
     initImageFallbacks();
     initGalleryLightbox();
+    initReelLightbox();
+    initStripControls();
     startCountdownTicker();
     renderSharedChrome();
     initMenu();
