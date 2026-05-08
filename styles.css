@@ -1287,6 +1287,7 @@ h2,
   }
 
   .gallery-lightbox__stage img {
+    width: 100%;
     max-height: min(74vh, 700px);
   }
 
@@ -1307,7 +1308,7 @@ h2,
   }
 
   .reel-lightbox__frame {
-    width: min(100%, 360px);
+    width: 100%;
     height: min(70vh, 680px);
   }
 }
