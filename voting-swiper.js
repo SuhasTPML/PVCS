@@ -274,10 +274,58 @@
           '<p class="eyebrow">Voting</p>',
           '<h1>Vote category by category</h1>',
           '<p>Pick one nominee per category. The flow advances automatically, and the final screen appears only after all four categories are complete.</p>',
+          getStage() === STAGES.during ? '<a class="btn btn--primary live-vote-btn" href="#/live"><span class="live-dot" aria-hidden="true"></span>Check live voting results</a>' : "",
         "</div>",
         '<div class="voting-intro__media">',
           '<img class="stage-hero__ilu voting-intro__ilu" src="https://images.assettype.com/prajavani/2023-05/3c0c9a4d-1465-4205-b225-bcb20ae0d843/sponsors_banner_logo.png" alt="Sponsors banner logo" loading="eager">',
         "</div>",
+      "</section>"
+    ].join("");
+  }
+
+  var POSITION_LABELS = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
+
+  function renderLiveRoute(root) {
+    if (!root) {
+      return;
+    }
+    var categories = getCategories();
+    root.innerHTML = [
+      '<section class="section-card live-results">',
+        '<a class="live-results__back" href="#/voting">← Back to voting</a>',
+        '<div>',
+          '<p class="eyebrow">Live</p>',
+          '<h1>Vote share snapshot</h1>',
+        "</div>",
+        categories.map(function (category) {
+          var nominees = (category.nominees || []).slice().sort(function (a, b) {
+            return Number(b.votes || 0) - Number(a.votes || 0);
+          });
+          var total = nominees.reduce(function (sum, n) { return sum + Number(n.votes || 0); }, 0) || 1;
+          return [
+            '<div class="section-card live-category">',
+              '<h2 class="live-category__heading">' + escapeHtml(category.title) + "</h2>",
+              nominees.map(function (nominee, i) {
+                var pct = Math.round((Number(nominee.votes || 0) / total) * 100);
+                var pos = POSITION_LABELS[i] || (i + 1) + "th";
+                var color = (nominee.accent && nominee.accent[0]) || "var(--accent-strong)";
+                return [
+                  '<div class="live-bar-item">',
+                    '<div class="live-bar-item__meta">',
+                      '<span class="live-bar-item__pos">' + escapeHtml(pos) + "</span>",
+                      '<span class="live-bar-item__name">' + escapeHtml(nominee.title) + "</span>",
+                      '<span class="live-bar-item__pct">' + pct + "%</span>",
+                    "</div>",
+                    '<div class="live-bar-track">',
+                      '<div class="live-bar-fill" style="--bar-w:' + pct + '%;background:' + escapeHtml(color) + '"></div>',
+                    "</div>",
+                  "</div>"
+                ].join("");
+              }).join(""),
+              '<a class="btn btn--primary live-category__cta" href="#/voting">Vote now →</a>',
+            "</div>"
+          ].join("");
+        }).join(""),
       "</section>"
     ].join("");
   }
@@ -446,19 +494,72 @@
     ].join("");
   }
 
+  function formatCountdownUnit(value) {
+    return String(value || 0).padStart(2, "0");
+  }
+
+  function getCountdownParts(targetDate) {
+    var target = new Date(String(targetDate) + "T00:00:00");
+    var diff = target.getTime() - Date.now();
+    if (isNaN(target.getTime()) || diff <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+    var s = Math.floor(diff / 1000);
+    var m = Math.floor(s / 60);
+    return {
+      days: Math.floor(m / (60 * 24)),
+      hours: Math.floor((m % (60 * 24)) / 60),
+      minutes: m % 60,
+      seconds: s % 60
+    };
+  }
+
+  function formatEventDate(value) {
+    var d = new Date(String(value) + "T00:00:00");
+    if (isNaN(d.getTime())) { return String(value || ""); }
+    return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d);
+  }
+
   function renderVotingClosed(stage) {
-    var title = stage === STAGES.post ? "Voting is closed" : "Voting opens soon";
-    var copy = stage === STAGES.post
-      ? "The winners page now carries the main event CTA."
-      : "Use the home page to follow the countdown until the ballot opens.";
-    var href = stage === STAGES.post ? "#/winners" : "#/";
-    var label = stage === STAGES.post ? "View winners" : "Back to home";
+    if (stage === STAGES.pre) {
+      var eventDate = siteData.eventDate || "";
+      var cd = getCountdownParts(eventDate);
+      return [
+        '<section class="section-card stage-hero stage-hero--pre-vote">',
+          '<div class="stage-hero__media">',
+            '<img class="stage-hero__trophy" src="https://images.assettype.com/deccanherald/2026-04-30/zrlojphv/PVCS-Trophy.png" alt="PVCS trophy">',
+          "</div>",
+          '<div class="stage-hero__copy">',
+            '<p class="eyebrow">Voting</p>',
+            '<h1>Voting opens soon</h1>',
+            '<aside class="stage-hero__timeline" data-countdown-timer data-countdown-target="' + escapeHtml(eventDate) + '">',
+              '<div class="stage-hero__timeline-head">',
+                '<span class="stage-hero__panel-label">Voting opens</span>',
+                eventDate ? '<span class="stage-hero__timeline-date">on ' + escapeHtml(formatEventDate(eventDate)) + "</span>" : "",
+              "</div>",
+              '<div class="stage-hero__timer-grid" aria-label="Time remaining until voting opens">',
+                '<div class="stage-hero__timer-unit"><strong data-countdown-days>' + formatCountdownUnit(cd.days) + "</strong><span>Days</span></div>",
+                '<div class="stage-hero__timer-unit"><strong data-countdown-hours>' + formatCountdownUnit(cd.hours) + "</strong><span>Hours</span></div>",
+                '<div class="stage-hero__timer-unit"><strong data-countdown-minutes>' + formatCountdownUnit(cd.minutes) + "</strong><span>Minutes</span></div>",
+                '<div class="stage-hero__timer-unit"><strong data-countdown-seconds>' + formatCountdownUnit(cd.seconds) + "</strong><span>Seconds</span></div>",
+              "</div>",
+            "</aside>",
+            '<div class="stage-hero__actions">',
+              '<a class="btn btn--ghost" href="#/nominations">Browse nominations</a>',
+            "</div>",
+            '<img class="stage-hero__ilu" src="https://images.assettype.com/prajavani/2023-05/3c0c9a4d-1465-4205-b225-bcb20ae0d843/sponsors_banner_logo.png" alt="Sponsors banner logo" loading="eager">',
+          "</div>",
+        "</section>",
+        renderVotingSponsorBand()
+      ].join("");
+    }
+
     return [
       '<section class="section-card route-locked">',
         '<p class="eyebrow">Voting</p>',
-        '<h1>' + escapeHtml(title) + "</h1>",
-        '<p>' + escapeHtml(copy) + "</p>",
-        '<a class="btn btn--primary" href="' + href + '">' + escapeHtml(label) + "</a>",
+        '<h1>Voting is closed</h1>',
+        '<p>The winners page now carries the main event CTA.</p>',
+        '<a class="btn btn--primary" href="#/winners">View winners</a>',
       "</section>"
     ].join("");
   }
@@ -1084,6 +1185,7 @@
     var votingRoot = qs("[data-voting-root]");
     var nominationsRoot = qs("[data-nominations-root]");
     var winnersRoot = qs("[data-winners-root]");
+    var liveRoot = qs("[data-live-root]");
 
     if (route === "voting") {
       renderVotingRoute(votingRoot, stage);
@@ -1091,6 +1193,8 @@
       renderNominationsRouteTop(nominationsRoot, stage);
     } else if (route === "winners") {
       renderWinnersRoute(winnersRoot, stage);
+    } else if (route === "live") {
+      renderLiveRoute(liveRoot);
     }
   }
 

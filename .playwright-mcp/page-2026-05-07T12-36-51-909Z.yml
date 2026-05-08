@@ -1,0 +1,225 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Praja Vaani Cine Sammana home" [ref=e4] [cursor=pointer]:
+        - /url: "#/"
+        - img "Praja Vaani Cine Sammana" [ref=e5]
+      - navigation "Desktop navigation" [ref=e6]:
+        - link "ಮುಖಪುಟ" [ref=e7] [cursor=pointer]:
+          - /url: "#/"
+        - link "ವೋಟಿಂಗ್" [ref=e8] [cursor=pointer]:
+          - /url: "#/voting"
+        - link "ಸ್ಪರ್ಧೆ" [ref=e9] [cursor=pointer]:
+          - /url: "#/contest"
+        - link "ಪ್ರಕ್ರಿಯೆ" [ref=e10] [cursor=pointer]:
+          - /url: "#/process"
+        - link "ಪ್ರಸ್ತಾವನೆ" [ref=e11] [cursor=pointer]:
+          - /url: "#/about"
+        - link "ತೀರ್ಪುಗಾರರು" [ref=e12] [cursor=pointer]:
+          - /url: "#/jury"
+      - button "Open menu" [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+  - main [ref=e17]:
+    - generic [ref=e18]:
+      - img "PVCS trophy" [ref=e20]
+      - generic [ref=e22]:
+        - paragraph [ref=e23]: Praja Vaani Cine Sammana
+        - heading "Voting opens timeline" [level=1] [ref=e24]
+        - paragraph [ref=e25]: The pre-vote home keeps the opening date in focus with a live countdown timer.
+        - complementary [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]: Voting opens
+            - generic [ref=e29]: on 17 May 2026
+          - generic "Time remaining until voting opens" [ref=e30]:
+            - generic [ref=e31]:
+              - strong [ref=e32]: "09"
+              - generic [ref=e33]: Days
+            - generic [ref=e34]:
+              - strong [ref=e35]: "05"
+              - generic [ref=e36]: Hours
+            - generic [ref=e37]:
+              - strong [ref=e38]: "53"
+              - generic [ref=e39]: Minutes
+            - generic [ref=e40]:
+              - strong [ref=e41]: "08"
+              - generic [ref=e42]: Seconds
+        - img "Sponsors banner logo" [ref=e43]
+    - region "Sponsors" [ref=e44]:
+      - heading "Sponsors" [level=2] [ref=e45]
+      - generic [ref=e46]:
+        - link "Presenting Sponsor Presenting Sponsor" [ref=e47] [cursor=pointer]:
+          - /url: "#/contest"
+          - generic [ref=e48]: Presenting Sponsor
+          - img "Presenting Sponsor" [ref=e49]
+        - link "Powered By Powered By" [ref=e50] [cursor=pointer]:
+          - /url: "#/process"
+          - generic [ref=e51]: Powered By
+          - img "Powered By" [ref=e52]
+        - link "Special Partner Special Partner" [ref=e53] [cursor=pointer]:
+          - /url: "#/about"
+          - generic [ref=e54]: Special Partner
+          - img "Special Partner" [ref=e55]
+        - link "Associate Sponsor Associate Sponsor" [ref=e56] [cursor=pointer]:
+          - /url: "#/jury"
+          - generic [ref=e57]: Associate Sponsor
+          - img "Associate Sponsor" [ref=e58]
+        - link "Associate Sponsor Associate Sponsor" [ref=e59] [cursor=pointer]:
+          - /url: "#/previous-years"
+          - generic [ref=e60]: Associate Sponsor
+          - img "Associate Sponsor" [ref=e61]
+        - link "Telecast Partner Telecast Partner" [ref=e62] [cursor=pointer]:
+          - /url: "#/terms"
+          - generic [ref=e63]: Telecast Partner
+          - img "Telecast Partner" [ref=e64]
+        - link "Presenting Sponsor Presenting Sponsor" [ref=e65] [cursor=pointer]:
+          - /url: "#/contest"
+          - generic [ref=e66]: Presenting Sponsor
+          - img "Presenting Sponsor" [ref=e67]
+        - link "Powered By Powered By" [ref=e68] [cursor=pointer]:
+          - /url: "#/process"
+          - generic [ref=e69]: Powered By
+          - img "Powered By" [ref=e70]
+        - link "Special Partner Special Partner" [ref=e71] [cursor=pointer]:
+          - /url: "#/about"
+          - generic [ref=e72]: Special Partner
+          - img "Special Partner" [ref=e73]
+        - link "Associate Sponsor Associate Sponsor" [ref=e74] [cursor=pointer]:
+          - /url: "#/jury"
+          - generic [ref=e75]: Associate Sponsor
+          - img "Associate Sponsor" [ref=e76]
+        - link "Associate Sponsor Associate Sponsor" [ref=e77] [cursor=pointer]:
+          - /url: "#/previous-years"
+          - generic [ref=e78]: Associate Sponsor
+          - img "Associate Sponsor" [ref=e79]
+        - link "Telecast Partner Telecast Partner" [ref=e80] [cursor=pointer]:
+          - /url: "#/terms"
+          - generic [ref=e81]: Telecast Partner
+          - img "Telecast Partner" [ref=e82]
+    - generic [ref=e83]:
+      - generic [ref=e85]:
+        - paragraph [ref=e86]: Gallery
+        - heading "Photos and clips" [level=2] [ref=e87]
+      - generic [ref=e88]:
+        - article [ref=e89]:
+          - img "ಅರ್ಧರಾತ್ರಿ ಬಂದರು ಉತ್ಸವ ಆವೃತ್ತಿ" [ref=e90]
+          - generic [ref=e91]:
+            - paragraph [ref=e92]: ಅತ್ಯುತ್ತಮ ಚಿತ್ರ
+            - heading "ಅರ್ಧರಾತ್ರಿ ಬಂದರು ಉತ್ಸವ ಆವೃತ್ತಿ" [level=3] [ref=e93]
+        - article [ref=e94]:
+          - img "ಮೀರಾ ಅಯ್ಯರ್ ಉತ್ಸವ ಆವೃತ್ತಿ" [ref=e95]
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: ಅತ್ಯುತ್ತಮ ನಿರ್ದೇಶಕ
+            - heading "ಮೀರಾ ಅಯ್ಯರ್ ಉತ್ಸವ ಆವೃತ್ತಿ" [level=3] [ref=e98]
+        - article [ref=e99]:
+          - img "ನಿರಂಜನಾ ಅಂತಿಮ ಕಟ್" [ref=e100]
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: ಅತ್ಯುತ್ತಮ ಅಭಿನಯ
+            - heading "ನಿರಂಜನಾ ಅಂತಿಮ ಕಟ್" [level=3] [ref=e103]
+        - article [ref=e104]:
+          - img "ಕೊನೆಯ ರೀಲ್ ಅಂತಿಮ ಕಟ್" [ref=e105]
+          - generic [ref=e106]:
+            - paragraph [ref=e107]: ಜನಪ್ರಿಯ ಆಯ್ಕೆ
+            - heading "ಕೊನೆಯ ರೀಲ್ ಅಂತಿಮ ಕಟ್" [level=3] [ref=e108]
+      - generic [ref=e109]:
+        - article [ref=e110]:
+          - img "Festival reel" [ref=e111]
+          - generic [ref=e112]:
+            - paragraph [ref=e113]: Highlights and arrivals
+            - heading "Festival reel" [level=3] [ref=e114]
+        - article [ref=e115]:
+          - img "Winner recap" [ref=e116]
+          - generic [ref=e117]:
+            - paragraph [ref=e118]: Post-vote summary
+            - heading "Winner recap" [level=3] [ref=e119]
+        - article [ref=e120]:
+          - img "Sponsor wall" [ref=e121]
+          - generic [ref=e122]:
+            - paragraph [ref=e123]: Commercial partners
+            - heading "Sponsor wall" [level=3] [ref=e124]
+  - complementary "Side menu" [ref=e125]:
+    - generic [ref=e126]:
+      - generic [ref=e127]:
+        - generic [ref=e128]: Sections
+        - strong [ref=e129]: Menu
+      - button "Close menu" [ref=e130] [cursor=pointer]:
+        - img [ref=e131]
+    - list [ref=e134]:
+      - generic [ref=e135]:
+        - generic [ref=e136]: Primary
+        - list [ref=e137]:
+          - listitem [ref=e138]:
+            - link "ಮುಖಪುಟ" [ref=e139] [cursor=pointer]:
+              - /url: "#/"
+              - img [ref=e141]
+              - generic [ref=e143]: ಮುಖಪುಟ
+              - generic [ref=e144]: ›
+          - listitem [ref=e145]:
+            - link "ವೋಟಿಂಗ್" [ref=e146] [cursor=pointer]:
+              - /url: "#/voting"
+              - img [ref=e148]
+              - generic [ref=e150]: ವೋಟಿಂಗ್
+              - generic [ref=e151]: ›
+          - listitem [ref=e152]:
+            - link "ಸ್ಪರ್ಧೆ" [ref=e153] [cursor=pointer]:
+              - /url: "#/contest"
+              - img [ref=e155]
+              - generic [ref=e157]: ಸ್ಪರ್ಧೆ
+              - generic [ref=e158]: ›
+          - listitem [ref=e159]:
+            - link "ಪ್ರಕ್ರಿಯೆ" [ref=e160] [cursor=pointer]:
+              - /url: "#/process"
+              - img [ref=e162]
+              - generic [ref=e164]: ಪ್ರಕ್ರಿಯೆ
+              - generic [ref=e165]: ›
+      - generic [ref=e166]:
+        - generic [ref=e167]: More
+        - list [ref=e168]:
+          - listitem [ref=e169]:
+            - link "ಪ್ರಸ್ತಾವನೆ" [ref=e170] [cursor=pointer]:
+              - /url: "#/about"
+              - img [ref=e172]
+              - generic [ref=e174]: ಪ್ರಸ್ತಾವನೆ
+              - generic [ref=e175]: ›
+          - listitem [ref=e176]:
+            - link "ತೀರ್ಪುಗಾರರು" [ref=e177] [cursor=pointer]:
+              - /url: "#/jury"
+              - img [ref=e179]
+              - generic [ref=e181]: ತೀರ್ಪುಗಾರರು
+              - generic [ref=e182]: ›
+          - listitem [ref=e183]:
+            - link "ಸಿನಿ ಕಾರ್ನರ್" [ref=e184] [cursor=pointer]:
+              - /url: "#/cine-corner"
+              - img [ref=e186]
+              - generic [ref=e188]: ಸಿನಿ ಕಾರ್ನರ್
+              - generic [ref=e189]: ›
+          - listitem [ref=e190]:
+            - link "ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು" [ref=e191] [cursor=pointer]:
+              - /url: "#/previous-years"
+              - img [ref=e193]
+              - generic [ref=e195]: ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು
+              - generic [ref=e196]: ›
+          - listitem [ref=e197]:
+            - link "ನಿಯಮಗಳು" [ref=e198] [cursor=pointer]:
+              - /url: "#/terms"
+              - img [ref=e200]
+              - generic [ref=e202]: ನಿಯಮಗಳು
+              - generic [ref=e203]: ›
+    - link "Back to home" [ref=e204] [cursor=pointer]:
+      - /url: "#/"
+  - dialog "ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ" [ref=e205]:
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - heading "ಪ್ರಜಾವಾಣಿ ಸಿನಿ ಸಮ್ಮಾನ" [level=2] [ref=e208]
+        - button "Close popup" [ref=e209] [cursor=pointer]:
+          - img [ref=e210]
+      - paragraph [ref=e213]: 2024ರಲ್ಲಿ ಬಿಡುಗಡೆಯಾದ ಕನ್ನಡ ಚಲನಚಿತ್ರಗಳ ಶ್ರೇಷ್ಠ ಪ್ರತಿಭೆಗಳನ್ನು ಗುರುತಿಸುವ ಮೂರನೇ ಆವೃತ್ತಿಯ ವೇದಿಕೆ.
+      - link "ಆಯ್ಕೆ ಪ್ರಕ್ರಿಯೆ ನೋಡಿ" [ref=e214] [cursor=pointer]:
+        - /url: "#/process"
+  - complementary [ref=e215]:
+    - generic [ref=e216]:
+      - generic [ref=e217]: Stage
+      - strong [ref=e218]: Pre Vote
+    - generic [ref=e219]:
+      - button "Pre Vote" [ref=e220] [cursor=pointer]
+      - button "During Vote" [ref=e221] [cursor=pointer]
+      - button "Post Vote" [ref=e222] [cursor=pointer]

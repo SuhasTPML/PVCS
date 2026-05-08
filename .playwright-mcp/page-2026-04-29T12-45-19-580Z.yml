@@ -1,0 +1,580 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - 'link "à²ªà³à²°à²œà²¾à²µà²¾à²£à²¿ à²¸à²¿à²¨à²¿ à²¸à²®à³à²®à²¾à²¨" [ref=e4] [cursor=pointer]':
+      - /url: index.html
+      - 'img "à²ªà³à²°à²œà²¾à²µà²¾à²£à²¿ à²¸à²¿à²¨à²¿ à²¸à²®à³à²®à²¾à²¨" [ref=e5]'
+  - main [ref=e6]:
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: Voting
+      - heading "Category-by-category nominee carousel" [level=1] [ref=e9]
+      - paragraph [ref=e10]: Swipe horizontally inside each category to move the active card. Tap Vote Now on the centered nominee, then move through the flow until the phone step unlocks.
+    - generic [ref=e11]:
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: Category
+        - heading "Best Film" [level=2] [ref=e15]
+        - paragraph [ref=e16]: Pick the film that balanced craft, emotion, and audience pull the best.
+      - generic [ref=e17]:
+        - button "Previous nominee" [ref=e18] [cursor=pointer]: ‹
+        - generic "Best Film nominees" [ref=e19]:
+          - generic [ref=e20]:
+            - group "10 / 12" [ref=e21]:
+              - article [ref=e22]:
+                - generic [ref=e23]:
+                  - generic [ref=e24]: "#10"
+                  - heading "Sunlit Frames Studio Pick" [level=3] [ref=e25]
+                - generic [ref=e26]:
+                  - paragraph [ref=e27]: A character-first story with a warm visual language and a slow, confident payoff. Demo variant 10 for carousel testing.
+                  - button: Vote Now
+            - group "11 / 12" [ref=e28]:
+              - article [ref=e29]:
+                - generic [ref=e30]:
+                  - generic [ref=e31]: "#11"
+                  - heading "Midnight Harbor Extended Cut" [level=3] [ref=e32]
+                - generic [ref=e33]:
+                  - paragraph [ref=e34]: A sharp-edged mystery built on atmosphere, pacing, and a strong final reveal. Demo variant 11 for carousel testing.
+                  - button: Vote Now
+            - group "12 / 12" [ref=e35]:
+              - article [ref=e36]:
+                - generic [ref=e37]:
+                  - generic [ref=e38]: "#12"
+                  - heading "River of Dust Spotlight" [level=3] [ref=e39]
+                - generic [ref=e40]:
+                  - paragraph [ref=e41]: A patient ensemble drama with lived-in performances and a memorable final stretch. Demo variant 12 for carousel testing.
+                  - button: Vote Now
+            - group "1 / 12" [ref=e42]:
+              - article [ref=e43]:
+                - img "Sunlit Frames" [ref=e44]
+                - generic [ref=e45]:
+                  - generic [ref=e46]: "#01"
+                  - heading "Sunlit Frames" [level=3] [ref=e47]
+                - generic [ref=e48]:
+                  - paragraph [ref=e49]: A character-first story with a warm visual language and a slow, confident payoff.
+                  - button "Vote Now" [ref=e50] [cursor=pointer]
+            - group "2 / 12" [ref=e51]:
+              - article [ref=e52]:
+                - img "Midnight Harbor" [ref=e53]
+                - generic [ref=e54]:
+                  - generic [ref=e55]: "#02"
+                  - heading "Midnight Harbor" [level=3] [ref=e56]
+                - generic [ref=e57]:
+                  - paragraph [ref=e58]: A sharp-edged mystery built on atmosphere, pacing, and a strong final reveal.
+                  - button: Vote Now
+            - group "3 / 12" [ref=e59]:
+              - article [ref=e60]:
+                - img "River of Dust" [ref=e61]
+                - generic [ref=e62]:
+                  - generic [ref=e63]: "#03"
+                  - heading "River of Dust" [level=3] [ref=e64]
+                - generic [ref=e65]:
+                  - paragraph [ref=e66]: A patient ensemble drama with lived-in performances and a memorable final stretch.
+                  - button: Vote Now
+            - group "4 / 12" [ref=e67]:
+              - article [ref=e68]:
+                - generic [ref=e69]:
+                  - generic [ref=e70]: "#04"
+                  - heading "Sunlit Frames Encore" [level=3] [ref=e71]
+                - generic [ref=e72]:
+                  - paragraph [ref=e73]: A character-first story with a warm visual language and a slow, confident payoff. Demo variant 4 for carousel testing.
+                  - button: Vote Now
+            - group "5 / 12" [ref=e74]:
+              - article [ref=e75]:
+                - generic [ref=e76]:
+                  - generic [ref=e77]: "#05"
+                  - heading "Midnight Harbor Midnight Cut" [level=3] [ref=e78]
+                - generic [ref=e79]:
+                  - paragraph [ref=e80]: A sharp-edged mystery built on atmosphere, pacing, and a strong final reveal. Demo variant 5 for carousel testing.
+                  - button: Vote Now
+            - group "6 / 12" [ref=e81]:
+              - article [ref=e82]:
+                - generic [ref=e83]:
+                  - generic [ref=e84]: "#06"
+                  - heading "River of Dust Audience Pick" [level=3] [ref=e85]
+                - generic [ref=e86]:
+                  - paragraph [ref=e87]: A patient ensemble drama with lived-in performances and a memorable final stretch. Demo variant 6 for carousel testing.
+                  - button: Vote Now
+            - group "7 / 12" [ref=e88]:
+              - article [ref=e89]:
+                - generic [ref=e90]:
+                  - generic [ref=e91]: "#07"
+                  - heading "Sunlit Frames Final Cut" [level=3] [ref=e92]
+                - generic [ref=e93]:
+                  - paragraph [ref=e94]: A character-first story with a warm visual language and a slow, confident payoff. Demo variant 7 for carousel testing.
+                  - button: Vote Now
+            - group "8 / 12" [ref=e95]:
+              - article [ref=e96]:
+                - generic [ref=e97]:
+                  - generic [ref=e98]: "#08"
+                  - heading "Midnight Harbor Festival Edit" [level=3] [ref=e99]
+                - generic [ref=e100]:
+                  - paragraph [ref=e101]: A sharp-edged mystery built on atmosphere, pacing, and a strong final reveal. Demo variant 8 for carousel testing.
+                  - button: Vote Now
+            - group "9 / 12" [ref=e102]:
+              - article [ref=e103]:
+                - generic [ref=e104]:
+                  - generic [ref=e105]: "#09"
+                  - heading "River of Dust Gold Reel" [level=3] [ref=e106]
+                - generic [ref=e107]:
+                  - paragraph [ref=e108]: A patient ensemble drama with lived-in performances and a memorable final stretch. Demo variant 9 for carousel testing.
+                  - button: Vote Now
+        - button "Next nominee" [ref=e109] [cursor=pointer]: ›
+      - paragraph [ref=e110]: Swipe horizontally to move through nominees. Tap Vote Now on the centered card.
+    - generic [ref=e111]:
+      - generic [ref=e113]:
+        - paragraph [ref=e114]: Category
+        - heading "Best Director" [level=2] [ref=e115]
+        - paragraph [ref=e116]: A category for the most controlled visual storytelling and strongest command of tone.
+      - generic [ref=e117]:
+        - button "Previous nominee" [ref=e118] [cursor=pointer]: ‹
+        - generic "Best Director nominees" [ref=e119]:
+          - generic [ref=e120]:
+            - group "10 / 12" [ref=e121]:
+              - article [ref=e122]:
+                - generic [ref=e123]:
+                  - generic [ref=e124]: "#10"
+                  - heading "Anand Rao Studio Pick" [level=3] [ref=e125]
+                - generic [ref=e126]:
+                  - paragraph [ref=e127]: A careful, precise style that lets performances breathe while every frame does work. Demo variant 10 for carousel testing.
+                  - button: Vote Now
+            - group "11 / 12" [ref=e128]:
+              - article [ref=e129]:
+                - generic [ref=e130]:
+                  - generic [ref=e131]: "#11"
+                  - heading "Meera Iyer Extended Cut" [level=3] [ref=e132]
+                - generic [ref=e133]:
+                  - paragraph [ref=e134]: A modern visual rhythm with crisp blocking and fearless tonal shifts scene to scene. Demo variant 11 for carousel testing.
+                  - button: Vote Now
+            - group "12 / 12" [ref=e135]:
+              - article [ref=e136]:
+                - generic [ref=e137]:
+                  - generic [ref=e138]: "#12"
+                  - heading "Karthik Venkat Spotlight" [level=3] [ref=e139]
+                - generic [ref=e140]:
+                  - paragraph [ref=e141]: An emotionally controlled performance map with a particularly strong final act. Demo variant 12 for carousel testing.
+                  - button: Vote Now
+            - group "1 / 12" [ref=e142]:
+              - article [ref=e143]:
+                - img "Anand Rao" [ref=e144]
+                - generic [ref=e145]:
+                  - generic [ref=e146]: "#01"
+                  - heading "Anand Rao" [level=3] [ref=e147]
+                - generic [ref=e148]:
+                  - paragraph [ref=e149]: A careful, precise style that lets performances breathe while every frame does work.
+                  - button "Vote Now" [ref=e150] [cursor=pointer]
+            - group "2 / 12" [ref=e151]:
+              - article [ref=e152]:
+                - img "Meera Iyer" [ref=e153]
+                - generic [ref=e154]:
+                  - generic [ref=e155]: "#02"
+                  - heading "Meera Iyer" [level=3] [ref=e156]
+                - generic [ref=e157]:
+                  - paragraph [ref=e158]: A modern visual rhythm with crisp blocking and fearless tonal shifts scene to scene.
+                  - button: Vote Now
+            - group "3 / 12" [ref=e159]:
+              - article [ref=e160]:
+                - img "Karthik Venkat" [ref=e161]
+                - generic [ref=e162]:
+                  - generic [ref=e163]: "#03"
+                  - heading "Karthik Venkat" [level=3] [ref=e164]
+                - generic [ref=e165]:
+                  - paragraph [ref=e166]: An emotionally controlled performance map with a particularly strong final act.
+                  - button: Vote Now
+            - group "4 / 12" [ref=e167]:
+              - article [ref=e168]:
+                - generic [ref=e169]:
+                  - generic [ref=e170]: "#04"
+                  - heading "Anand Rao Encore" [level=3] [ref=e171]
+                - generic [ref=e172]:
+                  - paragraph [ref=e173]: A careful, precise style that lets performances breathe while every frame does work. Demo variant 4 for carousel testing.
+                  - button: Vote Now
+            - group "5 / 12" [ref=e174]:
+              - article [ref=e175]:
+                - generic [ref=e176]:
+                  - generic [ref=e177]: "#05"
+                  - heading "Meera Iyer Midnight Cut" [level=3] [ref=e178]
+                - generic [ref=e179]:
+                  - paragraph [ref=e180]: A modern visual rhythm with crisp blocking and fearless tonal shifts scene to scene. Demo variant 5 for carousel testing.
+                  - button: Vote Now
+            - group "6 / 12" [ref=e181]:
+              - article [ref=e182]:
+                - generic [ref=e183]:
+                  - generic [ref=e184]: "#06"
+                  - heading "Karthik Venkat Audience Pick" [level=3] [ref=e185]
+                - generic [ref=e186]:
+                  - paragraph [ref=e187]: An emotionally controlled performance map with a particularly strong final act. Demo variant 6 for carousel testing.
+                  - button: Vote Now
+            - group "7 / 12" [ref=e188]:
+              - article [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]: "#07"
+                  - heading "Anand Rao Final Cut" [level=3] [ref=e192]
+                - generic [ref=e193]:
+                  - paragraph [ref=e194]: A careful, precise style that lets performances breathe while every frame does work. Demo variant 7 for carousel testing.
+                  - button: Vote Now
+            - group "8 / 12" [ref=e195]:
+              - article [ref=e196]:
+                - generic [ref=e197]:
+                  - generic [ref=e198]: "#08"
+                  - heading "Meera Iyer Festival Edit" [level=3] [ref=e199]
+                - generic [ref=e200]:
+                  - paragraph [ref=e201]: A modern visual rhythm with crisp blocking and fearless tonal shifts scene to scene. Demo variant 8 for carousel testing.
+                  - button: Vote Now
+            - group "9 / 12" [ref=e202]:
+              - article [ref=e203]:
+                - generic [ref=e204]:
+                  - generic [ref=e205]: "#09"
+                  - heading "Karthik Venkat Gold Reel" [level=3] [ref=e206]
+                - generic [ref=e207]:
+                  - paragraph [ref=e208]: An emotionally controlled performance map with a particularly strong final act. Demo variant 9 for carousel testing.
+                  - button: Vote Now
+        - button "Next nominee" [ref=e209] [cursor=pointer]: ›
+      - paragraph [ref=e210]: Use the side arrows or swipe to spotlight another nominee.
+    - generic [ref=e211]:
+      - generic [ref=e213]:
+        - paragraph [ref=e214]: Category
+        - heading "Best Performance" [level=2] [ref=e215]
+        - paragraph [ref=e216]: The performance that felt the most present, textured, and memorable on screen.
+      - generic [ref=e217]:
+        - button "Previous nominee" [ref=e218] [cursor=pointer]: ‹
+        - generic "Best Performance nominees" [ref=e219]:
+          - generic [ref=e220]:
+            - group "10 / 12" [ref=e221]:
+              - article [ref=e222]:
+                - generic [ref=e223]:
+                  - generic [ref=e224]: "#10"
+                  - heading "Niranjana Studio Pick" [level=3] [ref=e225]
+                - generic [ref=e226]:
+                  - paragraph [ref=e227]: A restrained performance that grows in impact as the story becomes more intimate. Demo variant 10 for carousel testing.
+                  - button: Vote Now
+            - group "11 / 12" [ref=e228]:
+              - article [ref=e229]:
+                - generic [ref=e230]:
+                  - generic [ref=e231]: "#11"
+                  - heading "Rahul Shetty Extended Cut" [level=3] [ref=e232]
+                - generic [ref=e233]:
+                  - paragraph [ref=e234]: A high-energy performance with sharp comic timing and clean emotional turns. Demo variant 11 for carousel testing.
+                  - button: Vote Now
+            - group "12 / 12" [ref=e235]:
+              - article [ref=e236]:
+                - generic [ref=e237]:
+                  - generic [ref=e238]: "#12"
+                  - heading "Sahana Prakash Spotlight" [level=3] [ref=e239]
+                - generic [ref=e240]:
+                  - paragraph [ref=e241]: A scene-stealing turn that lands small beats with uncommon precision and warmth. Demo variant 12 for carousel testing.
+                  - button: Vote Now
+            - group "1 / 12" [ref=e242]:
+              - article [ref=e243]:
+                - img "Niranjana" [ref=e244]
+                - generic [ref=e245]:
+                  - generic [ref=e246]: "#01"
+                  - heading "Niranjana" [level=3] [ref=e247]
+                - generic [ref=e248]:
+                  - paragraph [ref=e249]: A restrained performance that grows in impact as the story becomes more intimate.
+                  - button "Vote Now" [ref=e250] [cursor=pointer]
+            - group "2 / 12" [ref=e251]:
+              - article [ref=e252]:
+                - img "Rahul Shetty" [ref=e253]
+                - generic [ref=e254]:
+                  - generic [ref=e255]: "#02"
+                  - heading "Rahul Shetty" [level=3] [ref=e256]
+                - generic [ref=e257]:
+                  - paragraph [ref=e258]: A high-energy performance with sharp comic timing and clean emotional turns.
+                  - button: Vote Now
+            - group "3 / 12" [ref=e259]:
+              - article [ref=e260]:
+                - img "Sahana Prakash" [ref=e261]
+                - generic [ref=e262]:
+                  - generic [ref=e263]: "#03"
+                  - heading "Sahana Prakash" [level=3] [ref=e264]
+                - generic [ref=e265]:
+                  - paragraph [ref=e266]: A scene-stealing turn that lands small beats with uncommon precision and warmth.
+                  - button: Vote Now
+            - group "4 / 12" [ref=e267]:
+              - article [ref=e268]:
+                - generic [ref=e269]:
+                  - generic [ref=e270]: "#04"
+                  - heading "Niranjana Encore" [level=3] [ref=e271]
+                - generic [ref=e272]:
+                  - paragraph [ref=e273]: A restrained performance that grows in impact as the story becomes more intimate. Demo variant 4 for carousel testing.
+                  - button: Vote Now
+            - group "5 / 12" [ref=e274]:
+              - article [ref=e275]:
+                - generic [ref=e276]:
+                  - generic [ref=e277]: "#05"
+                  - heading "Rahul Shetty Midnight Cut" [level=3] [ref=e278]
+                - generic [ref=e279]:
+                  - paragraph [ref=e280]: A high-energy performance with sharp comic timing and clean emotional turns. Demo variant 5 for carousel testing.
+                  - button: Vote Now
+            - group "6 / 12" [ref=e281]:
+              - article [ref=e282]:
+                - generic [ref=e283]:
+                  - generic [ref=e284]: "#06"
+                  - heading "Sahana Prakash Audience Pick" [level=3] [ref=e285]
+                - generic [ref=e286]:
+                  - paragraph [ref=e287]: A scene-stealing turn that lands small beats with uncommon precision and warmth. Demo variant 6 for carousel testing.
+                  - button: Vote Now
+            - group "7 / 12" [ref=e288]:
+              - article [ref=e289]:
+                - generic [ref=e290]:
+                  - generic [ref=e291]: "#07"
+                  - heading "Niranjana Final Cut" [level=3] [ref=e292]
+                - generic [ref=e293]:
+                  - paragraph [ref=e294]: A restrained performance that grows in impact as the story becomes more intimate. Demo variant 7 for carousel testing.
+                  - button: Vote Now
+            - group "8 / 12" [ref=e295]:
+              - article [ref=e296]:
+                - generic [ref=e297]:
+                  - generic [ref=e298]: "#08"
+                  - heading "Rahul Shetty Festival Edit" [level=3] [ref=e299]
+                - generic [ref=e300]:
+                  - paragraph [ref=e301]: A high-energy performance with sharp comic timing and clean emotional turns. Demo variant 8 for carousel testing.
+                  - button: Vote Now
+            - group "9 / 12" [ref=e302]:
+              - article [ref=e303]:
+                - generic [ref=e304]:
+                  - generic [ref=e305]: "#09"
+                  - heading "Sahana Prakash Gold Reel" [level=3] [ref=e306]
+                - generic [ref=e307]:
+                  - paragraph [ref=e308]: A scene-stealing turn that lands small beats with uncommon precision and warmth. Demo variant 9 for carousel testing.
+                  - button: Vote Now
+        - button "Next nominee" [ref=e309] [cursor=pointer]: ›
+      - paragraph [ref=e310]: Voting always happens on the main card. The two side cards are preview states.
+    - generic [ref=e311]:
+      - generic [ref=e313]:
+        - paragraph [ref=e314]: Category
+        - heading "Audience Choice" [level=2] [ref=e315]
+        - paragraph [ref=e316]: The crowd favorite category with the broadest appeal across genres and formats.
+      - generic [ref=e317]:
+        - button "Previous nominee" [ref=e318] [cursor=pointer]: ‹
+        - generic "Audience Choice nominees" [ref=e319]:
+          - generic [ref=e320]:
+            - group "10 / 12" [ref=e321]:
+              - article [ref=e322]:
+                - generic [ref=e323]:
+                  - generic [ref=e324]: "#10"
+                  - heading "The Last Reel Studio Pick" [level=3] [ref=e325]
+                - generic [ref=e326]:
+                  - paragraph [ref=e327]: A layered crowd-pleaser that keeps momentum while still landing emotional beats. Demo variant 10 for carousel testing.
+                  - button: Vote Now
+            - group "11 / 12" [ref=e328]:
+              - article [ref=e329]:
+                - generic [ref=e330]:
+                  - generic [ref=e331]: "#11"
+                  - heading "City Parade Extended Cut" [level=3] [ref=e332]
+                - generic [ref=e333]:
+                  - paragraph [ref=e334]: Big energy, strong music cues, and a polished finish that plays well with audiences. Demo variant 11 for carousel testing.
+                  - button: Vote Now
+            - group "12 / 12" [ref=e335]:
+              - article [ref=e336]:
+                - generic [ref=e337]:
+                  - generic [ref=e338]: "#12"
+                  - heading "After the Rain Spotlight" [level=3] [ref=e339]
+                - generic [ref=e340]:
+                  - paragraph [ref=e341]: A heartfelt, accessible story that gives every character a satisfying moment. Demo variant 12 for carousel testing.
+                  - button: Vote Now
+            - group "1 / 12" [ref=e342]:
+              - article [ref=e343]:
+                - img "The Last Reel" [ref=e344]
+                - generic [ref=e345]:
+                  - generic [ref=e346]: "#01"
+                  - heading "The Last Reel" [level=3] [ref=e347]
+                - generic [ref=e348]:
+                  - paragraph [ref=e349]: A layered crowd-pleaser that keeps momentum while still landing emotional beats.
+                  - button "Vote Now" [ref=e350] [cursor=pointer]
+            - group "2 / 12" [ref=e351]:
+              - article [ref=e352]:
+                - img "City Parade" [ref=e353]
+                - generic [ref=e354]:
+                  - generic [ref=e355]: "#02"
+                  - heading "City Parade" [level=3] [ref=e356]
+                - generic [ref=e357]:
+                  - paragraph [ref=e358]: Big energy, strong music cues, and a polished finish that plays well with audiences.
+                  - button: Vote Now
+            - group "3 / 12" [ref=e359]:
+              - article [ref=e360]:
+                - img "After the Rain" [ref=e361]
+                - generic [ref=e362]:
+                  - generic [ref=e363]: "#03"
+                  - heading "After the Rain" [level=3] [ref=e364]
+                - generic [ref=e365]:
+                  - paragraph [ref=e366]: A heartfelt, accessible story that gives every character a satisfying moment.
+                  - button: Vote Now
+            - group "4 / 12" [ref=e367]:
+              - article [ref=e368]:
+                - generic [ref=e369]:
+                  - generic [ref=e370]: "#04"
+                  - heading "The Last Reel Encore" [level=3] [ref=e371]
+                - generic [ref=e372]:
+                  - paragraph [ref=e373]: A layered crowd-pleaser that keeps momentum while still landing emotional beats. Demo variant 4 for carousel testing.
+                  - button: Vote Now
+            - group "5 / 12" [ref=e374]:
+              - article [ref=e375]:
+                - generic [ref=e376]:
+                  - generic [ref=e377]: "#05"
+                  - heading "City Parade Midnight Cut" [level=3] [ref=e378]
+                - generic [ref=e379]:
+                  - paragraph [ref=e380]: Big energy, strong music cues, and a polished finish that plays well with audiences. Demo variant 5 for carousel testing.
+                  - button: Vote Now
+            - group "6 / 12" [ref=e381]:
+              - article [ref=e382]:
+                - generic [ref=e383]:
+                  - generic [ref=e384]: "#06"
+                  - heading "After the Rain Audience Pick" [level=3] [ref=e385]
+                - generic [ref=e386]:
+                  - paragraph [ref=e387]: A heartfelt, accessible story that gives every character a satisfying moment. Demo variant 6 for carousel testing.
+                  - button: Vote Now
+            - group "7 / 12" [ref=e388]:
+              - article [ref=e389]:
+                - generic [ref=e390]:
+                  - generic [ref=e391]: "#07"
+                  - heading "The Last Reel Final Cut" [level=3] [ref=e392]
+                - generic [ref=e393]:
+                  - paragraph [ref=e394]: A layered crowd-pleaser that keeps momentum while still landing emotional beats. Demo variant 7 for carousel testing.
+                  - button: Vote Now
+            - group "8 / 12" [ref=e395]:
+              - article [ref=e396]:
+                - generic [ref=e397]:
+                  - generic [ref=e398]: "#08"
+                  - heading "City Parade Festival Edit" [level=3] [ref=e399]
+                - generic [ref=e400]:
+                  - paragraph [ref=e401]: Big energy, strong music cues, and a polished finish that plays well with audiences. Demo variant 8 for carousel testing.
+                  - button: Vote Now
+            - group "9 / 12" [ref=e402]:
+              - article [ref=e403]:
+                - generic [ref=e404]:
+                  - generic [ref=e405]: "#09"
+                  - heading "After the Rain Gold Reel" [level=3] [ref=e406]
+                - generic [ref=e407]:
+                  - paragraph [ref=e408]: A heartfelt, accessible story that gives every character a satisfying moment. Demo variant 9 for carousel testing.
+                  - button: Vote Now
+        - button "Next nominee" [ref=e409] [cursor=pointer]: ›
+      - paragraph [ref=e410]: Scroll down for the next category after you cast your vote.
+    - generic [ref=e411]:
+      - generic [ref=e412]:
+        - paragraph [ref=e413]: Final step
+        - heading "Confirm your vote with a phone number" [level=2] [ref=e414]
+        - paragraph [ref=e415]: All four categories must be complete before submission unlocks. Your number is used to prevent duplicate votes.
+      - generic [ref=e417]:
+        - generic [ref=e418]: 0 of 4 categories complete
+        - generic [ref=e419]: Finish all categories to unlock submission
+      - generic [ref=e421]:
+        - article [ref=e422]:
+          - paragraph [ref=e423]: Category
+          - heading "Best Film" [level=3] [ref=e424]
+          - paragraph [ref=e425]: Not selected yet
+          - button "Change vote" [ref=e426] [cursor=pointer]
+        - article [ref=e427]:
+          - paragraph [ref=e428]: Category
+          - heading "Best Director" [level=3] [ref=e429]
+          - paragraph [ref=e430]: Not selected yet
+          - button "Change vote" [ref=e431] [cursor=pointer]
+        - article [ref=e432]:
+          - paragraph [ref=e433]: Category
+          - heading "Best Performance" [level=3] [ref=e434]
+          - paragraph [ref=e435]: Not selected yet
+          - button "Change vote" [ref=e436] [cursor=pointer]
+        - article [ref=e437]:
+          - paragraph [ref=e438]: Category
+          - heading "Audience Choice" [level=3] [ref=e439]
+          - paragraph [ref=e440]: Not selected yet
+          - button "Change vote" [ref=e441] [cursor=pointer]
+      - generic [ref=e442]:
+        - paragraph [ref=e443]: Thank you
+        - heading "Your ballot is ready" [level=3] [ref=e444]
+        - paragraph [ref=e445]: Your selections are locked in. This preview will be wired to the backend submission endpoint next.
+      - generic [ref=e446]:
+        - generic [ref=e447]:
+          - generic [ref=e448]: Phone number
+          - textbox "Phone number" [disabled] [ref=e449]:
+            - /placeholder: "9876543210"
+        - paragraph [ref=e450]: Complete all four categories to unlock this field.
+        - button "Complete all categories" [disabled] [ref=e451]
+        - paragraph [ref=e452]: Finish the four categories to unlock submission.
+  - navigation "Primary" [ref=e453]:
+    - generic [ref=e454]:
+      - link "ಮುಖಪುಟ" [ref=e455] [cursor=pointer]:
+        - /url: index.html
+        - img [ref=e457]
+        - generic [ref=e459]: ಮುಖಪುಟ
+      - link "ವೋಟಿಂಗ್" [ref=e460] [cursor=pointer]:
+        - /url: voting-swiper.html
+        - img [ref=e462]
+        - generic [ref=e464]: ವೋಟಿಂಗ್
+      - link "ಸ್ಪರ್ಧೆ" [ref=e465] [cursor=pointer]:
+        - /url: contest.html
+        - img [ref=e467]
+        - generic [ref=e469]: ಸ್ಪರ್ಧೆ
+      - link "ಪ್ರಕ್ರಿಯೆ" [ref=e470] [cursor=pointer]:
+        - /url: process.html
+        - img [ref=e472]
+        - generic [ref=e474]: ಪ್ರಕ್ರಿಯೆ
+      - link "ಮೆನು" [ref=e475] [cursor=pointer]:
+        - /url: "#menu"
+        - img [ref=e477]
+        - generic [ref=e479]: ಮೆನು
+  - complementary "Side menu" [ref=e480]:
+    - generic [ref=e481]:
+      - strong [ref=e482]: Site Sections
+      - button "Close menu" [ref=e483] [cursor=pointer]: X
+    - list [ref=e484]:
+      - generic [ref=e485]:
+        - generic [ref=e486]: ಮುಖ್ಯ ವಿಭಾಗಗಳು
+        - list [ref=e487]:
+          - listitem [ref=e488]:
+            - link "ಮುಖಪುಟ" [ref=e489] [cursor=pointer]:
+              - /url: index.html
+              - img [ref=e491]
+              - generic [ref=e493]: ಮುಖಪುಟ
+              - generic [ref=e494]: ›
+          - listitem [ref=e495]:
+            - link "ವೋಟಿಂಗ್" [ref=e496] [cursor=pointer]:
+              - /url: voting-swiper.html
+              - img [ref=e498]
+              - generic [ref=e500]: ವೋಟಿಂಗ್
+              - generic [ref=e501]: ›
+          - listitem [ref=e502]:
+            - link "ಸ್ಪರ್ಧೆ" [ref=e503] [cursor=pointer]:
+              - /url: contest.html
+              - img [ref=e505]
+              - generic [ref=e507]: ಸ್ಪರ್ಧೆ
+              - generic [ref=e508]: ›
+          - listitem [ref=e509]:
+            - link "ಪ್ರಕ್ರಿಯೆ" [ref=e510] [cursor=pointer]:
+              - /url: process.html
+              - img [ref=e512]
+              - generic [ref=e514]: ಪ್ರಕ್ರಿಯೆ
+              - generic [ref=e515]: ›
+      - generic [ref=e516]:
+        - generic [ref=e517]: ಇತರೆ
+        - list [ref=e518]:
+          - listitem [ref=e519]:
+            - link "ಪ್ರಸ್ತಾವನೆ" [ref=e520] [cursor=pointer]:
+              - /url: about.html
+              - img [ref=e522]
+              - generic [ref=e524]: ಪ್ರಸ್ತಾವನೆ
+              - generic [ref=e525]: ›
+          - listitem [ref=e526]:
+            - link "ತೀರ್ಪುಗಾರರು" [ref=e527] [cursor=pointer]:
+              - /url: jury.html
+              - img [ref=e529]
+              - generic [ref=e531]: ತೀರ್ಪುಗಾರರು
+              - generic [ref=e532]: ›
+          - listitem [ref=e533]:
+            - link "ಸಿನಿ ಕಾರ್ನರ್" [ref=e534] [cursor=pointer]:
+              - /url: cine-corner.html
+              - img [ref=e536]
+              - generic [ref=e538]: ಸಿನಿ ಕಾರ್ನರ್
+              - generic [ref=e539]: ›
+          - listitem [ref=e540]:
+            - link "ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು" [ref=e541] [cursor=pointer]:
+              - /url: previous-years.html
+              - img [ref=e543]
+              - generic [ref=e545]: ಹಿಂದಿನ ಆವೃತ್ತಿಗಳು
+              - generic [ref=e546]: ›
+          - listitem [ref=e547]:
+            - link "ನಿಯಮಗಳು" [ref=e548] [cursor=pointer]:
+              - /url: terms.html
+              - img [ref=e550]
+              - generic [ref=e552]: ನಿಯಮಗಳು
+              - generic [ref=e553]: ›
+    - link "Back Home" [ref=e554] [cursor=pointer]:
+      - /url: index.html

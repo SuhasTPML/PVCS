@@ -173,7 +173,8 @@
       jury: "jury",
       "cine-corner": "cine-corner",
       "previous-years": "previous-years",
-      terms: "terms"
+      terms: "terms",
+      live: "live"
     };
   }
 
@@ -277,6 +278,7 @@
       home: "M12 3.5 3.5 10v10.5h5.5v-6h6v6h5.5V10z",
       vote: "M5 6.5h14v11H5zm2 2v7h10v-7zm2.5-4h5l1 2h-7z",
       contest: "M7 5h10v3h2v10H5V8h2zm2 5.5 2 2 4-4",
+      nominees: "M6 6.5h12v3H6zm0 4.5h12v3H6zm0 4.5h12v3H6z",
       process: "M6 6h12v3H6zm0 5h12v3H6zm0 5h8v3H6z",
       photo: "M5 6.5h14v11H5zm2 2v7h10v-7zm1.5 6 2.5-3 2 2 1.5-2 2 3z",
       video: "M6 6.5h12v11H6zm4 2.5 4 3-4 3z",
@@ -301,6 +303,7 @@
     if (page === "#/voting") return "vote";
     if (page === "#/winners") return "winners";
     if (page === "#/contest") return "contest";
+    if (page === "#/nominations") return "nominees";
     if (page === "#/process") return "process";
     if (page === "#/photos") return "photo";
     if (page === "#/videos") return "video";
@@ -443,6 +446,12 @@
     }
 
     list.innerHTML =
+      (currentStage === STAGES.during ?
+        '<a class="side-menu__live-link" href="#/live">' +
+          '<span class="live-dot" aria-hidden="true"></span>' +
+          '<span>Live vote</span>' +
+        '</a>'
+        : "") +
       '<section class="side-menu__section">' +
         '<div class="side-menu__section-title">All sections</div>' +
         '<ul class="side-menu__list">' +

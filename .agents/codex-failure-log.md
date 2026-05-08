@@ -441,3 +441,11 @@ This includes code changes, shell commands, search/read patterns, replace/edit a
 - Symptom: The patch kept failing to match the live text around the encoded arrow glyph.
 - Working approach: Leave the original link helper untouched, add submenu helpers beside it, and redirect only the menu list map call.
 - Next-time rule: When a line contains garbled glyphs, do not patch the literal text; add adjacent helpers and swap the call site instead.
+
+## 2026-05-08 - Narrow CSS patch for duplicate vote tiles
+- Context: Simplifying the voting card layout and mobile nav density.
+- Command/workflow: `apply_patch` against `styles.css`.
+- Failed approach: Tried to replace both vote-tile rule blocks in one broad patch.
+- Symptom: The patch context failed because the same selector existed in multiple places.
+- Working approach: Remove the earlier duplicate block, then patch the later vote-tile block and footer overrides in smaller hunks.
+- Next-time rule: When a selector is duplicated in this stylesheet, resolve the duplicates first and patch only one live definition at a time.
