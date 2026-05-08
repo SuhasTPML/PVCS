@@ -474,7 +474,7 @@
       return;
     }
 
-    var repeated = siteData.sponsors.concat(siteData.sponsors);
+    var repeated = siteData.sponsors.concat(siteData.sponsors, siteData.sponsors, siteData.sponsors);
     track.innerHTML = repeated
       .map(function (item) {
         return (

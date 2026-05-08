@@ -561,7 +561,7 @@ body[data-page="home"] .page-shell {
 .sponsor-band__track {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   width: max-content;
   padding: 0;
   animation: sponsor-marquee 28s linear infinite;
@@ -570,10 +570,11 @@ body[data-page="home"] .page-shell {
 .sponsor-chip {
   min-width: 152px;
   display: grid;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
+  margin-right: 10px;
   justify-items: center;
-  padding: 12px 14px;
+  padding: 6px 14px;
   border: 1px solid rgba(255, 248, 239, 0.12);
   border-radius: 14px;
   background: rgba(255, 248, 239, 0.96);
@@ -2152,7 +2153,7 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(-25%);
   }
 }
 
