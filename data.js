@@ -8,7 +8,7 @@ function makeDummyNominees(seed, title) {
     return {
       id: safeSeed + "-nominee-" + index,
       title: title + " Nominee " + index,
-      subtitle: "Temporary nominee",
+      subtitle: "Nominee",
       summary: "Placeholder copy for the nominations browser.",
       image: "https://picsum.photos/seed/" + safeSeed + "-" + index + "/400/560",
       votes: 0,
@@ -21,7 +21,7 @@ function makeNominationCategory(id, title, linkedVotingCategoryId) {
   return {
     id: id,
     title: title,
-    description: "Temporary nominations category for " + title + ".",
+    description: title + " category.",
     nominees: makeDummyNominees(id, title),
     isPublicVotingCategory: Boolean(linkedVotingCategoryId),
     linkedVotingCategoryId: linkedVotingCategoryId || ""
@@ -389,6 +389,7 @@ window.CINE_SITE_DATA = {
         { label: "Home", pageUrl: "#/", icon: "home" },
         { label: "Vote Now", pageUrl: "#/voting", icon: "vote", emphasis: true },
         { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Nominees", pageUrl: "#/nominations", icon: "nominees" },
         { label: "Photos", pageUrl: "#/", icon: "photo", scrollTarget: "home-photo-section" },
         { label: "Videos", pageUrl: "#/", icon: "video", scrollTarget: "home-video-section" },
         { label: "Process", pageUrl: "#/process", icon: "process" }
@@ -397,13 +398,14 @@ window.CINE_SITE_DATA = {
         { label: "Home", pageUrl: "#/", icon: "home" },
         { label: "Vote Now", pageUrl: "#/voting", icon: "vote", emphasis: true },
         { label: "Contests", pageUrl: "#/contest", icon: "contest" },
-        { label: "Process", pageUrl: "#/process", icon: "process" },
+        { label: "Nominees", pageUrl: "#/nominations", icon: "nominees" },
         { label: "Menu", pageUrl: "#menu", icon: "menu", menuTrigger: true }
       ],
       menu: [
         { label: "Home", pageUrl: "#/", icon: "home" },
         { label: "Vote Now", pageUrl: "#/voting", icon: "vote", emphasis: true },
         { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Nominees", pageUrl: "#/nominations", icon: "nominees" },
         { label: "Photos", pageUrl: "#/", icon: "photo", scrollTarget: "home-photo-section" },
         { label: "Videos", pageUrl: "#/", icon: "video", scrollTarget: "home-video-section" },
         { label: "Process", pageUrl: "#/process", icon: "process" },
@@ -419,6 +421,7 @@ window.CINE_SITE_DATA = {
         { label: "Home", pageUrl: "#/", icon: "home" },
         { label: "Winners", pageUrl: "#/winners", icon: "winners", emphasis: true },
         { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Nominees", pageUrl: "#/nominations", icon: "nominees" },
         { label: "Photos", pageUrl: "#/", icon: "photo", scrollTarget: "home-photo-section" },
         { label: "Videos", pageUrl: "#/", icon: "video", scrollTarget: "home-video-section" },
         { label: "Process", pageUrl: "#/process", icon: "process" }
@@ -434,6 +437,7 @@ window.CINE_SITE_DATA = {
         { label: "Home", pageUrl: "#/", icon: "home" },
         { label: "Winners", pageUrl: "#/winners", icon: "winners", emphasis: true },
         { label: "Contests", pageUrl: "#/contest", icon: "contest" },
+        { label: "Nominees", pageUrl: "#/nominations", icon: "nominees" },
         { label: "Photos", pageUrl: "#/", icon: "photo", scrollTarget: "home-photo-section" },
         { label: "Videos", pageUrl: "#/", icon: "video", scrollTarget: "home-video-section" },
         { label: "Process", pageUrl: "#/process", icon: "process" },

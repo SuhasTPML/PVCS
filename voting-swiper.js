@@ -6,6 +6,7 @@
     post: "post-vote"
   };
   var MAX_PHONE = 10;
+  var VOTE_PLACEHOLDER_IMAGE = "https://placehold.co/640x420/1d0100/f8c55f?text=PVCS";
 
   function qs(selector, root) {
     return (root || document).querySelector(selector);
@@ -163,6 +164,66 @@
     return digits.slice(0, MAX_PHONE);
   }
 
+  function ensurePhoneValidationState() {
+    var state = getState();
+    if (!state.phone.validation) {
+      state.phone.validation = {
+        attempted: false,
+        name: "",
+        mobile: ""
+      };
+    }
+    return state.phone.validation;
+  }
+
+  function getPhoneValidationErrors(state) {
+    var phoneState = state || getState();
+    var name = String(phoneState.phone.name || "").trim();
+    var mobile = normalizePhoneInput(phoneState.phone.mobile);
+    return {
+      name: name.length >= 2 ? "" : "Enter at least 2 characters.",
+      mobile: isValidPhone(mobile) ? "" : "Enter a valid 10-digit Indian mobile number."
+    };
+  }
+
+  function syncPhoneValidation(root) {
+    var form = qs("[data-vote-final-form]", root);
+    if (!form) {
+      return;
+    }
+
+    var state = getState();
+    var validation = ensurePhoneValidationState();
+    var errors = validation.attempted ? getPhoneValidationErrors(state) : {
+      name: "",
+      mobile: ""
+    };
+
+    [
+      {
+        field: qs('[name="name"]', form),
+        wrap: qs("[data-name-field]", form),
+        error: qs("[data-name-error]", form),
+        value: errors.name
+      },
+      {
+        field: qs('[name="mobile"]', form),
+        wrap: qs("[data-mobile-field]", form),
+        error: qs("[data-mobile-error]", form),
+        value: errors.mobile
+      }
+    ].forEach(function (item) {
+      if (!item.field || !item.wrap || !item.error) {
+        return;
+      }
+      var hasError = Boolean(item.value);
+      item.wrap.classList.toggle("is-invalid", hasError);
+      item.field.setAttribute("aria-invalid", hasError ? "true" : "false");
+      item.error.hidden = !hasError;
+      item.error.textContent = item.value || "";
+    });
+  }
+
   function scrollToElement(element) {
     if (!element) {
       return;
@@ -187,6 +248,7 @@
     if (mode === "pick") {
       return [
         '<' + tag + ' class="' + classes.join(" ") + '"' + (mode === "browse" ? "" : ' type="button" data-nominee-id="' + escapeHtml(nominee.id) + '" data-nominee-index="' + index + '"') + '>',
+          '<img class="vote-tile__image vote-tile__image--pick" src="' + escapeHtml(nominee.voteImage || nominee.image || VOTE_PLACEHOLDER_IMAGE) + '" alt="' + escapeHtml(nominee.title) + '" loading="lazy">',
           '<span class="vote-tile__body vote-tile__body--pick">',
             '<strong>' + escapeHtml(nominee.title) + "</strong>",
             '<span>' + escapeHtml(nominee.summary || "") + "</span>",
@@ -196,11 +258,8 @@
     }
     return [
       '<' + tag + ' class="' + classes.join(" ") + '"' + (mode === "browse" ? "" : ' type="button" data-nominee-id="' + escapeHtml(nominee.id) + '" data-nominee-index="' + index + '"') + '>',
-        '<img class="vote-tile__image" src="' + escapeHtml(nominee.image) + '" alt="' + escapeHtml(nominee.title) + '">',
-        '<span class="vote-tile__rank">#' + String(index + 1).padStart(2, "0") + "</span>",
         '<span class="vote-tile__body">',
           '<strong>' + escapeHtml(nominee.title) + "</strong>",
-          '<small>' + escapeHtml(nominee.subtitle || "") + "</small>",
           '<span>' + escapeHtml(nominee.summary || "") + "</span>",
         "</span>",
       "</" + tag + ">"
@@ -304,14 +363,14 @@
     var nominees = (category.nominees || []).slice(0, 8);
     return [
       '<section class="vote-stepper__panel section-card" data-step-category="' + escapeHtml(category.id) + '" data-step-index="' + stepIndex + '">',
+        '<div class="vote-stepper__sticky-title">',
+          '<h2>' + escapeHtml(category.title) + "</h2>",
+        "</div>",
         '<div class="vote-stepper__panel-head">',
           '<div>',
-            '<p class="eyebrow">Category ' + String(stepIndex + 1).padStart(2, "0") + "</p>",
-            '<h2>' + escapeHtml(category.title) + "</h2>",
             '<p>' + escapeHtml(category.description) + "</p>",
           "</div>",
           '<div class="vote-stepper__panel-meta">',
-            '<span>' + formatNumber(nominees.length) + " nominees</span>",
             '<span>' + formatNumber(getCompletedCount()) + " of " + formatNumber(getCategories().length) + " complete</span>",
           "</div>",
         "</div>",
@@ -328,6 +387,7 @@
 
   function renderFinalStep() {
     var state = getState();
+    ensurePhoneValidationState();
     var completed = getCompletedCount();
     var categories = getCategories();
     var districts = (siteData.districts || []).slice();
@@ -354,9 +414,10 @@
           }).join("") + "</div>",
         "</div>",
         '<form class="vote-final__form" data-vote-final-form novalidate>',
-          '<label class="vote-final__field">',
+          '<label class="vote-final__field" data-name-field>',
             '<span>Name</span>',
             '<input type="text" name="name" autocomplete="name" minlength="2" placeholder="Your name" value="' + escapeHtml(state.phone.name) + '">',
+            '<p class="vote-final__field-error" data-name-error hidden aria-live="polite"></p>',
           "</label>",
           '<label class="vote-final__field">',
             '<span>District</span>',
@@ -366,11 +427,14 @@
               }).join(""),
             "</select>",
           "</label>",
-          '<label class="vote-final__field">',
+          '<label class="vote-final__field" data-mobile-field>',
             '<span>Mobile</span>',
-            '<input type="tel" name="mobile" inputmode="numeric" autocomplete="tel" maxlength="14" placeholder="9876543210" value="' + escapeHtml(state.phone.mobile) + '">',
+            '<div class="phone-input">',
+              '<span class="phone-input__prefix" aria-hidden="true">+91</span>',
+              '<input type="text" name="mobile" inputmode="numeric" autocomplete="tel-national" maxlength="10" pattern="[0-9]*" placeholder="9876543210" value="' + escapeHtml(state.phone.mobile) + '">',
+            "</div>",
+            '<p class="vote-final__field-error" data-mobile-error hidden aria-live="polite"></p>',
           "</label>",
-          '<p class="vote-final__helper">Name must be at least 2 characters. Mobile must be a valid Indian number starting 6 to 9.</p>',
           '<div class="vote-final__actions">',
             '<button class="btn btn--ghost" type="button" data-step-back="' + categories.length + '">Previous</button>',
             '<button class="btn btn--primary" type="submit" data-final-submit>Submit vote</button>',
@@ -418,22 +482,13 @@
 
     var sections = [
       renderVotingLeadIn(),
-      renderVotingSponsorBand(),
-      '<section class="vote-stepper section-card" data-vote-stepper>',
-        '<header class="vote-stepper__header">',
-          '<div>',
-            '<p class="eyebrow">Progress</p>',
-            '<h2>' + formatNumber(getCompletedCount()) + " of " + formatNumber(categories.length) + " complete</h2>",
-          "</div>",
-        "</header>",
-        '<div class="vote-stepper__status" data-step-status></div>',
-      "</section>"
+      renderVotingSponsorBand()
     ];
 
     if (currentStep < categories.length) {
-      sections[1] = sections[1].replace("</section>", renderStepperCategory(categories[currentStep], currentStep) + "</section>");
+      sections.push(renderStepperCategory(categories[currentStep], currentStep));
     } else {
-      sections[1] = sections[1].replace("</section>", renderFinalStep() + "</section>");
+      sections.push(renderFinalStep());
     }
 
     root.innerHTML = sections.join("");
@@ -444,6 +499,13 @@
     }
   }
 
+  function renderNominationWidgetIcon(kind) {
+    if (kind === "close") {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11m0-11l-11 11"/></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8v2a4 4 0 0 1-1.35 3H13v2.5h2.25A4 4 0 0 1 12 15.5a4 4 0 0 1-3.25-2H11V11h-1.65A4 4 0 0 1 8 8V6zm-1 12h10v2H7z"/></svg>';
+  }
+
   function renderNominationsRoute(root) {
     if (!root) {
       return;
@@ -452,23 +514,81 @@
     var stage = getStage();
     var categories = getNominationCategories();
     var sections = [
+      '<div class="nomination-widget-sentinel" data-nomination-widget-sentinel aria-hidden="true"></div>',
       '<section class="section-card nominations-hero">',
         '<p class="eyebrow">Nominations</p>',
         '<h1>' + (stage === STAGES.post ? "Archive and winners browser" : "Jump through the categories") + "</h1>",
         '<p>' + (stage === STAGES.post ? "Use the selector to jump through the full archive and winner surfaces." : "Use the selector to jump directly to any category.") + "</p>",
       "</section>",
+      '<div class="nomination-list">' + categories.map(function (category) {
+        var canVote = stage === STAGES.during && isPublicNominationCategory(category);
+        return [
+          '<section class="section-card nomination-section" data-nomination-section="' + escapeHtml(category.id) + '">',
+            '<div class="nomination-section__header">',
+              '<div>',
+                '<p class="eyebrow">' + escapeHtml(category.title) + "</p>",
+                '<h2>' + escapeHtml(category.description) + "</h2>",
+              "</div>",
+              canVote ? '<div class="nomination-section__actions"><a class="btn btn--ghost" href="#/voting">Vote in this category</a></div>' : "",
+            "</div>",
+            '<div class="nomination-section__grid">' + (category.nominees || []).slice(0, 8).map(function (nominee, index) {
+              return renderNomineeCard(nominee, index, "browse", false);
+            }).join("") + "</div>",
+          "</section>"
+        ].join("");
+      }).join("") + "</div>"
+    ];
+
+    sections.push(
       '<aside class="nomination-widget section-card" data-nomination-widget>',
-        '<label>',
-          '<span class="eyebrow">Jump to category</span>',
-          '<select data-nomination-select>',
-            '<option value="">Choose a category</option>',
-            categories.map(function (category) {
-              return '<option value="' + escapeHtml(category.id) + '">' + escapeHtml(category.title) + "</option>";
-            }).join(""),
-          "</select>",
-        "</label>",
-        '<p class="nomination-widget__note">The widget auto-scrolls to the selected section.</p>',
+        '<button type="button" class="nomination-widget__toggle" data-nomination-widget-toggle aria-expanded="true" aria-controls="nomination-widget-panel">',
+          '<span class="nomination-widget__toggle-icon" aria-hidden="true">⌄</span>',
+          '<span class="nomination-widget__toggle-label">Choose category</span>',
+        "</button>",
+        '<div class="nomination-widget__panel" id="nomination-widget-panel" data-nomination-widget-panel>',
+          '<label class="nomination-widget__label">',
+            '<span class="sr-only">Jump to category</span>',
+            '<select data-nomination-select>',
+              '<option value="">Choose a category</option>',
+              categories.map(function (category) {
+                return '<option value="' + escapeHtml(category.id) + '">' + escapeHtml(category.title) + "</option>";
+              }).join(""),
+            "</select>",
+          "</label>",
+        "</div>",
+      "</aside>"
+    );
+
+    root.innerHTML = sections.join("");
+    initNominationWidget(root);
+  }
+
+  function renderNominationsRouteTop(root) {
+    if (!root) {
+      return;
+    }
+
+    var stage = getStage();
+    var categories = getNominationCategories();
+    var sections = [
+      '<aside class="nomination-widget" data-nomination-widget>',
+        '<button type="button" class="nomination-widget__toggle" data-nomination-widget-toggle>',
+          '<span class="nomination-widget__toggle-icon" aria-hidden="true" data-nomination-widget-icon>' + renderNominationWidgetIcon("trophy") + "</span>",
+          '<span class="nomination-widget__toggle-label">Choose category</span>',
+        "</button>",
+        '<select class="nomination-widget__select-hidden" data-nomination-select aria-label="Jump to category">',
+          '<option value="">Choose a category</option>',
+          categories.map(function (category) {
+            return '<option value="' + escapeHtml(category.id) + '">' + escapeHtml(category.title) + "</option>";
+          }).join(""),
+        "</select>",
       "</aside>",
+      '<div class="nomination-widget-sentinel" data-nomination-widget-sentinel aria-hidden="true"></div>',
+      '<section class="section-card nominations-hero">',
+        '<p class="eyebrow">Nominations</p>',
+        '<h1>' + (stage === STAGES.post ? "Archive and winners browser" : "Jump through the categories") + "</h1>",
+        '<p>' + (stage === STAGES.post ? "Use the selector to jump through the full archive and winner surfaces." : "Use the selector to jump directly to any category.") + "</p>",
+      "</section>",
       '<div class="nomination-list">' + categories.map(function (category) {
         var canVote = stage === STAGES.during && isPublicNominationCategory(category);
         return [
@@ -566,7 +686,9 @@
 
   function initNominationWidget(root) {
     var select = qs("[data-nomination-select]", root);
-    if (!select) {
+    var widget = qs("[data-nomination-widget]", root);
+    var toggle = qs("[data-nomination-widget-toggle]", root);
+    if (!select || !widget || !toggle) {
       return;
     }
 
@@ -577,31 +699,16 @@
       }
       var section = qs('[data-nomination-section="' + categoryId + '"]', root);
       scrollToElement(section);
+      select.value = "";
     });
-  }
 
-  function getCategoryProgressMessage(stepIndex) {
-    var categories = getCategories();
-    var completed = getCompletedCount();
-    if (stepIndex >= categories.length) {
-      return completed === categories.length
-        ? "All categories are complete. Review your ballot and submit."
-        : "Finish all categories to unlock submission.";
-    }
-    var selection = getState().selections[categories[stepIndex].id];
-    return selection && selection.nomineeId
-      ? "Selection saved. Continue to the next category."
-      : "Choose one nominee to unlock the next step.";
-  }
-
-  function refreshStepStatus(root) {
-    var status = qs("[data-step-status]", root);
-    if (!status) {
-      return;
-    }
-    var state = getState();
-    var categories = getCategories();
-    status.textContent = getCategoryProgressMessage(Math.min(state.currentStep || 0, categories.length));
+    toggle.addEventListener("click", function () {
+      try {
+        select.showPicker();
+      } catch (e) {
+        try { select.click(); } catch (e2) {}
+      }
+    });
   }
 
   function refreshFinalStatus(root) {
@@ -622,7 +729,7 @@
   function syncVotingRoute(root) {
     var state = getState();
     var categories = getCategories();
-    refreshStepStatus(root);
+    ensureSelectionState();
 
     if (root.__pvcsVotingBound) {
       refreshFinalState(root);
@@ -646,7 +753,6 @@
         var stepIndex = Number(nextButton.getAttribute("data-step-next"));
         var category = categories[stepIndex];
         if (!category || !state.selections[category.id] || !state.selections[category.id].nomineeId) {
-          refreshStepStatus(root);
           return;
         }
         state.currentStep = Math.min(categories.length, stepIndex + 1);
@@ -693,17 +799,58 @@
       }
     });
 
+    root.addEventListener("beforeinput", function (event) {
+      var input = event.target.closest('[name="mobile"]');
+      if (!input || !input.closest("[data-vote-final-form]")) {
+        return;
+      }
+      if (event.inputType && event.inputType.indexOf("delete") === 0) {
+        return;
+      }
+      if (typeof event.data === "string" && /[^0-9]/.test(event.data)) {
+        event.preventDefault();
+      }
+    });
+
+    root.addEventListener("paste", function (event) {
+      var input = event.target.closest('[name="mobile"]');
+      if (!input || !input.closest("[data-vote-final-form]")) {
+        return;
+      }
+      event.preventDefault();
+      var pasted = (event.clipboardData || window.clipboardData).getData("text");
+      var normalized = normalizePhoneInput(pasted);
+      input.value = normalized;
+      state.phone.mobile = normalized;
+      if (state.submissionStatus !== "idle") {
+        state.submissionStatus = "idle";
+        state.submissionMessage = "";
+      }
+      syncPhoneValidation(root);
+      refreshFinalStatus(root);
+      refreshSubmitButton(root);
+    });
+
     root.addEventListener("input", function (event) {
       var input = event.target.closest("[name]");
       if (!input) {
         return;
       }
       if (input.closest("[data-vote-final-form]")) {
-        state.phone[input.name] = input.value;
+        if (input.name === "mobile") {
+          var normalized = normalizePhoneInput(input.value);
+          if (input.value !== normalized) {
+            input.value = normalized;
+          }
+          state.phone.mobile = normalized;
+        } else {
+          state.phone[input.name] = input.value;
+        }
         if (state.submissionStatus !== "idle") {
           state.submissionStatus = "idle";
           state.submissionMessage = "";
         }
+        syncPhoneValidation(root);
         refreshFinalStatus(root);
         refreshSubmitButton(root);
       }
@@ -721,11 +868,17 @@
         if (!field) {
           return;
         }
-        state.phone[field.name] = field.value;
+        if (field.name === "mobile") {
+          field.value = normalizePhoneInput(field.value);
+          state.phone.mobile = field.value;
+        } else {
+          state.phone[field.name] = field.value;
+        }
         if (state.submissionStatus !== "idle") {
           state.submissionStatus = "idle";
           state.submissionMessage = "";
         }
+        syncPhoneValidation(root);
         refreshFinalStatus(root);
         refreshSubmitButton(root);
       });
@@ -748,6 +901,7 @@
         field.value = state.phone[field.name] || "";
       }
     });
+    syncPhoneValidation(root);
     refreshFinalStatus(root);
     refreshSubmitButton(root);
   }
@@ -796,14 +950,20 @@
 
   function submitBallot(root) {
     var state = getState();
+    var validation = ensurePhoneValidationState();
     var name = String(state.phone.name || "").trim();
     var mobile = normalizePhoneInput(state.phone.mobile);
     var allComplete = getCompletedCount() === getCategories().length;
     var formStatus = qs("[data-final-status]", root);
+    var errors = getPhoneValidationErrors(state);
 
     if (!allComplete) {
       state.submissionStatus = "error";
       state.submissionMessage = "Complete all four categories first.";
+      validation.attempted = true;
+      validation.name = "";
+      validation.mobile = "";
+      syncPhoneValidation(root);
       refreshFinalStatus(root);
       refreshSubmitButton(root);
       return;
@@ -812,6 +972,10 @@
     if (name.length < 2) {
       state.submissionStatus = "error";
       state.submissionMessage = "Enter a name with at least 2 characters.";
+      validation.attempted = true;
+      validation.name = errors.name;
+      validation.mobile = "";
+      syncPhoneValidation(root);
       refreshFinalStatus(root);
       refreshSubmitButton(root);
       return;
@@ -820,6 +984,10 @@
     if (!isValidPhone(mobile)) {
       state.submissionStatus = "error";
       state.submissionMessage = "Enter a valid 10-digit Indian mobile number.";
+      validation.attempted = true;
+      validation.name = "";
+      validation.mobile = errors.mobile;
+      syncPhoneValidation(root);
       refreshFinalStatus(root);
       refreshSubmitButton(root);
       return;
@@ -827,6 +995,10 @@
 
     state.phone.name = name;
     state.phone.mobile = mobile;
+    validation.attempted = false;
+    validation.name = "";
+    validation.mobile = "";
+    syncPhoneValidation(root);
     state.submissionStatus = "submitting";
     state.submissionMessage = "Submitting your ballot...";
     refreshFinalStatus(root);
@@ -839,6 +1011,10 @@
       window.setTimeout(function () {
         state.submissionStatus = "success";
         state.submissionMessage = "Your ballot was accepted.";
+        validation.attempted = false;
+        validation.name = "";
+        validation.mobile = "";
+        syncPhoneValidation(root);
         refreshFinalStatus(root);
         refreshSubmitButton(root);
         if (formStatus) {
@@ -867,6 +1043,10 @@
         if (result.data && result.data.status === "duplicate") {
           state.submissionStatus = "error";
           state.submissionMessage = "This phone number already voted.";
+          validation.attempted = true;
+          validation.name = "";
+          validation.mobile = errors.mobile;
+          syncPhoneValidation(root);
           refreshFinalStatus(root);
           refreshSubmitButton(root);
           return;
@@ -878,12 +1058,20 @@
 
         state.submissionStatus = "success";
         state.submissionMessage = "Your ballot was accepted.";
+        validation.attempted = false;
+        validation.name = "";
+        validation.mobile = "";
+        syncPhoneValidation(root);
         refreshFinalStatus(root);
         refreshSubmitButton(root);
       })
       .catch(function () {
         state.submissionStatus = "error";
         state.submissionMessage = "Submission failed. Please try again.";
+        validation.attempted = true;
+        validation.name = "";
+        validation.mobile = errors.mobile;
+        syncPhoneValidation(root);
         refreshFinalStatus(root);
         refreshSubmitButton(root);
       });
@@ -899,7 +1087,7 @@
     if (route === "voting") {
       renderVotingRoute(votingRoot, stage);
     } else if (route === "nominations") {
-      renderNominationsRoute(nominationsRoot, stage);
+      renderNominationsRouteTop(nominationsRoot, stage);
     } else if (route === "winners") {
       renderWinnersRoute(winnersRoot, stage);
     }
