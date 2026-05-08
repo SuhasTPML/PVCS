@@ -450,7 +450,6 @@
         '<div class="vote-final__summary">',
           '<div class="vote-final__summary-meta">',
             '<span>' + formatNumber(completed) + " of " + formatNumber(categories.length) + " complete</span>",
-            '<span>District list starts with Others</span>',
           "</div>",
           '<div class="vote-final__summary-grid">' + categories.map(function (category) {
             var selected = getSelectedNominee(category);

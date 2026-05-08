@@ -875,7 +875,7 @@ h2,
   min-height: 38px;
   padding: 8px 12px;
   border: 0;
-  border-radius: 0;
+  border-radius: 14px;
   background: rgba(255, 248, 239, 0.04);
   color: var(--text);
   cursor: pointer;
@@ -2179,6 +2179,10 @@ body[data-page="voting-swiper"] .vote-success-chip strong {
 }
 
 @media (min-width: 760px) {
+  :root {
+    --header-h: 56px;
+  }
+
   .page-shell {
     padding-top: calc(var(--header-h) + 24px);
   }
@@ -3770,8 +3774,25 @@ body[data-page="home"] .home-shell {
   .stage-hero {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
-    padding: 24px;
-    gap: 10px;
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .stage-hero__media {
+    min-height: 200px;
+  }
+
+  .stage-hero__timeline {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .stage-hero__timer-unit {
+    padding: 8px 6px;
+  }
+
+  .stage-hero__timer-unit strong {
+    font-size: clamp(1rem, 2.4vw, 1.5rem);
   }
 
   .stage-hero__ilu {
